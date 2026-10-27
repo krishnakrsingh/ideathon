@@ -423,35 +423,61 @@ class LfmManager(private val context: Context? = null) {
 
         val messagesArray = JSONArray()
 
-        // 1. System Prompt (No thinking, language instructed)
+        // 1. System Prompt (grounded clinical guidance, language directives)
         val systemPrompt = buildSystemPrompt(responseLanguage, currentQuery, citations, allHistoryMeasurements)
-        messagesArray.put(JSONObject().apply {
-            put("role", "system")
-            put("content", systemPrompt)
-        })
 
-        // 2. Preceding multi-turn conversation history (excluding the current query)
-        val priorTurns = history.filter {
+        // 2. Format prior turns with strict user/assistant alternation (required by Gemma Jinja template)
+        val rawPrior = history.filter {
             it.content.isNotBlank() && !(it.role == MessageRole.USER && it.content == currentQuery)
         }.takeLast(12)
 
-        for (msg in priorTurns) {
-            val role = when (msg.role) {
-                MessageRole.USER -> "user"
-                MessageRole.ASSISTANT -> "assistant"
-                MessageRole.SYSTEM -> "system"
+        val formattedTurns = mutableListOf<Pair<String, String>>()
+        for (msg in rawPrior) {
+            val role = if (msg.role == MessageRole.USER) "user" else "assistant"
+            if (formattedTurns.isNotEmpty() && formattedTurns.last().first == role) {
+                val last = formattedTurns.removeAt(formattedTurns.size - 1)
+                formattedTurns.add(Pair(role, "${last.second}\n${msg.content}"))
+            } else {
+                formattedTurns.add(Pair(role, msg.content))
             }
-            messagesArray.put(JSONObject().apply {
-                put("role", role)
-                put("content", msg.content)
-            })
         }
 
-        // 3. Current user query
-        messagesArray.put(JSONObject().apply {
-            put("role", "user")
-            put("content", currentQuery)
-        })
+        // If history ends with "user", drop it so current query will be the only trailing user turn
+        if (formattedTurns.isNotEmpty() && formattedTurns.last().first == "user") {
+            formattedTurns.removeAt(formattedTurns.size - 1)
+        }
+
+        // Ensure first turn starts with "user"
+        if (formattedTurns.isNotEmpty() && formattedTurns.first().first != "user") {
+            formattedTurns.removeAt(0)
+        }
+
+        if (formattedTurns.isEmpty()) {
+            // First turn in conversation: include system prompt + current query
+            messagesArray.put(JSONObject().apply {
+                put("role", "user")
+                put("content", "$systemPrompt\n\nPatient Query: $currentQuery")
+            })
+        } else {
+            // Prepend system prompt to the first user turn
+            val first = formattedTurns.removeAt(0)
+            messagesArray.put(JSONObject().apply {
+                put("role", "user")
+                put("content", "$systemPrompt\n\n${first.second}")
+            })
+            // Add remaining alternating turns
+            for (turn in formattedTurns) {
+                messagesArray.put(JSONObject().apply {
+                    put("role", turn.first)
+                    put("content", turn.second)
+                })
+            }
+            // Final turn is the current user query
+            messagesArray.put(JSONObject().apply {
+                put("role", "user")
+                put("content", currentQuery)
+            })
+        }
 
         val requestBody = JSONObject().apply {
             put("messages", messagesArray)
