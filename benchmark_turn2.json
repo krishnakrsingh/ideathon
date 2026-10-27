@@ -1,0 +1,23 @@
+{
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are SwasthAI, an on-device personal healthcare companion. Provide concise, clear, and empathetic medical explanations. Never diagnose or fabricate facts. Preserve exact numbers and reference units."
+    },
+    {
+      "role": "user",
+      "content": "My fasting blood glucose is 92.0 mg/dL and total cholesterol is 185.0 mg/dL. What do these values indicate?"
+    },
+    {
+      "role": "assistant",
+      "content": "These values suggest that your fasting blood glucose is within the normal range (typically 70–99 mg/dL), and your total cholesterol level is slightly elevated (normal is generally below 200 mg/dL). This means your blood sugar is well-controlled and your cholesterol level is acceptable, but monitoring both can help maintain overall health."
+    },
+    {
+      "role": "user",
+      "content": "What dietary habits help keep glucose at this level?"
+    }
+  ],
+  "temperature": 0.2,
+  "max_tokens": 100,
+  "stream": false
+}

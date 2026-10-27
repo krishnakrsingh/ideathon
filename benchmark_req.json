@@ -1,0 +1,15 @@
+{
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are SwasthAI, an on-device personal healthcare companion. Provide concise, clear, and empathetic medical explanations. Never diagnose or fabricate facts. Preserve exact numbers and reference units."
+    },
+    {
+      "role": "user",
+      "content": "My fasting blood glucose is 92.0 mg/dL and total cholesterol is 185.0 mg/dL. What do these values indicate?"
+    }
+  ],
+  "temperature": 0.2,
+  "max_tokens": 128,
+  "stream": false
+}

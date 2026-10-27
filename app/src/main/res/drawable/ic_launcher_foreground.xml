@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Healthcare medical cross / pulse symbol -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M48,24h12v24h24v12h-24v24h-12v-24h-24v-12h24z" />
+</vector>
