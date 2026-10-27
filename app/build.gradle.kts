@@ -83,6 +83,9 @@ dependencies {
     // Google LiteRT-LM for MedGemma 1.5 4B IT (.litertlm)
     implementation("com.google.ai.edge.litertlm:litertlm-android:0.18.0")
 
+    // Google ML Kit On-Device Text Recognition for Medical Images/Reports
+    implementation("com.google.android.gms:play-services-mlkit-text-recognition:19.0.1")
+
     // Google LiteRT Core for EmbeddingGemma
     implementation("com.google.ai.edge.litert:litert:2.3.0")
 

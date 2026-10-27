@@ -31,7 +31,8 @@ data class ChatUiState(
     val inputText: String = "",
     val isStreaming: Boolean = false,
     val modelStatus: ModelInferenceStatus = ModelInferenceStatus.NOT_INSTALLED,
-    val emergencyWarning: String? = null
+    val emergencyWarning: String? = null,
+    val selectedImageUri: String? = null
 ) {
     val medGemmaStatus: ModelInferenceStatus get() = modelStatus
 }
@@ -190,29 +191,40 @@ class ChatViewModel(
         )
     }
 
+    fun selectImage(uri: String?) {
+        _uiState.value = _uiState.value.copy(selectedImageUri = uri)
+    }
+
+    fun clearSelectedImage() {
+        _uiState.value = _uiState.value.copy(selectedImageUri = null)
+    }
+
     fun sendMessage() {
         val text = _uiState.value.inputText.trim()
-        if (text.isBlank()) return
+        val imageUri = _uiState.value.selectedImageUri
+        if (text.isBlank() && imageUri == null) return
 
+        val titleText = if (text.isNotBlank()) text.take(30) else "Medical Image Consultation"
         val convoId = _uiState.value.currentConversationId
         if (convoId == null) {
             viewModelScope.launch {
                 val newId = chatRepository.createConversation(
-                    title = text.take(30),
+                    title = titleText,
                     activeDocumentId = _uiState.value.activeDocumentId,
                     scope = _uiState.value.currentScope
                 )
                 selectConversation(newId)
-                executeSend(newId, text)
+                executeSend(newId, text, imageUri)
             }
         } else {
-            executeSend(convoId, text)
+            executeSend(convoId, text, imageUri)
         }
     }
 
-    private fun executeSend(conversationId: Long, text: String) {
+    private fun executeSend(conversationId: Long, text: String, imageUri: String?) {
         _uiState.value = _uiState.value.copy(
             inputText = "",
+            selectedImageUri = null,
             isStreaming = true
         )
 
@@ -221,7 +233,8 @@ class ChatViewModel(
                 conversationId = conversationId,
                 userQuery = text,
                 activeDocId = _uiState.value.activeDocumentId,
-                overrideScope = _uiState.value.currentScope
+                overrideScope = _uiState.value.currentScope,
+                imageUri = imageUri
             ).collect { msg ->
                 val currentList = _uiState.value.currentMessages.toMutableList()
                 val existingIndex = currentList.indexOfFirst {

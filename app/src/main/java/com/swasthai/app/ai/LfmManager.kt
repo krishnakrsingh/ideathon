@@ -35,6 +35,7 @@ data class LfmBenchmarkMetrics(
 )
 
 class LfmManager(private val context: Context? = null) {
+    val appContext: Context? get() = context
 
     var status: ModelInferenceStatus = ModelInferenceStatus.NOT_INSTALLED
         private set
@@ -432,7 +433,7 @@ class LfmManager(private val context: Context? = null) {
         // 2. Preceding multi-turn conversation history (excluding the current query)
         val priorTurns = history.filter {
             it.content.isNotBlank() && !(it.role == MessageRole.USER && it.content == currentQuery)
-        }.takeLast(6)
+        }.takeLast(12)
 
         for (msg in priorTurns) {
             val role = when (msg.role) {

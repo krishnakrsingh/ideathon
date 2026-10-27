@@ -1,8 +1,8 @@
 {
   "app/build.gradle.kts": {
-    "mtime": 1793116804.0523767,
-    "seen": 1793119914.378909,
-    "ast_hash": "1aae8f28ab8300b2c770b8bb174fe10a",
+    "mtime": 1793124133.9493299,
+    "seen": 1793124699.9316213,
+    "ast_hash": "434e8df5adb07b2add11078d5c581739",
     "semantic_hash": ""
   },
   "app/src/main/java/com/swasthai/app/MainActivity.kt": {
@@ -36,9 +36,9 @@
     "semantic_hash": ""
   },
   "app/src/main/java/com/swasthai/app/data/local/SwasthDatabase.kt": {
-    "mtime": 1793122177.7867343,
-    "seen": 1793123325.9015408,
-    "ast_hash": "c0061af88669ff4ed7a54eb0cf799fdf",
+    "mtime": 1793123606.1779225,
+    "seen": 1793124699.9316666,
+    "ast_hash": "f485f2554a01ba1691ec272132c22b4d",
     "semantic_hash": ""
   },
   "app/src/main/java/com/swasthai/app/data/local/dao/ConversationDao.kt": {
@@ -66,9 +66,9 @@
     "semantic_hash": ""
   },
   "app/src/main/java/com/swasthai/app/data/local/entity/ConversationEntity.kt": {
-    "mtime": 1793122170.4830546,
-    "seen": 1793123325.9015527,
-    "ast_hash": "d9d75e0a7d1294abc549ce1eb702c5b6",
+    "mtime": 1793123596.9426248,
+    "seen": 1793124699.9316795,
+    "ast_hash": "1623a188a7ef6b7802c3ac24112e11db",
     "semantic_hash": ""
   },
   "app/src/main/java/com/swasthai/app/data/local/entity/DocumentEntity.kt": {
@@ -84,9 +84,9 @@
     "semantic_hash": ""
   },
   "app/src/main/java/com/swasthai/app/data/repository/ChatRepository.kt": {
-    "mtime": 1793122411.80552,
-    "seen": 1793123325.9015594,
-    "ast_hash": "f1d1930ed28ae57a9a9184f015c1a305",
+    "mtime": 1793124345.6679878,
+    "seen": 1793124699.9316869,
+    "ast_hash": "ff95e40a273064cedb6f0e6b26b30e82",
     "semantic_hash": ""
   },
   "app/src/main/java/com/swasthai/app/data/repository/DocumentRepository.kt": {
@@ -102,9 +102,9 @@
     "semantic_hash": ""
   },
   "app/src/main/java/com/swasthai/app/domain/model/ChatModels.kt": {
-    "mtime": 1793122151.5772202,
-    "seen": 1793123325.9015667,
-    "ast_hash": "06c9f0065df3e435f28dc8aa0d153639",
+    "mtime": 1793123580.6870797,
+    "seen": 1793124699.9316938,
+    "ast_hash": "c9992ed8a08d170fe0e5e3feed8d9c81",
     "semantic_hash": ""
   },
   "app/src/main/java/com/swasthai/app/domain/model/DocumentModels.kt": {
@@ -138,15 +138,15 @@
     "semantic_hash": ""
   },
   "app/src/main/java/com/swasthai/app/ui/chat/ChatScreen.kt": {
-    "mtime": 1793122601.5484636,
-    "seen": 1793123325.9015813,
-    "ast_hash": "529d0a4d8f68de230b89f107a4ecde94",
+    "mtime": 1793124454.019559,
+    "seen": 1793124699.9317076,
+    "ast_hash": "7994853124929d3ed62377556ebda4f4",
     "semantic_hash": ""
   },
   "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt": {
-    "mtime": 1793122449.811357,
-    "seen": 1793123325.9015834,
-    "ast_hash": "d2f59cf0f11f7784f6553bdb9d9d9d65",
+    "mtime": 1793123723.093166,
+    "seen": 1793124699.9317098,
+    "ast_hash": "15a6a08382e9e7b3a3f28237314fcf82",
     "semantic_hash": ""
   },
   "app/src/main/java/com/swasthai/app/ui/components/AppBottomNav.kt": {
@@ -450,9 +450,9 @@
     "semantic_hash": ""
   },
   "app/src/main/java/com/swasthai/app/ai/LfmManager.kt": {
-    "mtime": 1793122878.1914265,
-    "seen": 1793123325.901531,
-    "ast_hash": "1af05cb98f59bd3615c56157c6cd6999",
+    "mtime": 1793124304.776023,
+    "seen": 1793124699.9316578,
+    "ast_hash": "20251ef726e7d754633120a9c1cd3efd",
     "semantic_hash": ""
   },
   "app/src/test/java/com/swasthai/app/LfmPromptBuilderTest.kt": {
@@ -531,6 +531,18 @@
     "mtime": 1793123285.7617688,
     "seen": 1793123325.9017234,
     "ast_hash": "b2e031498803927358469df66225d3e3",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/swasthai/app/ai/ImageTextExtractor.kt": {
+    "mtime": 1793124248.3220139,
+    "seen": 1793124699.9316537,
+    "ast_hash": "ece891e601774db2b0840afbd8b38e31",
+    "semantic_hash": ""
+  },
+  "chat_screen_new.png": {
+    "mtime": 1793124685.8186479,
+    "seen": 1793124699.931856,
+    "ast_hash": "6e9813bca32f6e82c01542a275723c49",
     "semantic_hash": ""
   }
 }

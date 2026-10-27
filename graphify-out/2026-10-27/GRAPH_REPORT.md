@@ -1,12 +1,12 @@
 # Graph Report - ideathon  (2026-10-27)
 
 ## Corpus Check
-- 85 files · ~103,404 words
+- 87 files · ~70,023 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 741 nodes · 1121 edges · 51 communities (49 shown, 2 thin omitted)
-- Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 3 edges (avg confidence: 0.85)
+- 785 nodes · 1224 edges · 52 communities (50 shown, 2 thin omitted)
+- Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 4 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
@@ -24,7 +24,7 @@
 - SwasthAI: Detailed User Flows & Interaction Journeys
 - 3. Single-Model Quality Validation Suite (MedGemma 1.5 4B IT)
 - 5. Complete Relational Database Schema (Room / SQLite)
-- SwasthApplication
+- HomeViewModel.kt
 - 1. Confirmed Architecture Decision Records (ADRs)
 - SwasthAI: Project Brief & Foundational Blueprint
 - SwasthAI: Master Engineering Implementation Checklist
@@ -52,43 +52,44 @@
 - BenchmarkPrompts
 - LfmManager
 - ModelInferenceStatus
+- ClinicalKnowledgeEngine
 
 ## God Nodes (most connected - your core abstractions)
 1. `ModelInferenceStatus` - 26 edges
-2. `SourceCitation` - 25 edges
-3. `LfmManager` - 24 edges
-4. `DocumentDao` - 18 edges
-5. `EmbeddingEngine` - 17 edges
-6. `ChatViewModel` - 17 edges
-7. `DocumentRepository` - 16 edges
-8. `MedicalDocument` - 16 edges
-9. `VaultViewModel` - 16 edges
-10. `SwasthAI: Comprehensive Feature Catalog` - 16 edges
+2. `SourceCitation` - 26 edges
+3. `LfmManager` - 25 edges
+4. `ChatViewModel` - 25 edges
+5. `DocumentDao` - 18 edges
+6. `MedicalDocument` - 18 edges
+7. `EmbeddingEngine` - 17 edges
+8. `ChatRepository` - 17 edges
+9. `DocumentRepository` - 16 edges
+10. `ChatMessage` - 16 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `LiteRtModelTester` --references--> `Conversation`  [EXTRACTED]
   model-test-harness/src/main/java/com/swasthai/testharness/LiteRtModelTester.kt → app/src/main/java/com/swasthai/app/domain/model/ChatModels.kt
+- `ChatScreen()` --calls--> `ContextConfigSheet()`  [INFERRED]
+  app/src/main/java/com/swasthai/app/ui/chat/ChatScreen.kt → app/src/main/java/com/swasthai/app/ui/chat/ContextConfigSheet.kt
 - `MainAppContent()` --references--> `SwasthApplication`  [EXTRACTED]
   app/src/main/java/com/swasthai/app/MainActivity.kt → app/src/main/java/com/swasthai/app/SwasthApplication.kt
 - `MainAppContent()` --calls--> `ChatScreen()`  [EXTRACTED]
   app/src/main/java/com/swasthai/app/MainActivity.kt → app/src/main/java/com/swasthai/app/ui/chat/ChatScreen.kt
 - `MainAppContent()` --calls--> `HomeScreen()`  [EXTRACTED]
   app/src/main/java/com/swasthai/app/MainActivity.kt → app/src/main/java/com/swasthai/app/ui/home/HomeScreen.kt
-- `MainAppContent()` --calls--> `VaultScreen()`  [EXTRACTED]
-  app/src/main/java/com/swasthai/app/MainActivity.kt → app/src/main/java/com/swasthai/app/ui/vault/VaultScreen.kt
 
 ## Import Cycles
 - None detected.
 
-## Communities (51 total, 2 thin omitted)
+## Communities (52 total, 2 thin omitted)
 
 ### Community 0 - "DocumentDao"
 Cohesion: 0.06
 Nodes (14): ConversationDao, Flow, DocumentDao, Flow, ChunkWithDocument, RAGDao, ConversationEntity, MessageEntity (+6 more)
 
 ### Community 1 - "SourceCitation"
-Cohesion: 0.07
-Nodes (24): ClinicalKnowledgeEngine, Flow, Engine, Flow, Result, MedGemmaManager, ModelNotInstalledException, ChatRepository (+16 more)
+Cohesion: 0.08
+Nodes (22): Engine, Flow, Result, MedGemmaManager, ModelNotInstalledException, ChatRepository, Flow, ChatContextScope (+14 more)
 
 ### Community 2 - "MainActivity.kt"
 Cohesion: 0.08
@@ -107,16 +108,16 @@ Cohesion: 0.09
 Nodes (10): Flow, MeasurementDao, StructuredMeasurementEntity, DocumentChunker, ExtractedPage, ExtractionResult, ByteArray, PdfExtractor (+2 more)
 
 ### Community 6 - "EmbeddingEngine"
-Cohesion: 0.21
-Nodes (5): EmbeddingEngine, ByteArray, FloatArray, ScoredChunk, EmbeddingEngineTest
+Cohesion: 0.10
+Nodes (15): EmbeddingEngine, ByteArray, FloatArray, ScoredChunk, RAGPipeline, RetrievalMode, LOCAL_KEYWORD_FALLBACK, NO_RECORDS_FOUND (+7 more)
 
 ### Community 7 - "LiteRtModelTester"
 Cohesion: 0.11
 Nodes (17): BenchmarkMetrics, Completed, Error, Generating, Engine, Flow, Result, LiteRtModelTester (+9 more)
 
 ### Community 8 - "ChatViewModel"
-Cohesion: 0.12
-Nodes (7): EmergencyTriage, TriageResult, ChatUiState, ChatViewModel, StateFlow, ViewModel, EmergencyTriageTest
+Cohesion: 0.09
+Nodes (19): ScopeMode, ALL_HISTORY, CONVERSATION_ONLY, SPECIFIC_DOCS, TimeRangeFilter, ALL_TIME, CUSTOM, LAST_12_MONTHS (+11 more)
 
 ### Community 9 - "SwasthAI: Healthcare AI Safety, Clinical Guardrails & Evidence Grounding"
 Cohesion: 0.09
@@ -138,9 +139,9 @@ Nodes (20): 1. Testing Strategy & Multi-Tier Test Pyramid, 2.1 Benchmark Environ
 Cohesion: 0.11
 Nodes (17): 1. Principles of On-Device Healthcare RAG, 2. Document Processing & Ingestion Lifecycle, 3.1 Chunking Rules, 3.2 Vector Indexing & Similarity Metric, 3. Layout-Aware Semantic Chunking & Vector Search, 4.1 Grounded Prompt Template Structure, 4. Hybrid Retrieval & Grounded Context Assembly, 5.1 `documents` (+9 more)
 
-### Community 14 - "SwasthApplication"
-Cohesion: 0.09
-Nodes (23): RAGPipeline, RetrievalMode, LOCAL_KEYWORD_FALLBACK, NO_RECORDS_FOUND, SEMANTIC_VECTOR, STRUCTURED_SQL_ONLY, RetrievalResult, StructuredHit (+15 more)
+### Community 14 - "HomeViewModel.kt"
+Cohesion: 0.12
+Nodes (18): HistoryRepository, Flow, HealthTimelineItem, MeasurementRecorded, ReportImported, StructuredMeasurement, AppleMeasurementTrendCard(), HistoryScreen() (+10 more)
 
 ### Community 15 - "1. Confirmed Architecture Decision Records (ADRs)"
 Cohesion: 0.12
@@ -235,32 +236,36 @@ Cohesion: 0.67
 Nodes (3): 9. Feature Group H: Smart Symptom Guidance, FT-H01: Deterministic Pre-LLM Emergency Escalation (India 112 Standard), FT-H02: Structured Symptom Intake & Clarification Flow
 
 ### Community 46 - "LfmManager"
-Cohesion: 0.12
-Nodes (10): FloatArray, Flow, Result, LfmBenchmarkMetrics, LfmManager, StateFlow, ViewModel, SettingsUiState (+2 more)
+Cohesion: 0.14
+Nodes (11): FloatArray, Flow, Result, LfmBenchmarkMetrics, LfmManager, ResponseLanguage, AUTO, ENGLISH (+3 more)
 
 ### Community 47 - "ModelInferenceStatus"
-Cohesion: 0.13
-Nodes (19): ModelInferenceStatus, ERROR, GENERATING, INITIALIZING, NOT_INSTALLED, READY, AppTopBar(), AppleAssistantCard() (+11 more)
+Cohesion: 0.08
+Nodes (21): ModelInferenceStatus, ERROR, GENERATING, INITIALIZING, NOT_INSTALLED, READY, EmergencyTriage, TriageResult (+13 more)
+
+### Community 51 - "ClinicalKnowledgeEngine"
+Cohesion: 0.16
+Nodes (3): ClinicalKnowledgeEngine, Flow, ClinicalKnowledgeEngineTest
 
 ## Knowledge Gaps
-- **255 isolated node(s):** `SEMANTIC_VECTOR`, `LOCAL_KEYWORD_FALLBACK`, `STRUCTURED_SQL_ONLY`, `NO_RECORDS_FOUND`, `USER` (+250 more)
+- **266 isolated node(s):** `SEMANTIC_VECTOR`, `LOCAL_KEYWORD_FALLBACK`, `STRUCTURED_SQL_ONLY`, `NO_RECORDS_FOUND`, `USER` (+261 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **2 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `ModelInferenceStatus` connect `ModelInferenceStatus` to `SourceCitation`, `MainActivity.kt`, `DocumentRepository.kt`, `EmbeddingEngine`, `ChatViewModel`, `LfmManager`, `SwasthApplication`?**
+- **Why does `ModelInferenceStatus` connect `ModelInferenceStatus` to `SourceCitation`, `MainActivity.kt`, `DocumentRepository.kt`, `EmbeddingEngine`, `ChatViewModel`, `LfmManager`, `HomeViewModel.kt`?**
   _High betweenness centrality (0.061) - this node is a cross-community bridge._
-- **Why does `SourceCitation` connect `SourceCitation` to `LfmManager`, `SwasthApplication`?**
+- **Why does `SourceCitation` connect `SourceCitation` to `ClinicalKnowledgeEngine`, `LfmManager`, `EmbeddingEngine`?**
   _High betweenness centrality (0.034) - this node is a cross-community bridge._
-- **Why does `EmbeddingEngine` connect `EmbeddingEngine` to `SourceCitation`, `DocumentRepository.kt`, `LfmManager`, `SwasthApplication`, `ModelInferenceStatus`?**
-  _High betweenness centrality (0.029) - this node is a cross-community bridge._
+- **Why does `EmbeddingEngine` connect `EmbeddingEngine` to `ClinicalKnowledgeEngine`, `DocumentRepository.kt`, `ModelInferenceStatus`?**
+  _High betweenness centrality (0.028) - this node is a cross-community bridge._
 - **What connects `SEMANTIC_VECTOR`, `LOCAL_KEYWORD_FALLBACK`, `STRUCTURED_SQL_ONLY` to the rest of the system?**
-  _255 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _266 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `DocumentDao` be split into smaller, more focused modules?**
-  _Cohesion score 0.06168831168831169 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.05928614640048397 - nodes in this community are weakly interconnected._
 - **Should `SourceCitation` be split into smaller, more focused modules?**
-  _Cohesion score 0.06502816180235535 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.07826694619147449 - nodes in this community are weakly interconnected._
 - **Should `MainActivity.kt` be split into smaller, more focused modules?**
   _Cohesion score 0.07781649245063879 - nodes in this community are weakly interconnected._

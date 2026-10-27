@@ -4,7 +4,7 @@
   "2": "MainActivity.kt",
   "3": "DocumentRepository.kt",
   "4": "design.md",
-  "5": "MeasurementDao",
+  "5": "PdfExtractor",
   "6": "EmbeddingEngine",
   "7": "LiteRtModelTester",
   "8": "ChatViewModel",
@@ -50,5 +50,11 @@
   "48": "test_emb.py",
   "49": "test_server.py",
   "50": "test_stream.py",
-  "51": "ClinicalKnowledgeEngine"
+  "51": "ClinicalKnowledgeEngine",
+  "52": "ConversationDao",
+  "53": "RAGDao",
+  "54": "MeasurementDao",
+  "55": "SwasthDatabase.kt",
+  "56": ".extractText",
+  "57": "RetrievalMode"
 }

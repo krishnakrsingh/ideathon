@@ -1,8 +1,13 @@
 package com.swasthai.app.ui.chat
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,6 +18,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -25,14 +31,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.AddPhotoAlternate
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.HealthAndSafety
 import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.filled.Tune
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -42,8 +47,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -55,6 +58,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -94,6 +101,14 @@ fun ChatScreen(
 
     var inspectedCitation by remember { mutableStateOf<SourceCitation?>(null) }
 
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        if (uri != null) {
+            viewModel.selectImage(uri.toString())
+        }
+    }
+
     LaunchedEffect(initialConversationId) {
         if (initialConversationId != null && initialConversationId > 0) {
             viewModel.selectConversation(initialConversationId)
@@ -123,46 +138,104 @@ fun ChatScreen(
 
     Scaffold(
         topBar = {
-            Column(modifier = Modifier.fillMaxWidth().background(AppleSystemBackground)) {
-                TopAppBar(
-                    title = {
-                        Column {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text(
-                                    text = "AI Doc",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.Bold,
-                                    color = AppleLabelPrimary
-                                )
-                                Spacer(modifier = Modifier.width(6.dp))
-                                Box(
-                                    modifier = Modifier
-                                        .size(7.dp)
-                                        .clip(CircleShape)
-                                        .background(Color(0xFF34C759))
-                                )
-                            }
-                            Text(
-                                text = "Medical History Active • 100% On-Device",
-                                fontSize = 11.sp,
-                                color = AppleLabelSecondary
-                            )
+            // ULTRA COMPACT SLEEK APPLE HEADER (saves 70dp vertical space)
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(AppleSystemBackground)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 10.dp, vertical = 3.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // App Name & Live Status Dot
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = "AI Doc",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = AppleLabelPrimary,
+                            fontSize = 15.sp
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Box(
+                            modifier = Modifier
+                                .size(6.dp)
+                                .clip(CircleShape)
+                                .background(Color(0xFF34C759))
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(6.dp))
+
+                    // Inline Compact Context Scope Pill
+                    Row(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(AppleSearchFill)
+                            .clickable { viewModel.openContextSheet(true) }
+                            .padding(horizontal = 7.dp, vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Tune,
+                            contentDescription = null,
+                            tint = AppleSystemBlue,
+                            modifier = Modifier.size(11.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = uiState.currentScope.formatScopePill(uiState.availableDocuments),
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = AppleLabelPrimary,
+                            maxLines = 1
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(4.dp))
+
+                    // Quick Language Pill
+                    val langLabel = when (uiState.currentScope.responseLanguage) {
+                        ResponseLanguage.AUTO -> "Auto"
+                        ResponseLanguage.ENGLISH -> "EN"
+                        ResponseLanguage.HINDI -> "हिन्दी"
+                    }
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(AppleTealLight)
+                            .clickable { viewModel.openContextSheet(true) }
+                            .padding(horizontal = 6.dp, vertical = 3.dp)
+                    ) {
+                        Text(
+                            text = langLabel,
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = AppleHealthTeal
+                        )
+                    }
+
+                    // Header Action Buttons
+                    IconButton(
+                        onClick = { viewModel.createNewConversation() },
+                        modifier = Modifier.size(28.dp)
+                    ) {
+                        Icon(Icons.Default.Add, contentDescription = "New", tint = AppleSystemBlue, modifier = Modifier.size(17.dp))
+                    }
+                    if (uiState.currentConversationId != null) {
+                        IconButton(
+                            onClick = { viewModel.deleteCurrentConversation() },
+                            modifier = Modifier.size(28.dp)
+                        ) {
+                            Icon(Icons.Default.DeleteOutline, contentDescription = "Delete", tint = AppleSystemRed, modifier = Modifier.size(16.dp))
                         }
-                    },
-                    actions = {
-                        IconButton(onClick = { viewModel.createNewConversation() }) {
-                            Icon(Icons.Default.Add, contentDescription = "New Consultation", tint = AppleSystemBlue)
-                        }
-                        if (uiState.currentConversationId != null) {
-                            IconButton(onClick = { viewModel.deleteCurrentConversation() }) {
-                                Icon(Icons.Default.DeleteOutline, contentDescription = "Delete", tint = AppleSystemRed)
-                            }
-                        }
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = AppleSystemBackground
-                    )
-                )
+                    }
+                }
+
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -179,75 +252,11 @@ fun ChatScreen(
                 .padding(padding)
                 .imePadding()
         ) {
-            // Interactive Medical Record Context Scope Banner
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(AppleSystemBackground)
-                    .padding(horizontal = 14.dp, vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Row(
-                    modifier = Modifier
-                        .weight(1f)
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(AppleSearchFill)
-                        .clickable { viewModel.openContextSheet(true) }
-                        .padding(horizontal = 12.dp, vertical = 7.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Tune,
-                        contentDescription = "Scope Configuration",
-                        tint = AppleSystemBlue,
-                        modifier = Modifier.size(14.dp)
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(
-                        text = uiState.currentScope.formatScopePill(uiState.availableDocuments),
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = AppleLabelPrimary,
-                        maxLines = 1
-                    )
-                }
-
-                Spacer(modifier = Modifier.width(8.dp))
-
-                val langLabel = when (uiState.currentScope.responseLanguage) {
-                    ResponseLanguage.AUTO -> "Auto"
-                    ResponseLanguage.ENGLISH -> "EN"
-                    ResponseLanguage.HINDI -> "हिन्दी"
-                }
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(14.dp))
-                        .background(AppleTealLight)
-                        .clickable { viewModel.openContextSheet(true) }
-                        .padding(horizontal = 10.dp, vertical = 6.dp)
-                ) {
-                    Text(
-                        text = langLabel,
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = AppleHealthTeal
-                    )
-                }
-            }
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(0.5.dp)
-                    .background(AppleSeparator)
-            )
-
             // Emergency Safety Alert
             if (uiState.emergencyWarning != null) {
                 EmergencyBanner(
                     message = uiState.emergencyWarning!!,
-                    modifier = Modifier.padding(12.dp)
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
                 )
             }
 
@@ -256,24 +265,24 @@ fun ChatScreen(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
-                    .padding(horizontal = 14.dp),
+                    .padding(horizontal = 12.dp),
                 state = listState,
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                item { Spacer(modifier = Modifier.height(10.dp)) }
+                item { Spacer(modifier = Modifier.height(4.dp)) }
 
                 if (uiState.currentMessages.isEmpty()) {
                     item {
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(vertical = 32.dp, horizontal = 12.dp),
+                                .padding(vertical = 24.dp, horizontal = 12.dp),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Box(
                                 modifier = Modifier
-                                    .size(56.dp)
-                                    .clip(RoundedCornerShape(16.dp))
+                                    .size(48.dp)
+                                    .clip(RoundedCornerShape(14.dp))
                                     .background(AppleTealLight),
                                 contentAlignment = Alignment.Center
                             ) {
@@ -281,50 +290,23 @@ fun ChatScreen(
                                     imageVector = Icons.Default.HealthAndSafety,
                                     contentDescription = null,
                                     tint = AppleHealthTeal,
-                                    modifier = Modifier.size(32.dp)
+                                    modifier = Modifier.size(28.dp)
                                 )
                             }
-                            Spacer(modifier = Modifier.height(14.dp))
+                            Spacer(modifier = Modifier.height(10.dp))
                             Text(
                                 text = "Dr. Swasth AI Consultation",
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = AppleLabelPrimary
                             )
-                            Spacer(modifier = Modifier.height(6.dp))
+                            Spacer(modifier = Modifier.height(4.dp))
                             Text(
-                                text = "Your personal doctor-grade assistant running 100% locally on your Snapdragon 8 Elite.\nChoose your context scope to query saved blood reports, lipid panels, or chat freely.",
+                                text = "100% on-device clinical AI. Type your question or attach lab photos.",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = AppleLabelSecondary,
-                                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                                lineHeight = 18.sp
+                                textAlign = androidx.compose.ui.text.style.TextAlign.Center
                             )
-
-                            Spacer(modifier = Modifier.height(18.dp))
-
-                            // Privacy & Architecture Badge
-                            Row(
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(20.dp))
-                                    .background(AppleCardSurface)
-                                    .border(0.5.dp, AppleCardBorder, RoundedCornerShape(20.dp))
-                                    .padding(horizontal = 14.dp, vertical = 6.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Shield,
-                                    contentDescription = null,
-                                    tint = Color(0xFF34C759),
-                                    modifier = Modifier.size(14.dp)
-                                )
-                                Spacer(modifier = Modifier.width(6.dp))
-                                Text(
-                                    text = "Zero Cloud Calls • 100% Private",
-                                    fontSize = 11.sp,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = AppleLabelSecondary
-                                )
-                            }
                         }
                     }
                 } else {
@@ -342,28 +324,68 @@ fun ChatScreen(
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(vertical = 4.dp),
+                                .padding(vertical = 2.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             CircularProgressIndicator(
-                                modifier = Modifier.size(16.dp),
-                                strokeWidth = 2.dp,
+                                modifier = Modifier.size(14.dp),
+                                strokeWidth = 1.8.dp,
                                 color = AppleSystemBlue
                             )
-                            Spacer(modifier = Modifier.width(8.dp))
+                            Spacer(modifier = Modifier.width(6.dp))
                             Text(
-                                text = "Generating clinical guidance...",
+                                text = "Analyzing...",
                                 style = MaterialTheme.typography.bodySmall,
-                                color = AppleLabelSecondary
+                                color = AppleLabelSecondary,
+                                fontSize = 12.sp
                             )
                         }
                     }
                 }
 
-                item { Spacer(modifier = Modifier.height(10.dp)) }
+                item { Spacer(modifier = Modifier.height(4.dp)) }
             }
 
-            // Input Bar with Context Control Button
+            // ATTACHED IMAGE PREVIEW (shows when user picked a lab report / prescription photo)
+            if (uiState.selectedImageUri != null) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(AppleSystemBackground)
+                        .padding(horizontal = 12.dp, vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(46.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .border(1.dp, AppleCardBorder, RoundedCornerShape(8.dp))
+                    ) {
+                        MessageImageThumbnail(imageUri = uiState.selectedImageUri!!)
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "Medical Image Attached",
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = AppleLabelPrimary,
+                        modifier = Modifier.weight(1f)
+                    )
+                    IconButton(
+                        onClick = { viewModel.clearSelectedImage() },
+                        modifier = Modifier.size(28.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Remove attached image",
+                            tint = AppleLabelTertiary,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+                }
+            }
+
+            // ULTRA COMPACT INPUT BAR (saves space, fits tightly above keyboard)
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -379,57 +401,60 @@ fun ChatScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 10.dp, vertical = 8.dp),
+                        .padding(horizontal = 8.dp, vertical = 3.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Clearly Visible Context Control Button
+                    // Image / Document Camera Picker Button
                     IconButton(
-                        onClick = { viewModel.openContextSheet(true) },
-                        modifier = Modifier
-                            .size(38.dp)
-                            .clip(CircleShape)
-                            .background(AppleSearchFill)
+                        onClick = { imagePickerLauncher.launch("image/*") },
+                        modifier = Modifier.size(32.dp)
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Tune,
-                            contentDescription = "Medical Context Scope",
-                            tint = AppleSystemBlue,
-                            modifier = Modifier.size(19.dp)
+                            imageVector = Icons.Default.AddPhotoAlternate,
+                            contentDescription = "Attach Medical Document or Image",
+                            tint = if (uiState.selectedImageUri != null) AppleHealthTeal else AppleSystemBlue,
+                            modifier = Modifier.size(20.dp)
                         )
                     }
 
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
 
-                    OutlinedTextField(
-                        value = uiState.inputText,
-                        onValueChange = { viewModel.setInputText(it) },
-                        placeholder = {
+                    // Ultra-compact BasicTextField (zero wasted padding when keyboard is open)
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(AppleSearchFill)
+                            .padding(horizontal = 12.dp, vertical = 7.dp),
+                        contentAlignment = Alignment.CenterStart
+                    ) {
+                        if (uiState.inputText.isEmpty()) {
                             Text(
-                                "Ask Dr. Swasth...",
+                                text = if (uiState.selectedImageUri != null) "Ask about this image..." else "Ask Dr. Swasth...",
                                 color = AppleLabelTertiary,
-                                fontSize = 15.sp
+                                fontSize = 13.5.sp
                             )
-                        },
-                        modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(22.dp),
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = AppleSearchFill,
-                            unfocusedContainerColor = AppleSearchFill,
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent,
-                            focusedTextColor = AppleLabelPrimary,
-                            unfocusedTextColor = AppleLabelPrimary
-                        ),
-                        maxLines = 4
-                    )
+                        }
+                        BasicTextField(
+                            value = uiState.inputText,
+                            onValueChange = { viewModel.setInputText(it) },
+                            textStyle = TextStyle(
+                                fontSize = 13.5.sp,
+                                color = AppleLabelPrimary,
+                                fontWeight = FontWeight.Normal
+                            ),
+                            maxLines = 4,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
 
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
 
-                    val canSend = uiState.inputText.isNotBlank() && !uiState.isStreaming
+                    val canSend = (uiState.inputText.isNotBlank() || uiState.selectedImageUri != null) && !uiState.isStreaming
                     IconButton(
                         onClick = { viewModel.sendMessage() },
                         modifier = Modifier
-                            .size(38.dp)
+                            .size(32.dp)
                             .clip(CircleShape)
                             .background(if (canSend) AppleSystemBlue else AppleSearchFill),
                         enabled = canSend
@@ -438,12 +463,41 @@ fun ChatScreen(
                             imageVector = Icons.AutoMirrored.Filled.Send,
                             contentDescription = "Send",
                             tint = if (canSend) Color.White else AppleLabelTertiary,
-                            modifier = Modifier.size(18.dp)
+                            modifier = Modifier.size(15.dp)
                         )
                     }
                 }
             }
         }
+    }
+}
+
+@Composable
+fun MessageImageThumbnail(
+    imageUri: String,
+    modifier: Modifier = Modifier
+        .fillMaxWidth()
+        .heightIn(max = 200.dp)
+        .clip(RoundedCornerShape(12.dp))
+) {
+    val context = LocalContext.current
+    val bitmap = remember(imageUri) {
+        try {
+            val uri = Uri.parse(imageUri)
+            val inputStream = context.contentResolver.openInputStream(uri)
+            android.graphics.BitmapFactory.decodeStream(inputStream)?.asImageBitmap()
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    if (bitmap != null) {
+        Image(
+            bitmap = bitmap,
+            contentDescription = "Attached Medical Document",
+            modifier = modifier,
+            contentScale = ContentScale.Crop
+        )
     }
 }
 
@@ -463,9 +517,9 @@ fun AppleChatMessageBubble(
         val bubbleColor = if (isUser) AppleIMessageBlue else AppleCardSurface
         val textColor = if (isUser) Color.White else AppleIMessageText
         val shape = if (isUser) {
-            RoundedCornerShape(18.dp, 18.dp, 4.dp, 18.dp)
+            RoundedCornerShape(16.dp, 16.dp, 3.dp, 16.dp)
         } else {
-            RoundedCornerShape(18.dp, 18.dp, 18.dp, 4.dp)
+            RoundedCornerShape(16.dp, 16.dp, 16.dp, 3.dp)
         }
 
         val cleanContent = if (message.content.startsWith("null")) {
@@ -481,43 +535,54 @@ fun AppleChatMessageBubble(
                 .then(
                     if (!isUser) Modifier.border(0.5.dp, AppleCardBorder, shape) else Modifier
                 )
-                .padding(horizontal = 16.dp, vertical = 12.dp)
+                .padding(horizontal = 14.dp, vertical = 9.dp)
         ) {
-            Text(
-                text = cleanContent,
-                style = MaterialTheme.typography.bodyLarge,
-                color = textColor,
-                lineHeight = 22.sp
-            )
+            Column {
+                // If message contains an attached image, render it inside bubble!
+                if (!message.imageUri.isNullOrBlank()) {
+                    MessageImageThumbnail(imageUri = message.imageUri)
+                    Spacer(modifier = Modifier.height(4.dp))
+                }
+
+                if (cleanContent.isNotBlank()) {
+                    Text(
+                        text = cleanContent,
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = textColor,
+                        fontSize = 15.sp,
+                        lineHeight = 20.sp
+                    )
+                }
+            }
         }
 
-        // Citations Footnotes (Apple Pastel Blue Pills)
+        // Citations Footnotes
         if (message.citations.isNotEmpty()) {
-            Spacer(modifier = Modifier.height(6.dp))
+            Spacer(modifier = Modifier.height(4.dp))
             FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp),
-                modifier = Modifier.padding(horizontal = 4.dp)
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalArrangement = Arrangement.spacedBy(3.dp),
+                modifier = Modifier.padding(horizontal = 2.dp)
             ) {
                 message.citations.forEach { citation ->
                     Row(
                         modifier = Modifier
-                            .clip(RoundedCornerShape(12.dp))
+                            .clip(RoundedCornerShape(10.dp))
                             .background(AppleBlueLight)
                             .clickable { onCitationClick(citation) }
-                            .padding(horizontal = 8.dp, vertical = 4.dp),
+                            .padding(horizontal = 7.dp, vertical = 3.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
                             imageVector = Icons.Default.Description,
                             contentDescription = null,
                             tint = AppleSystemBlue,
-                            modifier = Modifier.size(12.dp)
+                            modifier = Modifier.size(11.dp)
                         )
-                        Spacer(modifier = Modifier.width(4.dp))
+                        Spacer(modifier = Modifier.width(3.dp))
                         Text(
                             text = citation.formatDisplay(),
-                            fontSize = 11.sp,
+                            fontSize = 10.sp,
                             color = AppleSystemBlue,
                             fontWeight = FontWeight.SemiBold
                         )

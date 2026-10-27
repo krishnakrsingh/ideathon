@@ -13,7 +13,7 @@
   "11": "SwasthAI: Detailed User Flows & Interaction Journeys",
   "12": "3. Single-Model Quality Validation Suite (MedGemma 1.5 4B IT)",
   "13": "5. Complete Relational Database Schema (Room / SQLite)",
-  "14": "SwasthApplication",
+  "14": "HomeViewModel.kt",
   "15": "1. Confirmed Architecture Decision Records (ADRs)",
   "16": "SwasthAI: Project Brief & Foundational Blueprint",
   "17": "SwasthAI: Master Engineering Implementation Checklist",
@@ -49,5 +49,6 @@
   "47": "ModelInferenceStatus",
   "48": "test_emb.py",
   "49": "test_server.py",
-  "50": "test_stream.py"
+  "50": "test_stream.py",
+  "51": "ClinicalKnowledgeEngine"
 }

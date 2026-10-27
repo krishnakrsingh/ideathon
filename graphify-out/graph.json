@@ -4,17 +4,17 @@
   "graph": {},
   "nodes": [
     {
-      "id": "app_src_main_java_com_swasthai_app_data_local_dao_conversationdao_conversationdao",
-      "label": "ConversationDao",
+      "id": "app_src_main_java_com_swasthai_app_ai_ragpipeline_retrievalresult",
+      "label": "RetrievalResult",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
       "community": 0,
       "community_name": "DocumentDao",
       "file_type": "code",
-      "norm_label": "conversationdao",
-      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/ConversationDao.kt",
-      "source_location": "L12"
+      "norm_label": "retrievalresult",
+      "source_file": "app/src/main/java/com/swasthai/app/ai/RAGPipeline.kt",
+      "source_location": "L16"
     },
     {
       "id": "app_src_main_java_com_swasthai_app_data_local_dao_documentdao_documentdao",
@@ -28,71 +28,6 @@
       "norm_label": "documentdao",
       "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/DocumentDao.kt",
       "source_location": "L12"
-    },
-    {
-      "id": "app_src_main_java_com_swasthai_app_data_local_dao_ragdao_chunkwithdocument",
-      "label": "ChunkWithDocument",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "DocumentDao",
-      "file_type": "code",
-      "norm_label": "chunkwithdocument",
-      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/RAGDao.kt",
-      "source_location": "L13"
-    },
-    {
-      "id": "app_src_main_java_com_swasthai_app_data_local_dao_ragdao_ragdao",
-      "label": "RAGDao",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "DocumentDao",
-      "file_type": "code",
-      "norm_label": "ragdao",
-      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/RAGDao.kt",
-      "source_location": "L22"
-    },
-    {
-      "id": "app_src_main_java_com_swasthai_app_data_local_entity_conversationentity_conversationentity",
-      "label": "ConversationEntity",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "DocumentDao",
-      "file_type": "code",
-      "norm_label": "conversationentity",
-      "source_file": "app/src/main/java/com/swasthai/app/data/local/entity/ConversationEntity.kt",
-      "source_location": "L8"
-    },
-    {
-      "id": "app_src_main_java_com_swasthai_app_data_local_entity_conversationentity_messageentity",
-      "label": "MessageEntity",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "DocumentDao",
-      "file_type": "code",
-      "norm_label": "messageentity",
-      "source_file": "app/src/main/java/com/swasthai/app/data/local/entity/ConversationEntity.kt",
-      "source_location": "L24"
-    },
-    {
-      "id": "app_src_main_java_com_swasthai_app_data_local_entity_documententity_chunkembeddingentity",
-      "label": "ChunkEmbeddingEntity",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "DocumentDao",
-      "file_type": "code",
-      "norm_label": "chunkembeddingentity",
-      "source_file": "app/src/main/java/com/swasthai/app/data/local/entity/DocumentEntity.kt",
-      "source_location": "L42"
     },
     {
       "id": "app_src_main_java_com_swasthai_app_data_local_entity_documententity_documentchunkentity",
@@ -119,19 +54,6 @@
       "norm_label": "documententity",
       "source_file": "app/src/main/java/com/swasthai/app/data/local/entity/DocumentEntity.kt",
       "source_location": "L8"
-    },
-    {
-      "id": "app_src_main_java_com_swasthai_app_data_local_swasthdatabase_swasthdatabase",
-      "label": "SwasthDatabase",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "DocumentDao",
-      "file_type": "code",
-      "norm_label": "swasthdatabase",
-      "source_file": "app/src/main/java/com/swasthai/app/data/local/SwasthDatabase.kt",
-      "source_location": "L18"
     },
     {
       "id": "app_src_main_java_com_swasthai_app_ai_medgemmamanager_medgemmamanager",
@@ -209,7 +131,7 @@
       "file_type": "code",
       "norm_label": "conversation",
       "source_file": "app/src/main/java/com/swasthai/app/domain/model/ChatModels.kt",
-      "source_location": "L98"
+      "source_location": "L99"
     },
     {
       "id": "app_src_main_java_com_swasthai_app_domain_model_chatmodels_messagerole",
@@ -223,6 +145,19 @@
       "norm_label": "messagerole",
       "source_file": "app/src/main/java/com/swasthai/app/domain/model/ChatModels.kt",
       "source_location": "L3"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_domain_model_chatmodels_responselanguage",
+      "label": "ResponseLanguage",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "SourceCitation",
+      "file_type": "code",
+      "norm_label": "responselanguage",
+      "source_file": "app/src/main/java/com/swasthai/app/domain/model/ChatModels.kt",
+      "source_location": "L31"
     },
     {
       "id": "app_src_main_java_com_swasthai_app_domain_model_chatmodels_sourcecitation",
@@ -693,19 +628,6 @@
       "source_location": "L37"
     },
     {
-      "id": "app_src_main_java_com_swasthai_app_domain_model_chatmodels_responselanguage",
-      "label": "ResponseLanguage",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 46,
-      "community_name": "LfmManager",
-      "file_type": "code",
-      "norm_label": "responselanguage",
-      "source_file": "app/src/main/java/com/swasthai/app/domain/model/ChatModels.kt",
-      "source_location": "L31"
-    },
-    {
       "id": "app_src_test_java_com_swasthai_app_lfmpromptbuildertest_lfmpromptbuildertest",
       "label": "LfmPromptBuilderTest",
       "_callable": true,
@@ -797,39 +719,13 @@
       "source_location": "L9"
     },
     {
-      "id": "app_src_main_java_com_swasthai_app_data_local_dao_measurementdao_measurementdao",
-      "label": "MeasurementDao",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "MeasurementDao",
-      "file_type": "code",
-      "norm_label": "measurementdao",
-      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/MeasurementDao.kt",
-      "source_location": "L10"
-    },
-    {
-      "id": "app_src_main_java_com_swasthai_app_data_local_entity_structuredmeasuremententity_structuredmeasuremententity",
-      "label": "StructuredMeasurementEntity",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "MeasurementDao",
-      "file_type": "code",
-      "norm_label": "structuredmeasuremententity",
-      "source_file": "app/src/main/java/com/swasthai/app/data/local/entity/StructuredMeasurementEntity.kt",
-      "source_location": "L8"
-    },
-    {
       "id": "app_src_main_java_com_swasthai_app_pdf_documentchunker_documentchunker",
       "label": "DocumentChunker",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
       "community": 5,
-      "community_name": "MeasurementDao",
+      "community_name": "PdfExtractor",
       "file_type": "code",
       "norm_label": "documentchunker",
       "source_file": "app/src/main/java/com/swasthai/app/pdf/DocumentChunker.kt",
@@ -842,7 +738,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 5,
-      "community_name": "MeasurementDao",
+      "community_name": "PdfExtractor",
       "file_type": "code",
       "norm_label": "extractedpage",
       "source_file": "app/src/main/java/com/swasthai/app/pdf/PdfExtractor.kt",
@@ -855,7 +751,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 5,
-      "community_name": "MeasurementDao",
+      "community_name": "PdfExtractor",
       "file_type": "code",
       "norm_label": "extractionresult",
       "source_file": "app/src/main/java/com/swasthai/app/pdf/PdfExtractor.kt",
@@ -868,7 +764,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 5,
-      "community_name": "MeasurementDao",
+      "community_name": "PdfExtractor",
       "file_type": "code",
       "norm_label": "pdfextractor",
       "source_file": "app/src/main/java/com/swasthai/app/pdf/PdfExtractor.kt",
@@ -881,7 +777,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 5,
-      "community_name": "MeasurementDao",
+      "community_name": "PdfExtractor",
       "file_type": "code",
       "norm_label": "documentchunkertest",
       "source_file": "app/src/test/java/com/swasthai/app/DocumentChunkerTest.kt",
@@ -894,7 +790,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 5,
-      "community_name": "MeasurementDao",
+      "community_name": "PdfExtractor",
       "file_type": "code",
       "norm_label": "pdfextractortest",
       "source_file": "app/src/test/java/com/swasthai/app/PdfExtractorTest.kt",
@@ -914,17 +810,147 @@
       "source_location": "L14"
     },
     {
-      "id": "app_src_test_java_com_swasthai_app_clinicalknowledgeenginetest_clinicalknowledgeenginetest",
-      "label": "ClinicalKnowledgeEngineTest",
+      "id": "app_src_main_java_com_swasthai_app_data_local_dao_conversationdao_conversationdao",
+      "label": "ConversationDao",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "community": 51,
-      "community_name": "ClinicalKnowledgeEngine",
+      "community": 52,
+      "community_name": "ConversationDao",
       "file_type": "code",
-      "norm_label": "clinicalknowledgeenginetest",
-      "source_file": "app/src/test/java/com/swasthai/app/ClinicalKnowledgeEngineTest.kt",
-      "source_location": "L11"
+      "norm_label": "conversationdao",
+      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/ConversationDao.kt",
+      "source_location": "L12"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_data_local_entity_conversationentity_conversationentity",
+      "label": "ConversationEntity",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 52,
+      "community_name": "ConversationDao",
+      "file_type": "code",
+      "norm_label": "conversationentity",
+      "source_file": "app/src/main/java/com/swasthai/app/data/local/entity/ConversationEntity.kt",
+      "source_location": "L8"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_data_local_entity_conversationentity_messageentity",
+      "label": "MessageEntity",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 52,
+      "community_name": "ConversationDao",
+      "file_type": "code",
+      "norm_label": "messageentity",
+      "source_file": "app/src/main/java/com/swasthai/app/data/local/entity/ConversationEntity.kt",
+      "source_location": "L24"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_data_local_dao_ragdao_chunkwithdocument",
+      "label": "ChunkWithDocument",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 53,
+      "community_name": "RAGDao",
+      "file_type": "code",
+      "norm_label": "chunkwithdocument",
+      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/RAGDao.kt",
+      "source_location": "L13"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_data_local_dao_ragdao_ragdao",
+      "label": "RAGDao",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 53,
+      "community_name": "RAGDao",
+      "file_type": "code",
+      "norm_label": "ragdao",
+      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/RAGDao.kt",
+      "source_location": "L22"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_data_local_entity_documententity_chunkembeddingentity",
+      "label": "ChunkEmbeddingEntity",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 53,
+      "community_name": "RAGDao",
+      "file_type": "code",
+      "norm_label": "chunkembeddingentity",
+      "source_file": "app/src/main/java/com/swasthai/app/data/local/entity/DocumentEntity.kt",
+      "source_location": "L42"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_data_local_dao_measurementdao_measurementdao",
+      "label": "MeasurementDao",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 54,
+      "community_name": "MeasurementDao",
+      "file_type": "code",
+      "norm_label": "measurementdao",
+      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/MeasurementDao.kt",
+      "source_location": "L10"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_data_local_entity_structuredmeasuremententity_structuredmeasuremententity",
+      "label": "StructuredMeasurementEntity",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 54,
+      "community_name": "MeasurementDao",
+      "file_type": "code",
+      "norm_label": "structuredmeasuremententity",
+      "source_file": "app/src/main/java/com/swasthai/app/data/local/entity/StructuredMeasurementEntity.kt",
+      "source_location": "L8"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_data_local_swasthdatabase_swasthdatabase",
+      "label": "SwasthDatabase",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 55,
+      "community_name": "SwasthDatabase.kt",
+      "file_type": "code",
+      "norm_label": "swasthdatabase",
+      "source_file": "app/src/main/java/com/swasthai/app/data/local/SwasthDatabase.kt",
+      "source_location": "L18"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_ai_imagetextextractor_imagetextextractor",
+      "label": "ImageTextExtractor",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 56,
+      "community_name": ".extractText",
+      "file_type": "code",
+      "norm_label": "imagetextextractor",
+      "source_file": "app/src/main/java/com/swasthai/app/ai/ImageTextExtractor.kt",
+      "source_location": "L17"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_ai_ragpipeline_retrievalmode",
+      "label": "RetrievalMode",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 57,
+      "community_name": "RetrievalMode",
+      "file_type": "code",
+      "norm_label": "retrievalmode",
+      "source_file": "app/src/main/java/com/swasthai/app/ai/RAGPipeline.kt",
+      "source_location": "L22"
     },
     {
       "id": "app_src_main_java_com_swasthai_app_ai_embeddingengine_embeddingengine",
@@ -966,32 +992,6 @@
       "source_location": "L29"
     },
     {
-      "id": "app_src_main_java_com_swasthai_app_ai_ragpipeline_retrievalmode",
-      "label": "RetrievalMode",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "EmbeddingEngine",
-      "file_type": "code",
-      "norm_label": "retrievalmode",
-      "source_file": "app/src/main/java/com/swasthai/app/ai/RAGPipeline.kt",
-      "source_location": "L22"
-    },
-    {
-      "id": "app_src_main_java_com_swasthai_app_ai_ragpipeline_retrievalresult",
-      "label": "RetrievalResult",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "EmbeddingEngine",
-      "file_type": "code",
-      "norm_label": "retrievalresult",
-      "source_file": "app/src/main/java/com/swasthai/app/ai/RAGPipeline.kt",
-      "source_location": "L16"
-    },
-    {
       "id": "app_src_main_java_com_swasthai_app_ai_ragpipeline_structuredhit",
       "label": "StructuredHit",
       "_callable": true,
@@ -1016,6 +1016,19 @@
       "norm_label": "swasthapplication",
       "source_file": "app/src/main/java/com/swasthai/app/SwasthApplication.kt",
       "source_location": "L16"
+    },
+    {
+      "id": "app_src_test_java_com_swasthai_app_clinicalknowledgeenginetest_clinicalknowledgeenginetest",
+      "label": "ClinicalKnowledgeEngineTest",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "EmbeddingEngine",
+      "file_type": "code",
+      "norm_label": "clinicalknowledgeenginetest",
+      "source_file": "app/src/test/java/com/swasthai/app/ClinicalKnowledgeEngineTest.kt",
+      "source_location": "L11"
     },
     {
       "id": "app_src_test_java_com_swasthai_app_embeddingenginetest_embeddingenginetest",
@@ -1210,139 +1223,7 @@
       "file_type": "code",
       "norm_label": "chatviewmodel",
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
-      "source_location": "L39"
-    },
-    {
-      "id": "app_src_main_java_com_swasthai_app_data_local_dao_conversationdao_conversationdao_deleteconversationbyid",
-      "label": ".deleteConversationById()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "DocumentDao",
-      "file_type": "code",
-      "norm_label": ".deleteconversationbyid()",
-      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/ConversationDao.kt",
-      "source_location": "L42"
-    },
-    {
-      "id": "app_src_main_java_com_swasthai_app_data_local_dao_conversationdao_conversationdao_deletemessagesforconversation",
-      "label": ".deleteMessagesForConversation()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "DocumentDao",
-      "file_type": "code",
-      "norm_label": ".deletemessagesforconversation()",
-      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/ConversationDao.kt",
-      "source_location": "L54"
-    },
-    {
-      "id": "app_src_main_java_com_swasthai_app_data_local_dao_conversationdao_conversationdao_getallconversations",
-      "label": ".getAllConversations()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "DocumentDao",
-      "file_type": "code",
-      "norm_label": ".getallconversations()",
-      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/ConversationDao.kt",
-      "source_location": "L15"
-    },
-    {
-      "id": "app_src_main_java_com_swasthai_app_data_local_dao_conversationdao_conversationdao_getconversationbyid",
-      "label": ".getConversationById()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "DocumentDao",
-      "file_type": "code",
-      "norm_label": ".getconversationbyid()",
-      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/ConversationDao.kt",
-      "source_location": "L18"
-    },
-    {
-      "id": "app_src_main_java_com_swasthai_app_data_local_dao_conversationdao_conversationdao_getmessagesforconversation",
-      "label": ".getMessagesForConversation()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "DocumentDao",
-      "file_type": "code",
-      "norm_label": ".getmessagesforconversation()",
-      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/ConversationDao.kt",
-      "source_location": "L45"
-    },
-    {
-      "id": "app_src_main_java_com_swasthai_app_data_local_dao_conversationdao_conversationdao_getmessageslist",
-      "label": ".getMessagesList()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "DocumentDao",
-      "file_type": "code",
-      "norm_label": ".getmessageslist()",
-      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/ConversationDao.kt",
-      "source_location": "L48"
-    },
-    {
-      "id": "app_src_main_java_com_swasthai_app_data_local_dao_conversationdao_conversationdao_insertconversation",
-      "label": ".insertConversation()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "DocumentDao",
-      "file_type": "code",
-      "norm_label": ".insertconversation()",
-      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/ConversationDao.kt",
-      "source_location": "L21"
-    },
-    {
-      "id": "app_src_main_java_com_swasthai_app_data_local_dao_conversationdao_conversationdao_insertmessage",
-      "label": ".insertMessage()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "DocumentDao",
-      "file_type": "code",
-      "norm_label": ".insertmessage()",
-      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/ConversationDao.kt",
-      "source_location": "L51"
-    },
-    {
-      "id": "app_src_main_java_com_swasthai_app_data_local_dao_conversationdao_conversationdao_updateconversation",
-      "label": ".updateConversation()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "DocumentDao",
-      "file_type": "code",
-      "norm_label": ".updateconversation()",
-      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/ConversationDao.kt",
-      "source_location": "L24"
-    },
-    {
-      "id": "app_src_main_java_com_swasthai_app_data_local_dao_conversationdao_conversationdao_updateconversationscope",
-      "label": ".updateConversationScope()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "DocumentDao",
-      "file_type": "code",
-      "norm_label": ".updateconversationscope()",
-      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/ConversationDao.kt",
-      "source_location": "L30"
-    },
-    {
-      "id": "app_src_main_java_com_swasthai_app_data_local_dao_conversationdao_conversationdao_updateconversationtimestamp",
-      "label": ".updateConversationTimestamp()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "DocumentDao",
-      "file_type": "code",
-      "norm_label": ".updateconversationtimestamp()",
-      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/ConversationDao.kt",
-      "source_location": "L27"
+      "source_location": "L40"
     },
     {
       "id": "app_src_main_java_com_swasthai_app_data_local_dao_documentdao_documentdao_deletedocumentbyid",
@@ -1489,174 +1370,6 @@
       "source_location": "L27"
     },
     {
-      "id": "app_src_main_java_com_swasthai_app_data_local_dao_ragdao_ragdao_deleteembeddingsfordocument",
-      "label": ".deleteEmbeddingsForDocument()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "DocumentDao",
-      "file_type": "code",
-      "norm_label": ".deleteembeddingsfordocument()",
-      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/RAGDao.kt",
-      "source_location": "L45"
-    },
-    {
-      "id": "app_src_main_java_com_swasthai_app_data_local_dao_ragdao_ragdao_getallembeddings",
-      "label": ".getAllEmbeddings()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "DocumentDao",
-      "file_type": "code",
-      "norm_label": ".getallembeddings()",
-      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/RAGDao.kt",
-      "source_location": "L28"
-    },
-    {
-      "id": "app_src_main_java_com_swasthai_app_data_local_dao_ragdao_ragdao_getchunkswithdocuments",
-      "label": ".getChunksWithDocuments()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "DocumentDao",
-      "file_type": "code",
-      "norm_label": ".getchunkswithdocuments()",
-      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/RAGDao.kt",
-      "source_location": "L41"
-    },
-    {
-      "id": "app_src_main_java_com_swasthai_app_data_local_dao_ragdao_ragdao_getchunkwithdocument",
-      "label": ".getChunkWithDocument()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "DocumentDao",
-      "file_type": "code",
-      "norm_label": ".getchunkwithdocument()",
-      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/RAGDao.kt",
-      "source_location": "L37"
-    },
-    {
-      "id": "app_src_main_java_com_swasthai_app_data_local_dao_ragdao_ragdao_getembeddingsfordocument",
-      "label": ".getEmbeddingsForDocument()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "DocumentDao",
-      "file_type": "code",
-      "norm_label": ".getembeddingsfordocument()",
-      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/RAGDao.kt",
-      "source_location": "L31"
-    },
-    {
-      "id": "app_src_main_java_com_swasthai_app_data_local_dao_ragdao_ragdao_getembeddingsfordocuments",
-      "label": ".getEmbeddingsForDocuments()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "DocumentDao",
-      "file_type": "code",
-      "norm_label": ".getembeddingsfordocuments()",
-      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/RAGDao.kt",
-      "source_location": "L34"
-    },
-    {
-      "id": "app_src_main_java_com_swasthai_app_data_local_dao_ragdao_ragdao_insertembeddings",
-      "label": ".insertEmbeddings()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "DocumentDao",
-      "file_type": "code",
-      "norm_label": ".insertembeddings()",
-      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/RAGDao.kt",
-      "source_location": "L25"
-    },
-    {
-      "id": "app_src_main_java_com_swasthai_app_data_local_entity_documententity_chunkembeddingentity_equals",
-      "label": ".equals()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "DocumentDao",
-      "file_type": "code",
-      "norm_label": ".equals()",
-      "source_file": "app/src/main/java/com/swasthai/app/data/local/entity/DocumentEntity.kt",
-      "source_location": "L60"
-    },
-    {
-      "id": "app_src_main_java_com_swasthai_app_data_local_entity_documententity_chunkembeddingentity_hashcode",
-      "label": ".hashCode()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "DocumentDao",
-      "file_type": "code",
-      "norm_label": ".hashcode()",
-      "source_file": "app/src/main/java/com/swasthai/app/data/local/entity/DocumentEntity.kt",
-      "source_location": "L67"
-    },
-    {
-      "id": "app_src_main_java_com_swasthai_app_data_local_swasthdatabase_swasthdatabase_conversationdao",
-      "label": ".conversationDao()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "DocumentDao",
-      "file_type": "code",
-      "norm_label": ".conversationdao()",
-      "source_file": "app/src/main/java/com/swasthai/app/data/local/SwasthDatabase.kt",
-      "source_location": "L32"
-    },
-    {
-      "id": "app_src_main_java_com_swasthai_app_data_local_swasthdatabase_swasthdatabase_documentdao",
-      "label": ".documentDao()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "DocumentDao",
-      "file_type": "code",
-      "norm_label": ".documentdao()",
-      "source_file": "app/src/main/java/com/swasthai/app/data/local/SwasthDatabase.kt",
-      "source_location": "L33"
-    },
-    {
-      "id": "app_src_main_java_com_swasthai_app_data_local_swasthdatabase_swasthdatabase_getinstance",
-      "label": ".getInstance()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "DocumentDao",
-      "file_type": "code",
-      "norm_label": ".getinstance()",
-      "source_file": "app/src/main/java/com/swasthai/app/data/local/SwasthDatabase.kt",
-      "source_location": "L41"
-    },
-    {
-      "id": "app_src_main_java_com_swasthai_app_data_local_swasthdatabase_swasthdatabase_ragdao",
-      "label": ".ragDao()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "DocumentDao",
-      "file_type": "code",
-      "norm_label": ".ragdao()",
-      "source_file": "app/src/main/java/com/swasthai/app/data/local/SwasthDatabase.kt",
-      "source_location": "L34"
-    },
-    {
-      "id": "app_src_main_java_com_swasthai_app_data_repository_chatrepository_chatrepository_createconversation",
-      "label": ".createConversation()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "DocumentDao",
-      "file_type": "code",
-      "norm_label": ".createconversation()",
-      "source_file": "app/src/main/java/com/swasthai/app/data/repository/ChatRepository.kt",
-      "source_location": "L51"
-    },
-    {
       "id": "app_src_main_java_com_swasthai_app_data_repository_documentrepository_documentrepository_getchunksfordocument",
       "label": ".getChunksForDocument()",
       "_callable": true,
@@ -1738,7 +1451,7 @@
       "file_type": "code",
       "norm_label": ".citationstojson()",
       "source_file": "app/src/main/java/com/swasthai/app/data/repository/ChatRepository.kt",
-      "source_location": "L257"
+      "source_location": "L293"
     },
     {
       "id": "app_src_main_java_com_swasthai_app_data_repository_chatrepository_chatrepository_deleteconversation",
@@ -1810,7 +1523,7 @@
       "file_type": "code",
       "norm_label": ".jsontocitations()",
       "source_file": "app/src/main/java/com/swasthai/app/data/repository/ChatRepository.kt",
-      "source_location": "L271"
+      "source_location": "L307"
     },
     {
       "id": "app_src_main_java_com_swasthai_app_data_repository_chatrepository_chatrepository_sendmessage",
@@ -1822,7 +1535,7 @@
       "file_type": "code",
       "norm_label": ".sendmessage()",
       "source_file": "app/src/main/java/com/swasthai/app/data/repository/ChatRepository.kt",
-      "source_location": "L113"
+      "source_location": "L115"
     },
     {
       "id": "app_src_main_java_com_swasthai_app_data_repository_chatrepository_chatrepository_todomain",
@@ -1834,7 +1547,7 @@
       "file_type": "code",
       "norm_label": ".todomain()",
       "source_file": "app/src/main/java/com/swasthai/app/data/repository/ChatRepository.kt",
-      "source_location": "L291"
+      "source_location": "L327"
     },
     {
       "id": "app_src_main_java_com_swasthai_app_data_repository_chatrepository_chatrepository_updateconversationscope",
@@ -1882,7 +1595,7 @@
       "file_type": "code",
       "norm_label": "applechatmessagebubble()",
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatScreen.kt",
-      "source_location": "L450"
+      "source_location": "L504"
     },
     {
       "id": "app_src_main_java_com_swasthai_app_ui_chat_chatscreen_chatscreen",
@@ -1894,7 +1607,19 @@
       "file_type": "code",
       "norm_label": "chatscreen()",
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatScreen.kt",
-      "source_location": "L85"
+      "source_location": "L92"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_ui_chat_chatscreen_messageimagethumbnail",
+      "label": "MessageImageThumbnail()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "SourceCitation",
+      "file_type": "code",
+      "norm_label": "messageimagethumbnail()",
+      "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatScreen.kt",
+      "source_location": "L475"
     },
     {
       "id": "app_src_main_java_com_swasthai_app_ui_components_emergencybanner_citationinspectiondialog",
@@ -2614,7 +2339,7 @@
       "file_type": "code",
       "norm_label": ".buildsystemprompt()",
       "source_file": "app/src/main/java/com/swasthai/app/ai/LfmManager.kt",
-      "source_location": "L354"
+      "source_location": "L355"
     },
     {
       "id": "app_src_main_java_com_swasthai_app_ai_lfmmanager_lfmmanager_findavailableembeddingmodel",
@@ -2626,7 +2351,7 @@
       "file_type": "code",
       "norm_label": ".findavailableembeddingmodel()",
       "source_file": "app/src/main/java/com/swasthai/app/ai/LfmManager.kt",
-      "source_location": "L115"
+      "source_location": "L116"
     },
     {
       "id": "app_src_main_java_com_swasthai_app_ai_lfmmanager_lfmmanager_findavailablegenerativemodel",
@@ -2638,7 +2363,7 @@
       "file_type": "code",
       "norm_label": ".findavailablegenerativemodel()",
       "source_file": "app/src/main/java/com/swasthai/app/ai/LfmManager.kt",
-      "source_location": "L95"
+      "source_location": "L96"
     },
     {
       "id": "app_src_main_java_com_swasthai_app_ai_lfmmanager_lfmmanager_findnativeserverbinary",
@@ -2650,7 +2375,7 @@
       "file_type": "code",
       "norm_label": ".findnativeserverbinary()",
       "source_file": "app/src/main/java/com/swasthai/app/ai/LfmManager.kt",
-      "source_location": "L133"
+      "source_location": "L134"
     },
     {
       "id": "app_src_main_java_com_swasthai_app_ai_lfmmanager_lfmmanager_generateembedding",
@@ -2662,7 +2387,7 @@
       "file_type": "code",
       "norm_label": ".generateembedding()",
       "source_file": "app/src/main/java/com/swasthai/app/ai/LfmManager.kt",
-      "source_location": "L317"
+      "source_location": "L318"
     },
     {
       "id": "app_src_main_java_com_swasthai_app_ai_lfmmanager_lfmmanager_generatestream",
@@ -2674,7 +2399,7 @@
       "file_type": "code",
       "norm_label": ".generatestream()",
       "source_file": "app/src/main/java/com/swasthai/app/ai/LfmManager.kt",
-      "source_location": "L403"
+      "source_location": "L404"
     },
     {
       "id": "app_src_main_java_com_swasthai_app_ai_lfmmanager_lfmmanager_initialize",
@@ -2686,7 +2411,7 @@
       "file_type": "code",
       "norm_label": ".initialize()",
       "source_file": "app/src/main/java/com/swasthai/app/ai/LfmManager.kt",
-      "source_location": "L152"
+      "source_location": "L153"
     },
     {
       "id": "app_src_main_java_com_swasthai_app_ai_lfmmanager_lfmmanager_initializeembedding",
@@ -2698,7 +2423,7 @@
       "file_type": "code",
       "norm_label": ".initializeembedding()",
       "source_file": "app/src/main/java/com/swasthai/app/ai/LfmManager.kt",
-      "source_location": "L302"
+      "source_location": "L303"
     },
     {
       "id": "app_src_main_java_com_swasthai_app_ai_lfmmanager_lfmmanager_isserverhealthy",
@@ -2710,7 +2435,7 @@
       "file_type": "code",
       "norm_label": ".isserverhealthy()",
       "source_file": "app/src/main/java/com/swasthai/app/ai/LfmManager.kt",
-      "source_location": "L287"
+      "source_location": "L288"
     },
     {
       "id": "app_src_main_java_com_swasthai_app_ai_lfmmanager_lfmmanager_release",
@@ -2722,7 +2447,7 @@
       "file_type": "code",
       "norm_label": ".release()",
       "source_file": "app/src/main/java/com/swasthai/app/ai/LfmManager.kt",
-      "source_location": "L533"
+      "source_location": "L534"
     },
     {
       "id": "app_src_main_java_com_swasthai_app_ai_lfmmanager_lfmmanager_startchatserver",
@@ -2734,7 +2459,7 @@
       "file_type": "code",
       "norm_label": ".startchatserver()",
       "source_file": "app/src/main/java/com/swasthai/app/ai/LfmManager.kt",
-      "source_location": "L203"
+      "source_location": "L204"
     },
     {
       "id": "app_src_main_java_com_swasthai_app_ai_lfmmanager_lfmmanager_startembeddingserver",
@@ -2746,19 +2471,7 @@
       "file_type": "code",
       "norm_label": ".startembeddingserver()",
       "source_file": "app/src/main/java/com/swasthai/app/ai/LfmManager.kt",
-      "source_location": "L249"
-    },
-    {
-      "id": "app_src_main_java_com_swasthai_app_ui_chat_chatviewmodel_chatviewmodel_setresponselanguage",
-      "label": ".setResponseLanguage()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 46,
-      "community_name": "LfmManager",
-      "file_type": "code",
-      "norm_label": ".setresponselanguage()",
-      "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
-      "source_location": "L142"
+      "source_location": "L250"
     },
     {
       "id": "app_src_test_java_com_swasthai_app_lfmpromptbuildertest_lfmpromptbuildertest_testhindisystempromptdirective",
@@ -2977,96 +2690,12 @@
       "source_location": "L37"
     },
     {
-      "id": "app_src_main_java_com_swasthai_app_data_local_dao_measurementdao_measurementdao_deletemeasurementsfordocument",
-      "label": ".deleteMeasurementsForDocument()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "MeasurementDao",
-      "file_type": "code",
-      "norm_label": ".deletemeasurementsfordocument()",
-      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/MeasurementDao.kt",
-      "source_location": "L28"
-    },
-    {
-      "id": "app_src_main_java_com_swasthai_app_data_local_dao_measurementdao_measurementdao_getallmeasurements",
-      "label": ".getAllMeasurements()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "MeasurementDao",
-      "file_type": "code",
-      "norm_label": ".getallmeasurements()",
-      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/MeasurementDao.kt",
-      "source_location": "L13"
-    },
-    {
-      "id": "app_src_main_java_com_swasthai_app_data_local_dao_measurementdao_measurementdao_getallmeasurementslist",
-      "label": ".getAllMeasurementsList()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "MeasurementDao",
-      "file_type": "code",
-      "norm_label": ".getallmeasurementslist()",
-      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/MeasurementDao.kt",
-      "source_location": "L16"
-    },
-    {
-      "id": "app_src_main_java_com_swasthai_app_data_local_dao_measurementdao_measurementdao_getmeasurementsbybiomarker",
-      "label": ".getMeasurementsByBiomarker()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "MeasurementDao",
-      "file_type": "code",
-      "norm_label": ".getmeasurementsbybiomarker()",
-      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/MeasurementDao.kt",
-      "source_location": "L22"
-    },
-    {
-      "id": "app_src_main_java_com_swasthai_app_data_local_dao_measurementdao_measurementdao_getmeasurementsfordocument",
-      "label": ".getMeasurementsForDocument()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "MeasurementDao",
-      "file_type": "code",
-      "norm_label": ".getmeasurementsfordocument()",
-      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/MeasurementDao.kt",
-      "source_location": "L19"
-    },
-    {
-      "id": "app_src_main_java_com_swasthai_app_data_local_dao_measurementdao_measurementdao_insertmeasurements",
-      "label": ".insertMeasurements()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "MeasurementDao",
-      "file_type": "code",
-      "norm_label": ".insertmeasurements()",
-      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/MeasurementDao.kt",
-      "source_location": "L25"
-    },
-    {
-      "id": "app_src_main_java_com_swasthai_app_data_local_swasthdatabase_swasthdatabase_measurementdao",
-      "label": ".measurementDao()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "MeasurementDao",
-      "file_type": "code",
-      "norm_label": ".measurementdao()",
-      "source_file": "app/src/main/java/com/swasthai/app/data/local/SwasthDatabase.kt",
-      "source_location": "L35"
-    },
-    {
       "id": "app_src_main_java_com_swasthai_app_pdf_documentchunker_documentchunker_chunkpages",
       "label": ".chunkPages()",
       "_callable": true,
       "_origin": "ast",
       "community": 5,
-      "community_name": "MeasurementDao",
+      "community_name": "PdfExtractor",
       "file_type": "code",
       "norm_label": ".chunkpages()",
       "source_file": "app/src/main/java/com/swasthai/app/pdf/DocumentChunker.kt",
@@ -3078,7 +2707,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 5,
-      "community_name": "MeasurementDao",
+      "community_name": "PdfExtractor",
       "file_type": "code",
       "norm_label": ".chunktextdirectly()",
       "source_file": "app/src/main/java/com/swasthai/app/pdf/DocumentChunker.kt",
@@ -3090,7 +2719,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 5,
-      "community_name": "MeasurementDao",
+      "community_name": "PdfExtractor",
       "file_type": "code",
       "norm_label": ".estimatetokens()",
       "source_file": "app/src/main/java/com/swasthai/app/pdf/DocumentChunker.kt",
@@ -3102,7 +2731,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 5,
-      "community_name": "MeasurementDao",
+      "community_name": "PdfExtractor",
       "file_type": "code",
       "norm_label": ".extractstructuredmeasurements()",
       "source_file": "app/src/main/java/com/swasthai/app/pdf/DocumentChunker.kt",
@@ -3114,7 +2743,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 5,
-      "community_name": "MeasurementDao",
+      "community_name": "PdfExtractor",
       "file_type": "code",
       "norm_label": ".countoccurrences()",
       "source_file": "app/src/main/java/com/swasthai/app/pdf/PdfExtractor.kt",
@@ -3126,7 +2755,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 5,
-      "community_name": "MeasurementDao",
+      "community_name": "PdfExtractor",
       "file_type": "code",
       "norm_label": ".decodepdftextblock()",
       "source_file": "app/src/main/java/com/swasthai/app/pdf/PdfExtractor.kt",
@@ -3138,7 +2767,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 5,
-      "community_name": "MeasurementDao",
+      "community_name": "PdfExtractor",
       "file_type": "code",
       "norm_label": ".detectreportdate()",
       "source_file": "app/src/main/java/com/swasthai/app/pdf/PdfExtractor.kt",
@@ -3150,7 +2779,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 5,
-      "community_name": "MeasurementDao",
+      "community_name": "PdfExtractor",
       "file_type": "code",
       "norm_label": ".extractplainreadabletext()",
       "source_file": "app/src/main/java/com/swasthai/app/pdf/PdfExtractor.kt",
@@ -3162,7 +2791,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 5,
-      "community_name": "MeasurementDao",
+      "community_name": "PdfExtractor",
       "file_type": "code",
       "norm_label": ".extracttextfrompdf()",
       "source_file": "app/src/main/java/com/swasthai/app/pdf/PdfExtractor.kt",
@@ -3174,7 +2803,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 5,
-      "community_name": "MeasurementDao",
+      "community_name": "PdfExtractor",
       "file_type": "code",
       "norm_label": ".parsepdftextpages()",
       "source_file": "app/src/main/java/com/swasthai/app/pdf/PdfExtractor.kt",
@@ -3186,7 +2815,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 5,
-      "community_name": "MeasurementDao",
+      "community_name": "PdfExtractor",
       "file_type": "code",
       "norm_label": ".testbiomarkerextractionfromlabreport()",
       "source_file": "app/src/test/java/com/swasthai/app/DocumentChunkerTest.kt",
@@ -3198,7 +2827,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 5,
-      "community_name": "MeasurementDao",
+      "community_name": "PdfExtractor",
       "file_type": "code",
       "norm_label": ".testchunkpagespreservespagenumbersandmonotonicindex()",
       "source_file": "app/src/test/java/com/swasthai/app/DocumentChunkerTest.kt",
@@ -3210,7 +2839,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 5,
-      "community_name": "MeasurementDao",
+      "community_name": "PdfExtractor",
       "file_type": "code",
       "norm_label": ".testsamplepdfgenerationandextraction()",
       "source_file": "app/src/test/java/com/swasthai/app/PdfExtractorTest.kt",
@@ -3361,40 +2990,400 @@
       "source_location": "L20"
     },
     {
-      "id": "app_src_test_java_com_swasthai_app_clinicalknowledgeenginetest_clinicalknowledgeenginetest_testgeneralbloodpressureguide",
-      "label": ".testGeneralBloodPressureGuide()",
+      "id": "app_src_main_java_com_swasthai_app_data_local_dao_conversationdao_conversationdao_deleteconversationbyid",
+      "label": ".deleteConversationById()",
       "_callable": true,
       "_origin": "ast",
-      "community": 51,
-      "community_name": "ClinicalKnowledgeEngine",
+      "community": 52,
+      "community_name": "ConversationDao",
       "file_type": "code",
-      "norm_label": ".testgeneralbloodpressureguide()",
-      "source_file": "app/src/test/java/com/swasthai/app/ClinicalKnowledgeEngineTest.kt",
-      "source_location": "L38"
+      "norm_label": ".deleteconversationbyid()",
+      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/ConversationDao.kt",
+      "source_location": "L42"
     },
     {
-      "id": "app_src_test_java_com_swasthai_app_clinicalknowledgeenginetest_clinicalknowledgeenginetest_testrecordgroundedsynthesiswithcitations",
-      "label": ".testRecordGroundedSynthesisWithCitations()",
+      "id": "app_src_main_java_com_swasthai_app_data_local_dao_conversationdao_conversationdao_deletemessagesforconversation",
+      "label": ".deleteMessagesForConversation()",
       "_callable": true,
       "_origin": "ast",
-      "community": 51,
-      "community_name": "ClinicalKnowledgeEngine",
+      "community": 52,
+      "community_name": "ConversationDao",
       "file_type": "code",
-      "norm_label": ".testrecordgroundedsynthesiswithcitations()",
-      "source_file": "app/src/test/java/com/swasthai/app/ClinicalKnowledgeEngineTest.kt",
+      "norm_label": ".deletemessagesforconversation()",
+      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/ConversationDao.kt",
+      "source_location": "L54"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_data_local_dao_conversationdao_conversationdao_getallconversations",
+      "label": ".getAllConversations()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 52,
+      "community_name": "ConversationDao",
+      "file_type": "code",
+      "norm_label": ".getallconversations()",
+      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/ConversationDao.kt",
+      "source_location": "L15"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_data_local_dao_conversationdao_conversationdao_getconversationbyid",
+      "label": ".getConversationById()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 52,
+      "community_name": "ConversationDao",
+      "file_type": "code",
+      "norm_label": ".getconversationbyid()",
+      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/ConversationDao.kt",
+      "source_location": "L18"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_data_local_dao_conversationdao_conversationdao_getmessagesforconversation",
+      "label": ".getMessagesForConversation()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 52,
+      "community_name": "ConversationDao",
+      "file_type": "code",
+      "norm_label": ".getmessagesforconversation()",
+      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/ConversationDao.kt",
+      "source_location": "L45"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_data_local_dao_conversationdao_conversationdao_getmessageslist",
+      "label": ".getMessagesList()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 52,
+      "community_name": "ConversationDao",
+      "file_type": "code",
+      "norm_label": ".getmessageslist()",
+      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/ConversationDao.kt",
+      "source_location": "L48"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_data_local_dao_conversationdao_conversationdao_insertconversation",
+      "label": ".insertConversation()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 52,
+      "community_name": "ConversationDao",
+      "file_type": "code",
+      "norm_label": ".insertconversation()",
+      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/ConversationDao.kt",
+      "source_location": "L21"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_data_local_dao_conversationdao_conversationdao_insertmessage",
+      "label": ".insertMessage()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 52,
+      "community_name": "ConversationDao",
+      "file_type": "code",
+      "norm_label": ".insertmessage()",
+      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/ConversationDao.kt",
+      "source_location": "L51"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_data_local_dao_conversationdao_conversationdao_updateconversation",
+      "label": ".updateConversation()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 52,
+      "community_name": "ConversationDao",
+      "file_type": "code",
+      "norm_label": ".updateconversation()",
+      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/ConversationDao.kt",
+      "source_location": "L24"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_data_local_dao_conversationdao_conversationdao_updateconversationscope",
+      "label": ".updateConversationScope()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 52,
+      "community_name": "ConversationDao",
+      "file_type": "code",
+      "norm_label": ".updateconversationscope()",
+      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/ConversationDao.kt",
+      "source_location": "L30"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_data_local_dao_conversationdao_conversationdao_updateconversationtimestamp",
+      "label": ".updateConversationTimestamp()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 52,
+      "community_name": "ConversationDao",
+      "file_type": "code",
+      "norm_label": ".updateconversationtimestamp()",
+      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/ConversationDao.kt",
+      "source_location": "L27"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_data_repository_chatrepository_chatrepository_createconversation",
+      "label": ".createConversation()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 52,
+      "community_name": "ConversationDao",
+      "file_type": "code",
+      "norm_label": ".createconversation()",
+      "source_file": "app/src/main/java/com/swasthai/app/data/repository/ChatRepository.kt",
+      "source_location": "L51"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_data_local_dao_ragdao_ragdao_deleteembeddingsfordocument",
+      "label": ".deleteEmbeddingsForDocument()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 53,
+      "community_name": "RAGDao",
+      "file_type": "code",
+      "norm_label": ".deleteembeddingsfordocument()",
+      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/RAGDao.kt",
+      "source_location": "L45"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_data_local_dao_ragdao_ragdao_getallembeddings",
+      "label": ".getAllEmbeddings()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 53,
+      "community_name": "RAGDao",
+      "file_type": "code",
+      "norm_label": ".getallembeddings()",
+      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/RAGDao.kt",
+      "source_location": "L28"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_data_local_dao_ragdao_ragdao_getchunkswithdocuments",
+      "label": ".getChunksWithDocuments()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 53,
+      "community_name": "RAGDao",
+      "file_type": "code",
+      "norm_label": ".getchunkswithdocuments()",
+      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/RAGDao.kt",
+      "source_location": "L41"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_data_local_dao_ragdao_ragdao_getchunkwithdocument",
+      "label": ".getChunkWithDocument()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 53,
+      "community_name": "RAGDao",
+      "file_type": "code",
+      "norm_label": ".getchunkwithdocument()",
+      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/RAGDao.kt",
+      "source_location": "L37"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_data_local_dao_ragdao_ragdao_getembeddingsfordocument",
+      "label": ".getEmbeddingsForDocument()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 53,
+      "community_name": "RAGDao",
+      "file_type": "code",
+      "norm_label": ".getembeddingsfordocument()",
+      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/RAGDao.kt",
+      "source_location": "L31"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_data_local_dao_ragdao_ragdao_getembeddingsfordocuments",
+      "label": ".getEmbeddingsForDocuments()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 53,
+      "community_name": "RAGDao",
+      "file_type": "code",
+      "norm_label": ".getembeddingsfordocuments()",
+      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/RAGDao.kt",
+      "source_location": "L34"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_data_local_dao_ragdao_ragdao_insertembeddings",
+      "label": ".insertEmbeddings()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 53,
+      "community_name": "RAGDao",
+      "file_type": "code",
+      "norm_label": ".insertembeddings()",
+      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/RAGDao.kt",
+      "source_location": "L25"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_data_local_entity_documententity_chunkembeddingentity_equals",
+      "label": ".equals()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 53,
+      "community_name": "RAGDao",
+      "file_type": "code",
+      "norm_label": ".equals()",
+      "source_file": "app/src/main/java/com/swasthai/app/data/local/entity/DocumentEntity.kt",
+      "source_location": "L60"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_data_local_entity_documententity_chunkembeddingentity_hashcode",
+      "label": ".hashCode()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 53,
+      "community_name": "RAGDao",
+      "file_type": "code",
+      "norm_label": ".hashcode()",
+      "source_file": "app/src/main/java/com/swasthai/app/data/local/entity/DocumentEntity.kt",
+      "source_location": "L67"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_data_local_dao_measurementdao_measurementdao_deletemeasurementsfordocument",
+      "label": ".deleteMeasurementsForDocument()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 54,
+      "community_name": "MeasurementDao",
+      "file_type": "code",
+      "norm_label": ".deletemeasurementsfordocument()",
+      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/MeasurementDao.kt",
+      "source_location": "L28"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_data_local_dao_measurementdao_measurementdao_getallmeasurements",
+      "label": ".getAllMeasurements()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 54,
+      "community_name": "MeasurementDao",
+      "file_type": "code",
+      "norm_label": ".getallmeasurements()",
+      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/MeasurementDao.kt",
       "source_location": "L13"
     },
     {
-      "id": "app_src_test_java_com_swasthai_app_clinicalknowledgeenginetest_clinicalknowledgeenginetest_testsearchtermsextractioninragpipeline",
-      "label": ".testSearchTermsExtractionInRAGPipeline()",
+      "id": "app_src_main_java_com_swasthai_app_data_local_dao_measurementdao_measurementdao_getallmeasurementslist",
+      "label": ".getAllMeasurementsList()",
       "_callable": true,
       "_origin": "ast",
-      "community": 51,
-      "community_name": "ClinicalKnowledgeEngine",
+      "community": 54,
+      "community_name": "MeasurementDao",
       "file_type": "code",
-      "norm_label": ".testsearchtermsextractioninragpipeline()",
-      "source_file": "app/src/test/java/com/swasthai/app/ClinicalKnowledgeEngineTest.kt",
-      "source_location": "L52"
+      "norm_label": ".getallmeasurementslist()",
+      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/MeasurementDao.kt",
+      "source_location": "L16"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_data_local_dao_measurementdao_measurementdao_getmeasurementsbybiomarker",
+      "label": ".getMeasurementsByBiomarker()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 54,
+      "community_name": "MeasurementDao",
+      "file_type": "code",
+      "norm_label": ".getmeasurementsbybiomarker()",
+      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/MeasurementDao.kt",
+      "source_location": "L22"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_data_local_dao_measurementdao_measurementdao_getmeasurementsfordocument",
+      "label": ".getMeasurementsForDocument()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 54,
+      "community_name": "MeasurementDao",
+      "file_type": "code",
+      "norm_label": ".getmeasurementsfordocument()",
+      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/MeasurementDao.kt",
+      "source_location": "L19"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_data_local_dao_measurementdao_measurementdao_insertmeasurements",
+      "label": ".insertMeasurements()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 54,
+      "community_name": "MeasurementDao",
+      "file_type": "code",
+      "norm_label": ".insertmeasurements()",
+      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/MeasurementDao.kt",
+      "source_location": "L25"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_data_local_swasthdatabase_swasthdatabase_conversationdao",
+      "label": ".conversationDao()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 55,
+      "community_name": "SwasthDatabase.kt",
+      "file_type": "code",
+      "norm_label": ".conversationdao()",
+      "source_file": "app/src/main/java/com/swasthai/app/data/local/SwasthDatabase.kt",
+      "source_location": "L32"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_data_local_swasthdatabase_swasthdatabase_documentdao",
+      "label": ".documentDao()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 55,
+      "community_name": "SwasthDatabase.kt",
+      "file_type": "code",
+      "norm_label": ".documentdao()",
+      "source_file": "app/src/main/java/com/swasthai/app/data/local/SwasthDatabase.kt",
+      "source_location": "L33"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_data_local_swasthdatabase_swasthdatabase_getinstance",
+      "label": ".getInstance()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 55,
+      "community_name": "SwasthDatabase.kt",
+      "file_type": "code",
+      "norm_label": ".getinstance()",
+      "source_file": "app/src/main/java/com/swasthai/app/data/local/SwasthDatabase.kt",
+      "source_location": "L41"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_data_local_swasthdatabase_swasthdatabase_measurementdao",
+      "label": ".measurementDao()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 55,
+      "community_name": "SwasthDatabase.kt",
+      "file_type": "code",
+      "norm_label": ".measurementdao()",
+      "source_file": "app/src/main/java/com/swasthai/app/data/local/SwasthDatabase.kt",
+      "source_location": "L35"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_data_local_swasthdatabase_swasthdatabase_ragdao",
+      "label": ".ragDao()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 55,
+      "community_name": "SwasthDatabase.kt",
+      "file_type": "code",
+      "norm_label": ".ragdao()",
+      "source_file": "app/src/main/java/com/swasthai/app/data/local/SwasthDatabase.kt",
+      "source_location": "L34"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_ai_imagetextextractor_imagetextextractor_extracttext",
+      "label": ".extractText()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 56,
+      "community_name": ".extractText",
+      "file_type": "code",
+      "norm_label": ".extracttext()",
+      "source_file": "app/src/main/java/com/swasthai/app/ai/ImageTextExtractor.kt",
+      "source_location": "L20"
     },
     {
       "id": "app_src_main_java_com_swasthai_app_ai_embeddingengine_embeddingengine_bytearraytofloats",
@@ -3527,6 +3516,42 @@
       "norm_label": ".oncreate()",
       "source_file": "app/src/main/java/com/swasthai/app/SwasthApplication.kt",
       "source_location": "L41"
+    },
+    {
+      "id": "app_src_test_java_com_swasthai_app_clinicalknowledgeenginetest_clinicalknowledgeenginetest_testgeneralbloodpressureguide",
+      "label": ".testGeneralBloodPressureGuide()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "EmbeddingEngine",
+      "file_type": "code",
+      "norm_label": ".testgeneralbloodpressureguide()",
+      "source_file": "app/src/test/java/com/swasthai/app/ClinicalKnowledgeEngineTest.kt",
+      "source_location": "L38"
+    },
+    {
+      "id": "app_src_test_java_com_swasthai_app_clinicalknowledgeenginetest_clinicalknowledgeenginetest_testrecordgroundedsynthesiswithcitations",
+      "label": ".testRecordGroundedSynthesisWithCitations()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "EmbeddingEngine",
+      "file_type": "code",
+      "norm_label": ".testrecordgroundedsynthesiswithcitations()",
+      "source_file": "app/src/test/java/com/swasthai/app/ClinicalKnowledgeEngineTest.kt",
+      "source_location": "L13"
+    },
+    {
+      "id": "app_src_test_java_com_swasthai_app_clinicalknowledgeenginetest_clinicalknowledgeenginetest_testsearchtermsextractioninragpipeline",
+      "label": ".testSearchTermsExtractionInRAGPipeline()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "EmbeddingEngine",
+      "file_type": "code",
+      "norm_label": ".testsearchtermsextractioninragpipeline()",
+      "source_file": "app/src/test/java/com/swasthai/app/ClinicalKnowledgeEngineTest.kt",
+      "source_location": "L52"
     },
     {
       "id": "app_src_test_java_com_swasthai_app_embeddingenginetest_embeddingenginetest_testcosinesimilarityidenticalandorthogonal",
@@ -3685,6 +3710,18 @@
       "source_location": "L62"
     },
     {
+      "id": "app_src_main_java_com_swasthai_app_ui_chat_chatviewmodel_chatviewmodel_clearselectedimage",
+      "label": ".clearSelectedImage()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 8,
+      "community_name": "ChatViewModel",
+      "file_type": "code",
+      "norm_label": ".clearselectedimage()",
+      "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
+      "source_location": "L198"
+    },
+    {
       "id": "app_src_main_java_com_swasthai_app_ui_chat_chatviewmodel_chatviewmodel_createnewconversation",
       "label": ".createNewConversation()",
       "_callable": true,
@@ -3694,7 +3731,7 @@
       "file_type": "code",
       "norm_label": ".createnewconversation()",
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
-      "source_location": "L146"
+      "source_location": "L147"
     },
     {
       "id": "app_src_main_java_com_swasthai_app_ui_chat_chatviewmodel_chatviewmodel_deletecurrentconversation",
@@ -3706,7 +3743,7 @@
       "file_type": "code",
       "norm_label": ".deletecurrentconversation()",
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
-      "source_location": "L157"
+      "source_location": "L158"
     },
     {
       "id": "app_src_main_java_com_swasthai_app_ui_chat_chatviewmodel_chatviewmodel_executesend",
@@ -3718,7 +3755,7 @@
       "file_type": "code",
       "norm_label": ".executesend()",
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
-      "source_location": "L213"
+      "source_location": "L224"
     },
     {
       "id": "app_src_main_java_com_swasthai_app_ui_chat_chatviewmodel_chatviewmodel_loadconversations",
@@ -3730,7 +3767,7 @@
       "file_type": "code",
       "norm_label": ".loadconversations()",
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
-      "source_location": "L60"
+      "source_location": "L61"
     },
     {
       "id": "app_src_main_java_com_swasthai_app_ui_chat_chatviewmodel_chatviewmodel_loaddocuments",
@@ -3742,7 +3779,7 @@
       "file_type": "code",
       "norm_label": ".loaddocuments()",
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
-      "source_location": "L71"
+      "source_location": "L72"
     },
     {
       "id": "app_src_main_java_com_swasthai_app_ui_chat_chatviewmodel_chatviewmodel_opencontextsheet",
@@ -3754,7 +3791,7 @@
       "file_type": "code",
       "norm_label": ".opencontextsheet()",
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
-      "source_location": "L102"
+      "source_location": "L103"
     },
     {
       "id": "app_src_main_java_com_swasthai_app_ui_chat_chatviewmodel_chatviewmodel_selectconversation",
@@ -3766,7 +3803,19 @@
       "file_type": "code",
       "norm_label": ".selectconversation()",
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
-      "source_location": "L79"
+      "source_location": "L80"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_ui_chat_chatviewmodel_chatviewmodel_selectimage",
+      "label": ".selectImage()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 8,
+      "community_name": "ChatViewModel",
+      "file_type": "code",
+      "norm_label": ".selectimage()",
+      "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
+      "source_location": "L194"
     },
     {
       "id": "app_src_main_java_com_swasthai_app_ui_chat_chatviewmodel_chatviewmodel_sendmessage",
@@ -3778,7 +3827,7 @@
       "file_type": "code",
       "norm_label": ".sendmessage()",
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
-      "source_location": "L193"
+      "source_location": "L202"
     },
     {
       "id": "app_src_main_java_com_swasthai_app_ui_chat_chatviewmodel_chatviewmodel_setactivedocument",
@@ -3790,7 +3839,7 @@
       "file_type": "code",
       "norm_label": ".setactivedocument()",
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
-      "source_location": "L173"
+      "source_location": "L174"
     },
     {
       "id": "app_src_main_java_com_swasthai_app_ui_chat_chatviewmodel_chatviewmodel_setinputtext",
@@ -3802,7 +3851,19 @@
       "file_type": "code",
       "norm_label": ".setinputtext()",
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
-      "source_location": "L185"
+      "source_location": "L186"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_ui_chat_chatviewmodel_chatviewmodel_setresponselanguage",
+      "label": ".setResponseLanguage()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 8,
+      "community_name": "ChatViewModel",
+      "file_type": "code",
+      "norm_label": ".setresponselanguage()",
+      "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
+      "source_location": "L143"
     },
     {
       "id": "app_src_main_java_com_swasthai_app_ui_chat_chatviewmodel_chatviewmodel_setscopemode",
@@ -3814,7 +3875,7 @@
       "file_type": "code",
       "norm_label": ".setscopemode()",
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
-      "source_location": "L114"
+      "source_location": "L115"
     },
     {
       "id": "app_src_main_java_com_swasthai_app_ui_chat_chatviewmodel_chatviewmodel_settimerange",
@@ -3826,7 +3887,7 @@
       "file_type": "code",
       "norm_label": ".settimerange()",
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
-      "source_location": "L133"
+      "source_location": "L134"
     },
     {
       "id": "app_src_main_java_com_swasthai_app_ui_chat_chatviewmodel_chatviewmodel_toggledocumentselection",
@@ -3838,7 +3899,7 @@
       "file_type": "code",
       "norm_label": ".toggledocumentselection()",
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
-      "source_location": "L118"
+      "source_location": "L119"
     },
     {
       "id": "app_src_main_java_com_swasthai_app_ui_chat_chatviewmodel_chatviewmodel_togglestructuredvitals",
@@ -3850,7 +3911,7 @@
       "file_type": "code",
       "norm_label": ".togglestructuredvitals()",
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
-      "source_location": "L137"
+      "source_location": "L138"
     },
     {
       "id": "app_src_main_java_com_swasthai_app_ui_chat_chatviewmodel_chatviewmodel_updatemodelstatus",
@@ -3862,7 +3923,7 @@
       "file_type": "code",
       "norm_label": ".updatemodelstatus()",
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
-      "source_location": "L54"
+      "source_location": "L55"
     },
     {
       "id": "app_src_main_java_com_swasthai_app_ui_chat_chatviewmodel_chatviewmodel_updatescope",
@@ -3874,7 +3935,7 @@
       "file_type": "code",
       "norm_label": ".updatescope()",
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
-      "source_location": "L106"
+      "source_location": "L107"
     },
     {
       "id": "app_src_main_java_com_swasthai_app_ui_chat_contextconfigsheet_contextconfigsheet",
@@ -3925,26 +3986,15 @@
       "source_location": "L488"
     },
     {
-      "id": "app_src_main_java_com_swasthai_app_data_local_dao_conversationdao",
-      "label": "ConversationDao.kt",
+      "id": "app_src_main_java_com_swasthai_app_ai_ragpipeline",
+      "label": "RAGPipeline.kt",
       "_origin": "ast",
       "community": 0,
       "community_name": "DocumentDao",
       "file_type": "code",
-      "norm_label": "conversationdao.kt",
-      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/ConversationDao.kt",
+      "norm_label": "ragpipeline.kt",
+      "source_file": "app/src/main/java/com/swasthai/app/ai/RAGPipeline.kt",
       "source_location": "L1"
-    },
-    {
-      "id": "app_src_main_java_com_swasthai_app_data_local_dao_conversationdao_kt_flow",
-      "label": "Flow",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "DocumentDao",
-      "file_type": "code",
-      "norm_label": "flow",
-      "source_file": "",
-      "source_location": ""
     },
     {
       "id": "app_src_main_java_com_swasthai_app_data_local_dao_documentdao",
@@ -3965,72 +4015,6 @@
       "community_name": "DocumentDao",
       "file_type": "code",
       "norm_label": "flow",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "app_src_main_java_com_swasthai_app_data_local_dao_ragdao",
-      "label": "RAGDao.kt",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "DocumentDao",
-      "file_type": "code",
-      "norm_label": "ragdao.kt",
-      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/RAGDao.kt",
-      "source_location": "L1"
-    },
-    {
-      "id": "app_src_main_java_com_swasthai_app_data_local_entity_conversationentity",
-      "label": "ConversationEntity.kt",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "DocumentDao",
-      "file_type": "code",
-      "norm_label": "conversationentity.kt",
-      "source_file": "app/src/main/java/com/swasthai/app/data/local/entity/ConversationEntity.kt",
-      "source_location": "L1"
-    },
-    {
-      "id": "app_src_main_java_com_swasthai_app_data_local_entity_documententity",
-      "label": "DocumentEntity.kt",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "DocumentDao",
-      "file_type": "code",
-      "norm_label": "documententity.kt",
-      "source_file": "app/src/main/java/com/swasthai/app/data/local/entity/DocumentEntity.kt",
-      "source_location": "L1"
-    },
-    {
-      "id": "app_src_main_java_com_swasthai_app_data_local_swasthdatabase",
-      "label": "SwasthDatabase.kt",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "DocumentDao",
-      "file_type": "code",
-      "norm_label": "swasthdatabase.kt",
-      "source_file": "app/src/main/java/com/swasthai/app/data/local/SwasthDatabase.kt",
-      "source_location": "L1"
-    },
-    {
-      "id": "context",
-      "label": "Context",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "DocumentDao",
-      "file_type": "code",
-      "norm_label": "context",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "roomdatabase",
-      "label": "RoomDatabase",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "DocumentDao",
-      "file_type": "code",
-      "norm_label": "roomdatabase",
       "source_file": "",
       "source_location": ""
     },
@@ -4145,6 +4129,39 @@
       "source_location": "L4"
     },
     {
+      "id": "app_src_main_java_com_swasthai_app_domain_model_chatmodels_responselanguage_auto",
+      "label": "AUTO",
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "SourceCitation",
+      "file_type": "code",
+      "norm_label": "auto",
+      "source_file": "app/src/main/java/com/swasthai/app/domain/model/ChatModels.kt",
+      "source_location": "L32"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_domain_model_chatmodels_responselanguage_english",
+      "label": "ENGLISH",
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "SourceCitation",
+      "file_type": "code",
+      "norm_label": "english",
+      "source_file": "app/src/main/java/com/swasthai/app/domain/model/ChatModels.kt",
+      "source_location": "L33"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_domain_model_chatmodels_responselanguage_hindi",
+      "label": "HINDI",
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "SourceCitation",
+      "file_type": "code",
+      "norm_label": "hindi",
+      "source_file": "app/src/main/java/com/swasthai/app/domain/model/ChatModels.kt",
+      "source_location": "L34"
+    },
+    {
       "id": "app_src_main_java_com_swasthai_app_ui_chat_chatscreen",
       "label": "ChatScreen.kt",
       "_origin": "ast",
@@ -4154,6 +4171,17 @@
       "norm_label": "chatscreen.kt",
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatScreen.kt",
       "source_location": "L1"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_ui_chat_chatscreen_kt_modifier",
+      "label": "Modifier",
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "SourceCitation",
+      "file_type": "code",
+      "norm_label": "modifier",
+      "source_file": "",
+      "source_location": ""
     },
     {
       "id": "app_src_main_java_com_swasthai_app_ui_components_emergencybanner",
@@ -4186,6 +4214,17 @@
       "file_type": "code",
       "norm_label": "chatregressionandragtest.kt",
       "source_file": "app/src/test/java/com/swasthai/app/ChatRegressionAndRagTest.kt",
+      "source_location": "L1"
+    },
+    {
+      "id": "app_src_test_java_com_swasthai_app_lfmpromptbuildertest",
+      "label": "LfmPromptBuilderTest.kt",
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "SourceCitation",
+      "file_type": "code",
+      "norm_label": "lfmpromptbuildertest.kt",
+      "source_file": "app/src/test/java/com/swasthai/app/LfmPromptBuilderTest.kt",
       "source_location": "L1"
     },
     {
@@ -8372,6 +8411,17 @@
       "source_location": "L1"
     },
     {
+      "id": "app_src_main_java_com_swasthai_app_ai_lfmmanager_kt_context",
+      "label": "Context",
+      "_origin": "ast",
+      "community": 46,
+      "community_name": "LfmManager",
+      "file_type": "code",
+      "norm_label": "context",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
       "id": "app_src_main_java_com_swasthai_app_ai_lfmmanager_kt_floatarray",
       "label": "FloatArray",
       "_origin": "ast",
@@ -8403,50 +8453,6 @@
       "norm_label": "result",
       "source_file": "",
       "source_location": ""
-    },
-    {
-      "id": "app_src_main_java_com_swasthai_app_domain_model_chatmodels_responselanguage_auto",
-      "label": "AUTO",
-      "_origin": "ast",
-      "community": 46,
-      "community_name": "LfmManager",
-      "file_type": "code",
-      "norm_label": "auto",
-      "source_file": "app/src/main/java/com/swasthai/app/domain/model/ChatModels.kt",
-      "source_location": "L32"
-    },
-    {
-      "id": "app_src_main_java_com_swasthai_app_domain_model_chatmodels_responselanguage_english",
-      "label": "ENGLISH",
-      "_origin": "ast",
-      "community": 46,
-      "community_name": "LfmManager",
-      "file_type": "code",
-      "norm_label": "english",
-      "source_file": "app/src/main/java/com/swasthai/app/domain/model/ChatModels.kt",
-      "source_location": "L33"
-    },
-    {
-      "id": "app_src_main_java_com_swasthai_app_domain_model_chatmodels_responselanguage_hindi",
-      "label": "HINDI",
-      "_origin": "ast",
-      "community": 46,
-      "community_name": "LfmManager",
-      "file_type": "code",
-      "norm_label": "hindi",
-      "source_file": "app/src/main/java/com/swasthai/app/domain/model/ChatModels.kt",
-      "source_location": "L34"
-    },
-    {
-      "id": "app_src_test_java_com_swasthai_app_lfmpromptbuildertest",
-      "label": "LfmPromptBuilderTest.kt",
-      "_origin": "ast",
-      "community": 46,
-      "community_name": "LfmManager",
-      "file_type": "code",
-      "norm_label": "lfmpromptbuildertest.kt",
-      "source_file": "app/src/test/java/com/swasthai/app/LfmPromptBuilderTest.kt",
-      "source_location": "L1"
     },
     {
       "id": "exception",
@@ -8647,55 +8653,11 @@
       "source_location": "L1"
     },
     {
-      "id": "app_src_main_java_com_swasthai_app_data_local_dao_measurementdao",
-      "label": "MeasurementDao.kt",
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "MeasurementDao",
-      "file_type": "code",
-      "norm_label": "measurementdao.kt",
-      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/MeasurementDao.kt",
-      "source_location": "L1"
-    },
-    {
-      "id": "app_src_main_java_com_swasthai_app_data_local_dao_measurementdao_kt_flow",
-      "label": "Flow",
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "MeasurementDao",
-      "file_type": "code",
-      "norm_label": "flow",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "app_src_main_java_com_swasthai_app_data_local_entity_structuredmeasuremententity",
-      "label": "StructuredMeasurementEntity.kt",
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "MeasurementDao",
-      "file_type": "code",
-      "norm_label": "structuredmeasuremententity.kt",
-      "source_file": "app/src/main/java/com/swasthai/app/data/local/entity/StructuredMeasurementEntity.kt",
-      "source_location": "L1"
-    },
-    {
-      "id": "app_src_main_java_com_swasthai_app_pdf_documentchunker",
-      "label": "DocumentChunker.kt",
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "MeasurementDao",
-      "file_type": "code",
-      "norm_label": "documentchunker.kt",
-      "source_file": "app/src/main/java/com/swasthai/app/pdf/DocumentChunker.kt",
-      "source_location": "L1"
-    },
-    {
       "id": "app_src_main_java_com_swasthai_app_pdf_pdfextractor",
       "label": "PdfExtractor.kt",
       "_origin": "ast",
       "community": 5,
-      "community_name": "MeasurementDao",
+      "community_name": "PdfExtractor",
       "file_type": "code",
       "norm_label": "pdfextractor.kt",
       "source_file": "app/src/main/java/com/swasthai/app/pdf/PdfExtractor.kt",
@@ -8706,7 +8668,7 @@
       "label": "ByteArray",
       "_origin": "ast",
       "community": 5,
-      "community_name": "MeasurementDao",
+      "community_name": "PdfExtractor",
       "file_type": "code",
       "norm_label": "bytearray",
       "source_file": "",
@@ -8717,7 +8679,7 @@
       "label": "DocumentChunkerTest.kt",
       "_origin": "ast",
       "community": 5,
-      "community_name": "MeasurementDao",
+      "community_name": "PdfExtractor",
       "file_type": "code",
       "norm_label": "documentchunkertest.kt",
       "source_file": "app/src/test/java/com/swasthai/app/DocumentChunkerTest.kt",
@@ -8728,7 +8690,7 @@
       "label": "PdfExtractorTest.kt",
       "_origin": "ast",
       "community": 5,
-      "community_name": "MeasurementDao",
+      "community_name": "PdfExtractor",
       "file_type": "code",
       "norm_label": "pdfextractortest.kt",
       "source_file": "app/src/test/java/com/swasthai/app/PdfExtractorTest.kt",
@@ -8768,15 +8730,213 @@
       "source_location": ""
     },
     {
-      "id": "app_src_test_java_com_swasthai_app_clinicalknowledgeenginetest",
-      "label": "ClinicalKnowledgeEngineTest.kt",
+      "id": "app_src_main_java_com_swasthai_app_data_local_dao_conversationdao",
+      "label": "ConversationDao.kt",
       "_origin": "ast",
-      "community": 51,
-      "community_name": "ClinicalKnowledgeEngine",
+      "community": 52,
+      "community_name": "ConversationDao",
       "file_type": "code",
-      "norm_label": "clinicalknowledgeenginetest.kt",
-      "source_file": "app/src/test/java/com/swasthai/app/ClinicalKnowledgeEngineTest.kt",
+      "norm_label": "conversationdao.kt",
+      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/ConversationDao.kt",
       "source_location": "L1"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_data_local_dao_conversationdao_kt_flow",
+      "label": "Flow",
+      "_origin": "ast",
+      "community": 52,
+      "community_name": "ConversationDao",
+      "file_type": "code",
+      "norm_label": "flow",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_data_local_entity_conversationentity",
+      "label": "ConversationEntity.kt",
+      "_origin": "ast",
+      "community": 52,
+      "community_name": "ConversationDao",
+      "file_type": "code",
+      "norm_label": "conversationentity.kt",
+      "source_file": "app/src/main/java/com/swasthai/app/data/local/entity/ConversationEntity.kt",
+      "source_location": "L1"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_data_local_dao_ragdao",
+      "label": "RAGDao.kt",
+      "_origin": "ast",
+      "community": 53,
+      "community_name": "RAGDao",
+      "file_type": "code",
+      "norm_label": "ragdao.kt",
+      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/RAGDao.kt",
+      "source_location": "L1"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_data_local_entity_documententity",
+      "label": "DocumentEntity.kt",
+      "_origin": "ast",
+      "community": 53,
+      "community_name": "RAGDao",
+      "file_type": "code",
+      "norm_label": "documententity.kt",
+      "source_file": "app/src/main/java/com/swasthai/app/data/local/entity/DocumentEntity.kt",
+      "source_location": "L1"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_data_local_dao_measurementdao",
+      "label": "MeasurementDao.kt",
+      "_origin": "ast",
+      "community": 54,
+      "community_name": "MeasurementDao",
+      "file_type": "code",
+      "norm_label": "measurementdao.kt",
+      "source_file": "app/src/main/java/com/swasthai/app/data/local/dao/MeasurementDao.kt",
+      "source_location": "L1"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_data_local_dao_measurementdao_kt_flow",
+      "label": "Flow",
+      "_origin": "ast",
+      "community": 54,
+      "community_name": "MeasurementDao",
+      "file_type": "code",
+      "norm_label": "flow",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_data_local_entity_structuredmeasuremententity",
+      "label": "StructuredMeasurementEntity.kt",
+      "_origin": "ast",
+      "community": 54,
+      "community_name": "MeasurementDao",
+      "file_type": "code",
+      "norm_label": "structuredmeasuremententity.kt",
+      "source_file": "app/src/main/java/com/swasthai/app/data/local/entity/StructuredMeasurementEntity.kt",
+      "source_location": "L1"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_pdf_documentchunker",
+      "label": "DocumentChunker.kt",
+      "_origin": "ast",
+      "community": 54,
+      "community_name": "MeasurementDao",
+      "file_type": "code",
+      "norm_label": "documentchunker.kt",
+      "source_file": "app/src/main/java/com/swasthai/app/pdf/DocumentChunker.kt",
+      "source_location": "L1"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_data_local_swasthdatabase",
+      "label": "SwasthDatabase.kt",
+      "_origin": "ast",
+      "community": 55,
+      "community_name": "SwasthDatabase.kt",
+      "file_type": "code",
+      "norm_label": "swasthdatabase.kt",
+      "source_file": "app/src/main/java/com/swasthai/app/data/local/SwasthDatabase.kt",
+      "source_location": "L1"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_data_local_swasthdatabase_kt_context",
+      "label": "Context",
+      "_origin": "ast",
+      "community": 55,
+      "community_name": "SwasthDatabase.kt",
+      "file_type": "code",
+      "norm_label": "context",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "roomdatabase",
+      "label": "RoomDatabase",
+      "_origin": "ast",
+      "community": 55,
+      "community_name": "SwasthDatabase.kt",
+      "file_type": "code",
+      "norm_label": "roomdatabase",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_ai_imagetextextractor",
+      "label": "ImageTextExtractor.kt",
+      "_origin": "ast",
+      "community": 56,
+      "community_name": ".extractText",
+      "file_type": "code",
+      "norm_label": "imagetextextractor.kt",
+      "source_file": "app/src/main/java/com/swasthai/app/ai/ImageTextExtractor.kt",
+      "source_location": "L1"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_ai_imagetextextractor_kt_context",
+      "label": "Context",
+      "_origin": "ast",
+      "community": 56,
+      "community_name": ".extractText",
+      "file_type": "code",
+      "norm_label": "context",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_ai_imagetextextractor_kt_uri",
+      "label": "Uri",
+      "_origin": "ast",
+      "community": 56,
+      "community_name": ".extractText",
+      "file_type": "code",
+      "norm_label": "uri",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_ai_ragpipeline_retrievalmode_local_keyword_fallback",
+      "label": "LOCAL_KEYWORD_FALLBACK",
+      "_origin": "ast",
+      "community": 57,
+      "community_name": "RetrievalMode",
+      "file_type": "code",
+      "norm_label": "local_keyword_fallback",
+      "source_file": "app/src/main/java/com/swasthai/app/ai/RAGPipeline.kt",
+      "source_location": "L24"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_ai_ragpipeline_retrievalmode_no_records_found",
+      "label": "NO_RECORDS_FOUND",
+      "_origin": "ast",
+      "community": 57,
+      "community_name": "RetrievalMode",
+      "file_type": "code",
+      "norm_label": "no_records_found",
+      "source_file": "app/src/main/java/com/swasthai/app/ai/RAGPipeline.kt",
+      "source_location": "L26"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_ai_ragpipeline_retrievalmode_semantic_vector",
+      "label": "SEMANTIC_VECTOR",
+      "_origin": "ast",
+      "community": 57,
+      "community_name": "RetrievalMode",
+      "file_type": "code",
+      "norm_label": "semantic_vector",
+      "source_file": "app/src/main/java/com/swasthai/app/ai/RAGPipeline.kt",
+      "source_location": "L23"
+    },
+    {
+      "id": "app_src_main_java_com_swasthai_app_ai_ragpipeline_retrievalmode_structured_sql_only",
+      "label": "STRUCTURED_SQL_ONLY",
+      "_origin": "ast",
+      "community": 57,
+      "community_name": "RetrievalMode",
+      "file_type": "code",
+      "norm_label": "structured_sql_only",
+      "source_file": "app/src/main/java/com/swasthai/app/ai/RAGPipeline.kt",
+      "source_location": "L25"
     },
     {
       "id": "app_src_main_java_com_swasthai_app_ai_embeddingengine",
@@ -8812,61 +8972,6 @@
       "source_location": ""
     },
     {
-      "id": "app_src_main_java_com_swasthai_app_ai_ragpipeline",
-      "label": "RAGPipeline.kt",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "EmbeddingEngine",
-      "file_type": "code",
-      "norm_label": "ragpipeline.kt",
-      "source_file": "app/src/main/java/com/swasthai/app/ai/RAGPipeline.kt",
-      "source_location": "L1"
-    },
-    {
-      "id": "app_src_main_java_com_swasthai_app_ai_ragpipeline_retrievalmode_local_keyword_fallback",
-      "label": "LOCAL_KEYWORD_FALLBACK",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "EmbeddingEngine",
-      "file_type": "code",
-      "norm_label": "local_keyword_fallback",
-      "source_file": "app/src/main/java/com/swasthai/app/ai/RAGPipeline.kt",
-      "source_location": "L24"
-    },
-    {
-      "id": "app_src_main_java_com_swasthai_app_ai_ragpipeline_retrievalmode_no_records_found",
-      "label": "NO_RECORDS_FOUND",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "EmbeddingEngine",
-      "file_type": "code",
-      "norm_label": "no_records_found",
-      "source_file": "app/src/main/java/com/swasthai/app/ai/RAGPipeline.kt",
-      "source_location": "L26"
-    },
-    {
-      "id": "app_src_main_java_com_swasthai_app_ai_ragpipeline_retrievalmode_semantic_vector",
-      "label": "SEMANTIC_VECTOR",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "EmbeddingEngine",
-      "file_type": "code",
-      "norm_label": "semantic_vector",
-      "source_file": "app/src/main/java/com/swasthai/app/ai/RAGPipeline.kt",
-      "source_location": "L23"
-    },
-    {
-      "id": "app_src_main_java_com_swasthai_app_ai_ragpipeline_retrievalmode_structured_sql_only",
-      "label": "STRUCTURED_SQL_ONLY",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "EmbeddingEngine",
-      "file_type": "code",
-      "norm_label": "structured_sql_only",
-      "source_file": "app/src/main/java/com/swasthai/app/ai/RAGPipeline.kt",
-      "source_location": "L25"
-    },
-    {
       "id": "app_src_main_java_com_swasthai_app_swasthapplication",
       "label": "SwasthApplication.kt",
       "_origin": "ast",
@@ -8875,6 +8980,17 @@
       "file_type": "code",
       "norm_label": "swasthapplication.kt",
       "source_file": "app/src/main/java/com/swasthai/app/SwasthApplication.kt",
+      "source_location": "L1"
+    },
+    {
+      "id": "app_src_test_java_com_swasthai_app_clinicalknowledgeenginetest",
+      "label": "ClinicalKnowledgeEngineTest.kt",
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "EmbeddingEngine",
+      "file_type": "code",
+      "norm_label": "clinicalknowledgeenginetest.kt",
+      "source_file": "app/src/test/java/com/swasthai/app/ClinicalKnowledgeEngineTest.kt",
       "source_location": "L1"
     },
     {
@@ -9598,24 +9714,12 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/src/main/java/com/swasthai/app/ai/LfmManager.kt",
-      "source_location": "L340",
+      "source_location": "L341",
       "weight": 1.0
     },
     {
       "source": "app_src_main_java_com_swasthai_app_ai_lfmmanager_lfmmanager_generatestream",
       "target": "app_src_main_java_com_swasthai_app_ai_lfmmanager_lfmmanager_findnativeserverbinary",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "app/src/main/java/com/swasthai/app/ai/LfmManager.kt",
-      "source_location": "L411",
-      "weight": 1.0
-    },
-    {
-      "source": "app_src_main_java_com_swasthai_app_ai_lfmmanager_lfmmanager_generatestream",
-      "target": "app_src_main_java_com_swasthai_app_ai_lfmmanager_lfmmanager_findavailablegenerativemodel",
       "relation": "calls",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -9627,6 +9731,18 @@
     },
     {
       "source": "app_src_main_java_com_swasthai_app_ai_lfmmanager_lfmmanager_generatestream",
+      "target": "app_src_main_java_com_swasthai_app_ai_lfmmanager_lfmmanager_findavailablegenerativemodel",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "app/src/main/java/com/swasthai/app/ai/LfmManager.kt",
+      "source_location": "L413",
+      "weight": 1.0
+    },
+    {
+      "source": "app_src_main_java_com_swasthai_app_ai_lfmmanager_lfmmanager_generatestream",
       "target": "app_src_main_java_com_swasthai_app_ai_lfmmanager_lfmmanager_startchatserver",
       "relation": "calls",
       "_origin": "ast",
@@ -9634,7 +9750,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/src/main/java/com/swasthai/app/ai/LfmManager.kt",
-      "source_location": "L414",
+      "source_location": "L415",
       "weight": 1.0
     },
     {
@@ -9646,7 +9762,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/src/main/java/com/swasthai/app/ai/LfmManager.kt",
-      "source_location": "L426",
+      "source_location": "L427",
       "weight": 1.0
     },
     {
@@ -9658,7 +9774,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/src/main/java/com/swasthai/app/ai/LfmManager.kt",
-      "source_location": "L513",
+      "source_location": "L514",
       "weight": 1.0
     },
     {
@@ -9670,7 +9786,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/src/main/java/com/swasthai/app/ai/LfmManager.kt",
-      "source_location": "L153",
+      "source_location": "L154",
       "weight": 1.0
     },
     {
@@ -9682,7 +9798,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/src/main/java/com/swasthai/app/ai/LfmManager.kt",
-      "source_location": "L165",
+      "source_location": "L166",
       "weight": 1.0
     },
     {
@@ -9694,7 +9810,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/src/main/java/com/swasthai/app/ai/LfmManager.kt",
-      "source_location": "L175",
+      "source_location": "L176",
       "weight": 1.0
     },
     {
@@ -9706,7 +9822,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/src/main/java/com/swasthai/app/ai/LfmManager.kt",
-      "source_location": "L180",
+      "source_location": "L181",
       "weight": 1.0
     },
     {
@@ -9718,7 +9834,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/src/main/java/com/swasthai/app/ai/LfmManager.kt",
-      "source_location": "L184",
+      "source_location": "L185",
       "weight": 1.0
     },
     {
@@ -9730,7 +9846,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/src/main/java/com/swasthai/app/ai/LfmManager.kt",
-      "source_location": "L188",
+      "source_location": "L189",
       "weight": 1.0
     },
     {
@@ -9742,7 +9858,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/src/main/java/com/swasthai/app/ai/LfmManager.kt",
-      "source_location": "L303",
+      "source_location": "L304",
       "weight": 1.0
     },
     {
@@ -9754,7 +9870,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/src/main/java/com/swasthai/app/ai/LfmManager.kt",
-      "source_location": "L308",
+      "source_location": "L309",
       "weight": 1.0
     },
     {
@@ -9766,7 +9882,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/src/main/java/com/swasthai/app/ai/LfmManager.kt",
-      "source_location": "L313",
+      "source_location": "L314",
       "weight": 1.0
     },
     {
@@ -9778,7 +9894,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/src/main/java/com/swasthai/app/ai/LfmManager.kt",
-      "source_location": "L232",
+      "source_location": "L233",
       "weight": 1.0
     },
     {
@@ -9790,7 +9906,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/src/main/java/com/swasthai/app/ai/LfmManager.kt",
-      "source_location": "L273",
+      "source_location": "L274",
       "weight": 1.0
     },
     {
@@ -9970,31 +10086,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/src/main/java/com/swasthai/app/data/repository/ChatRepository.kt",
-      "source_location": "L278",
-      "weight": 1.0
-    },
-    {
-      "source": "app_src_main_java_com_swasthai_app_data_repository_chatrepository_chatrepository_sendmessage",
-      "target": "app_src_main_java_com_swasthai_app_data_local_entity_conversationentity_messageentity",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "app/src/main/java/com/swasthai/app/data/repository/ChatRepository.kt",
-      "source_location": "L120",
-      "weight": 1.0
-    },
-    {
-      "source": "app_src_main_java_com_swasthai_app_data_repository_chatrepository_chatrepository_sendmessage",
-      "target": "app_src_main_java_com_swasthai_app_data_repository_chatrepository_chatrepository_getconversationbyid",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "app/src/main/java/com/swasthai/app/data/repository/ChatRepository.kt",
-      "source_location": "L129",
+      "source_location": "L314",
       "weight": 1.0
     },
     {
@@ -10006,7 +10098,43 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/src/main/java/com/swasthai/app/data/repository/ChatRepository.kt",
-      "source_location": "L130",
+      "source_location": "L123",
+      "weight": 1.0
+    },
+    {
+      "source": "app_src_main_java_com_swasthai_app_data_repository_chatrepository_chatrepository_sendmessage",
+      "target": "app_src_main_java_com_swasthai_app_ai_imagetextextractor_imagetextextractor_extracttext",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "app/src/main/java/com/swasthai/app/data/repository/ChatRepository.kt",
+      "source_location": "L129",
+      "weight": 1.0
+    },
+    {
+      "source": "app_src_main_java_com_swasthai_app_data_repository_chatrepository_chatrepository_sendmessage",
+      "target": "app_src_main_java_com_swasthai_app_data_local_entity_conversationentity_messageentity",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "app/src/main/java/com/swasthai/app/data/repository/ChatRepository.kt",
+      "source_location": "L157",
+      "weight": 1.0
+    },
+    {
+      "source": "app_src_main_java_com_swasthai_app_data_repository_chatrepository_chatrepository_sendmessage",
+      "target": "app_src_main_java_com_swasthai_app_data_repository_chatrepository_chatrepository_getconversationbyid",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "app/src/main/java/com/swasthai/app/data/repository/ChatRepository.kt",
+      "source_location": "L167",
       "weight": 1.0
     },
     {
@@ -10018,7 +10146,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/src/main/java/com/swasthai/app/data/repository/ChatRepository.kt",
-      "source_location": "L130",
+      "source_location": "L168",
       "weight": 1.0
     },
     {
@@ -10030,7 +10158,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/src/main/java/com/swasthai/app/data/repository/ChatRepository.kt",
-      "source_location": "L136",
+      "source_location": "L172",
       "weight": 1.0
     },
     {
@@ -10042,7 +10170,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/src/main/java/com/swasthai/app/data/repository/ChatRepository.kt",
-      "source_location": "L176",
+      "source_location": "L212",
       "weight": 1.0
     },
     {
@@ -10054,7 +10182,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/src/main/java/com/swasthai/app/data/repository/ChatRepository.kt",
-      "source_location": "L248",
+      "source_location": "L284",
       "weight": 1.0
     },
     {
@@ -10066,7 +10194,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/src/main/java/com/swasthai/app/data/repository/ChatRepository.kt",
-      "source_location": "L293",
+      "source_location": "L329",
       "weight": 1.0
     },
     {
@@ -10078,7 +10206,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/src/main/java/com/swasthai/app/data/repository/ChatRepository.kt",
-      "source_location": "L299",
+      "source_location": "L335",
       "weight": 1.0
     },
     {
@@ -10090,7 +10218,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/src/main/java/com/swasthai/app/data/repository/ChatRepository.kt",
-      "source_location": "L313",
+      "source_location": "L350",
       "weight": 1.0
     },
     {
@@ -10102,7 +10230,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/src/main/java/com/swasthai/app/data/repository/ChatRepository.kt",
-      "source_location": "L323",
+      "source_location": "L360",
       "weight": 1.0
     },
     {
@@ -10622,6 +10750,18 @@
       "weight": 1.0
     },
     {
+      "source": "app_src_main_java_com_swasthai_app_ui_chat_chatscreen_applechatmessagebubble",
+      "target": "app_src_main_java_com_swasthai_app_ui_chat_chatscreen_messageimagethumbnail",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatScreen.kt",
+      "source_location": "L543",
+      "weight": 1.0
+    },
+    {
       "source": "app_src_main_java_com_swasthai_app_ui_chat_chatscreen_chatscreen",
       "target": "app_src_main_java_com_swasthai_app_ui_components_emergencybanner_citationinspectiondialog",
       "relation": "calls",
@@ -10630,7 +10770,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatScreen.kt",
-      "source_location": "L110",
+      "source_location": "L125",
       "weight": 1.0
     },
     {
@@ -10642,7 +10782,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatScreen.kt",
-      "source_location": "L248",
+      "source_location": "L257",
       "weight": 1.0
     },
     {
@@ -10654,7 +10794,19 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatScreen.kt",
-      "source_location": "L332",
+      "source_location": "L314",
+      "weight": 1.0
+    },
+    {
+      "source": "app_src_main_java_com_swasthai_app_ui_chat_chatscreen_chatscreen",
+      "target": "app_src_main_java_com_swasthai_app_ui_chat_chatscreen_messageimagethumbnail",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatScreen.kt",
+      "source_location": "L364",
       "weight": 1.0
     },
     {
@@ -10666,7 +10818,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
-      "source_location": "L45",
+      "source_location": "L46",
       "weight": 1.0
     },
     {
@@ -10678,7 +10830,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
-      "source_location": "L153",
+      "source_location": "L154",
       "weight": 1.0
     },
     {
@@ -10690,7 +10842,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
-      "source_location": "L163",
+      "source_location": "L164",
       "weight": 1.0
     },
     {
@@ -10702,7 +10854,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
-      "source_location": "L220",
+      "source_location": "L232",
       "weight": 1.0
     },
     {
@@ -10714,7 +10866,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
-      "source_location": "L65",
+      "source_location": "L66",
       "weight": 1.0
     },
     {
@@ -10726,7 +10878,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
-      "source_location": "L205",
+      "source_location": "L216",
       "weight": 1.0
     },
     {
@@ -10738,7 +10890,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
-      "source_location": "L176",
+      "source_location": "L177",
       "weight": 1.0
     },
     {
@@ -10750,7 +10902,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
-      "source_location": "L143",
+      "source_location": "L144",
       "weight": 1.0
     },
     {
@@ -10762,7 +10914,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
-      "source_location": "L115",
+      "source_location": "L116",
       "weight": 1.0
     },
     {
@@ -10774,7 +10926,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
-      "source_location": "L134",
+      "source_location": "L135",
       "weight": 1.0
     },
     {
@@ -10786,7 +10938,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
-      "source_location": "L125",
+      "source_location": "L126",
       "weight": 1.0
     },
     {
@@ -10798,7 +10950,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
-      "source_location": "L139",
+      "source_location": "L140",
       "weight": 1.0
     },
     {
@@ -11403,6 +11555,18 @@
     },
     {
       "source": "app_src_main_java_com_swasthai_app_ai_lfmmanager_lfmmanager",
+      "target": "app_src_main_java_com_swasthai_app_ai_lfmmanager_kt_context",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "source_file": "app/src/main/java/com/swasthai/app/ai/LfmManager.kt",
+      "source_location": "L38",
+      "weight": 1.0
+    },
+    {
+      "source": "app_src_main_java_com_swasthai_app_ai_lfmmanager_lfmmanager",
       "target": "app_src_main_java_com_swasthai_app_domain_model_chatmodels_modelinferencestatus",
       "relation": "references",
       "_origin": "ast",
@@ -11410,7 +11574,7 @@
       "confidence_score": 1.0,
       "context": "field",
       "source_file": "app/src/main/java/com/swasthai/app/ai/LfmManager.kt",
-      "source_location": "L42",
+      "source_location": "L43",
       "weight": 1.0
     },
     {
@@ -11422,7 +11586,7 @@
       "confidence_score": 1.0,
       "context": "field",
       "source_file": "app/src/main/java/com/swasthai/app/ai/LfmManager.kt",
-      "source_location": "L54",
+      "source_location": "L55",
       "weight": 1.0
     },
     {
@@ -11542,7 +11706,7 @@
       "confidence_score": 1.0,
       "context": "field",
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
-      "source_location": "L36",
+      "source_location": "L37",
       "weight": 1.0
     },
     {
@@ -11554,7 +11718,7 @@
       "confidence_score": 1.0,
       "context": "field",
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
-      "source_location": "L46",
+      "source_location": "L47",
       "weight": 1.0
     },
     {
@@ -11722,7 +11886,7 @@
       "confidence_score": 1.0,
       "context": "generic_arg",
       "source_file": "app/src/main/java/com/swasthai/app/ai/LfmManager.kt",
-      "source_location": "L354",
+      "source_location": "L355",
       "weight": 1.0
     },
     {
@@ -11734,7 +11898,7 @@
       "confidence_score": 1.0,
       "context": "generic_arg",
       "source_file": "app/src/main/java/com/swasthai/app/ai/LfmManager.kt",
-      "source_location": "L403",
+      "source_location": "L404",
       "weight": 1.0
     },
     {
@@ -11746,7 +11910,7 @@
       "confidence_score": 1.0,
       "context": "generic_arg",
       "source_file": "app/src/main/java/com/swasthai/app/ai/LfmManager.kt",
-      "source_location": "L403",
+      "source_location": "L404",
       "weight": 1.0
     },
     {
@@ -12010,7 +12174,7 @@
       "confidence_score": 1.0,
       "context": "generic_arg",
       "source_file": "app/src/main/java/com/swasthai/app/data/repository/ChatRepository.kt",
-      "source_location": "L257",
+      "source_location": "L293",
       "weight": 1.0
     },
     {
@@ -12209,8 +12373,23 @@
       "weight": 1.0
     },
     {
+      "source": "app_src_main_java_com_swasthai_app_ai_imagetextextractor",
+      "target": "app_src_main_java_com_swasthai_app_ai_imagetextextractor_kt_context",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "metadata": {
+        "target_fqn": "android.content.Context"
+      },
+      "source_file": "app/src/main/java/com/swasthai/app/ai/ImageTextExtractor.kt",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
       "source": "app_src_main_java_com_swasthai_app_ai_lfmmanager",
-      "target": "context",
+      "target": "app_src_main_java_com_swasthai_app_ai_lfmmanager_kt_context",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -12224,23 +12403,8 @@
       "weight": 1.0
     },
     {
-      "source": "app_src_main_java_com_swasthai_app_ai_medgemmamanager",
-      "target": "context",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "metadata": {
-        "target_fqn": "android.content.Context"
-      },
-      "source_file": "app/src/main/java/com/swasthai/app/ai/MedGemmaManager.kt",
-      "source_location": "L3",
-      "weight": 1.0
-    },
-    {
       "source": "app_src_main_java_com_swasthai_app_data_local_swasthdatabase",
-      "target": "context",
+      "target": "app_src_main_java_com_swasthai_app_data_local_swasthdatabase_kt_context",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -12254,63 +12418,18 @@
       "weight": 1.0
     },
     {
-      "source": "app_src_main_java_com_swasthai_app_data_repository_documentrepository",
-      "target": "context",
+      "source": "app_src_main_java_com_swasthai_app_ai_imagetextextractor",
+      "target": "app_src_main_java_com_swasthai_app_ai_imagetextextractor_kt_uri",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "context": "import",
       "metadata": {
-        "target_fqn": "android.content.Context"
+        "target_fqn": "android.net.Uri"
       },
-      "source_file": "app/src/main/java/com/swasthai/app/data/repository/DocumentRepository.kt",
-      "source_location": "L3",
-      "weight": 1.0
-    },
-    {
-      "source": "app_src_main_java_com_swasthai_app_pdf_pdfextractor",
-      "target": "context",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "metadata": {
-        "target_fqn": "android.content.Context"
-      },
-      "source_file": "app/src/main/java/com/swasthai/app/pdf/PdfExtractor.kt",
-      "source_location": "L3",
-      "weight": 1.0
-    },
-    {
-      "source": "app_src_test_java_com_swasthai_app_medgemmapromptbuildertest",
-      "target": "context",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "metadata": {
-        "target_fqn": "android.content.Context"
-      },
-      "source_file": "app/src/test/java/com/swasthai/app/MedGemmaPromptBuilderTest.kt",
-      "source_location": "L3",
-      "weight": 1.0
-    },
-    {
-      "source": "model_test_harness_src_main_java_com_swasthai_testharness_litertmodeltester",
-      "target": "context",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "metadata": {
-        "target_fqn": "android.content.Context"
-      },
-      "source_file": "model-test-harness/src/main/java/com/swasthai/testharness/LiteRtModelTester.kt",
-      "source_location": "L3",
+      "source_file": "app/src/main/java/com/swasthai/app/ai/ImageTextExtractor.kt",
+      "source_location": "L4",
       "weight": 1.0
     },
     {
@@ -12404,6 +12523,21 @@
       "weight": 1.0
     },
     {
+      "source": "app_src_main_java_com_swasthai_app_ui_chat_chatscreen",
+      "target": "app_src_main_java_com_swasthai_app_ui_chat_chatscreen_kt_modifier",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "metadata": {
+        "target_fqn": "androidx.compose.ui.Modifier"
+      },
+      "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatScreen.kt",
+      "source_location": "L58",
+      "weight": 1.0
+    },
+    {
       "source": "app_src_main_java_com_swasthai_app_ui_chat_contextconfigsheet",
       "target": "app_src_main_java_com_swasthai_app_ui_chat_contextconfigsheet_kt_modifier",
       "relation": "imports",
@@ -12460,7 +12594,7 @@
         "target_fqn": "androidx.compose.ui.graphics.Color"
       },
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatScreen.kt",
-      "source_location": "L57",
+      "source_location": "L60",
       "weight": 1.0
     },
     {
@@ -13900,7 +14034,7 @@
         "target_fqn": "com.swasthai.app.domain.model.ChatMessage"
       },
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatScreen.kt",
-      "source_location": "L61",
+      "source_location": "L68",
       "weight": 1.0
     },
     {
@@ -14260,7 +14394,7 @@
         "target_fqn": "com.swasthai.app.domain.model.MessageRole"
       },
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatScreen.kt",
-      "source_location": "L62",
+      "source_location": "L69",
       "weight": 1.0
     },
     {
@@ -14545,7 +14679,7 @@
         "target_fqn": "com.swasthai.app.domain.model.ResponseLanguage"
       },
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatScreen.kt",
-      "source_location": "L63",
+      "source_location": "L70",
       "weight": 1.0
     },
     {
@@ -14770,7 +14904,7 @@
         "target_fqn": "com.swasthai.app.domain.model.SourceCitation"
       },
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatScreen.kt",
-      "source_location": "L64",
+      "source_location": "L71",
       "weight": 1.0
     },
     {
@@ -15190,7 +15324,7 @@
         "target_fqn": "com.swasthai.app.ui.components.CitationInspectionDialog"
       },
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatScreen.kt",
-      "source_location": "L65",
+      "source_location": "L72",
       "weight": 1.0
     },
     {
@@ -15205,7 +15339,7 @@
         "target_fqn": "com.swasthai.app.ui.components.EmergencyBanner"
       },
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatScreen.kt",
-      "source_location": "L66",
+      "source_location": "L73",
       "weight": 1.0
     },
     {
@@ -15692,6 +15826,30 @@
       "weight": 1.0
     },
     {
+      "source": "app_src_main_java_com_swasthai_app_ai_imagetextextractor_imagetextextractor_extracttext",
+      "target": "app_src_main_java_com_swasthai_app_ai_imagetextextractor_kt_context",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "source_file": "app/src/main/java/com/swasthai/app/ai/ImageTextExtractor.kt",
+      "source_location": "L20",
+      "weight": 1.0
+    },
+    {
+      "source": "app_src_main_java_com_swasthai_app_ai_imagetextextractor_imagetextextractor_extracttext",
+      "target": "app_src_main_java_com_swasthai_app_ai_imagetextextractor_kt_uri",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "source_file": "app/src/main/java/com/swasthai/app/ai/ImageTextExtractor.kt",
+      "source_location": "L20",
+      "weight": 1.0
+    },
+    {
       "source": "app_src_main_java_com_swasthai_app_ai_lfmmanager_lfmmanager_buildsystemprompt",
       "target": "app_src_main_java_com_swasthai_app_domain_model_chatmodels_responselanguage",
       "relation": "references",
@@ -15700,7 +15858,7 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "app/src/main/java/com/swasthai/app/ai/LfmManager.kt",
-      "source_location": "L354",
+      "source_location": "L355",
       "weight": 1.0
     },
     {
@@ -15712,7 +15870,7 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "app/src/main/java/com/swasthai/app/ai/LfmManager.kt",
-      "source_location": "L403",
+      "source_location": "L404",
       "weight": 1.0
     },
     {
@@ -15789,7 +15947,7 @@
     },
     {
       "source": "app_src_main_java_com_swasthai_app_data_local_swasthdatabase_swasthdatabase_getinstance",
-      "target": "context",
+      "target": "app_src_main_java_com_swasthai_app_data_local_swasthdatabase_kt_context",
       "relation": "references",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -15892,7 +16050,7 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatScreen.kt",
-      "source_location": "L450",
+      "source_location": "L504",
       "weight": 1.0
     },
     {
@@ -15904,7 +16062,19 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatScreen.kt",
-      "source_location": "L85",
+      "source_location": "L92",
+      "weight": 1.0
+    },
+    {
+      "source": "app_src_main_java_com_swasthai_app_ui_chat_chatscreen_messageimagethumbnail",
+      "target": "app_src_main_java_com_swasthai_app_ui_chat_chatscreen_kt_modifier",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatScreen.kt",
+      "source_location": "L475",
       "weight": 1.0
     },
     {
@@ -15916,7 +16086,7 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
-      "source_location": "L142",
+      "source_location": "L143",
       "weight": 1.0
     },
     {
@@ -15928,7 +16098,7 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
-      "source_location": "L114",
+      "source_location": "L115",
       "weight": 1.0
     },
     {
@@ -15940,7 +16110,7 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
-      "source_location": "L133",
+      "source_location": "L134",
       "weight": 1.0
     },
     {
@@ -15952,7 +16122,7 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
-      "source_location": "L106",
+      "source_location": "L107",
       "weight": 1.0
     },
     {
@@ -16336,7 +16506,7 @@
       "confidence_score": 1.0,
       "context": "return_type",
       "source_file": "app/src/main/java/com/swasthai/app/ai/LfmManager.kt",
-      "source_location": "L403",
+      "source_location": "L404",
       "weight": 1.0
     },
     {
@@ -16348,7 +16518,7 @@
       "confidence_score": 1.0,
       "context": "return_type",
       "source_file": "app/src/main/java/com/swasthai/app/ai/LfmManager.kt",
-      "source_location": "L152",
+      "source_location": "L153",
       "weight": 1.0
     },
     {
@@ -16360,7 +16530,7 @@
       "confidence_score": 1.0,
       "context": "return_type",
       "source_file": "app/src/main/java/com/swasthai/app/ai/LfmManager.kt",
-      "source_location": "L302",
+      "source_location": "L303",
       "weight": 1.0
     },
     {
@@ -16576,7 +16746,7 @@
       "confidence_score": 1.0,
       "context": "return_type",
       "source_file": "app/src/main/java/com/swasthai/app/data/repository/ChatRepository.kt",
-      "source_location": "L113",
+      "source_location": "L115",
       "weight": 1.0
     },
     {
@@ -17078,6 +17248,17 @@
       "weight": 1.0
     },
     {
+      "source": "app_src_main_java_com_swasthai_app_ai_imagetextextractor",
+      "target": "app_src_main_java_com_swasthai_app_ai_imagetextextractor_imagetextextractor",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/src/main/java/com/swasthai/app/ai/ImageTextExtractor.kt",
+      "source_location": "L17",
+      "weight": 1.0
+    },
+    {
       "source": "app_src_main_java_com_swasthai_app_ai_lfmmanager",
       "target": "app_src_main_java_com_swasthai_app_ai_lfmmanager_lfmbenchmarkmetrics",
       "relation": "contains",
@@ -17426,7 +17607,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/src/main/java/com/swasthai/app/domain/model/ChatModels.kt",
-      "source_location": "L98",
+      "source_location": "L99",
       "weight": 1.0
     },
     {
@@ -17640,13 +17821,24 @@
     },
     {
       "source": "app_src_main_java_com_swasthai_app_ui_chat_chatscreen",
+      "target": "app_src_main_java_com_swasthai_app_ui_chat_chatscreen_messageimagethumbnail",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatScreen.kt",
+      "source_location": "L475",
+      "weight": 1.0
+    },
+    {
+      "source": "app_src_main_java_com_swasthai_app_ui_chat_chatscreen",
       "target": "app_src_main_java_com_swasthai_app_ui_chat_chatscreen_applechatmessagebubble",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatScreen.kt",
-      "source_location": "L450",
+      "source_location": "L504",
       "weight": 1.0
     },
     {
@@ -17657,7 +17849,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatScreen.kt",
-      "source_location": "L85",
+      "source_location": "L92",
       "weight": 1.0
     },
     {
@@ -17679,7 +17871,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
-      "source_location": "L39",
+      "source_location": "L40",
       "weight": 1.0
     },
     {
@@ -21793,7 +21985,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
-      "source_location": "L39",
+      "source_location": "L40",
       "weight": 1.0
     },
     {
@@ -22083,6 +22275,17 @@
       "weight": 1.0
     },
     {
+      "source": "app_src_main_java_com_swasthai_app_ai_imagetextextractor_imagetextextractor",
+      "target": "app_src_main_java_com_swasthai_app_ai_imagetextextractor_imagetextextractor_extracttext",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/src/main/java/com/swasthai/app/ai/ImageTextExtractor.kt",
+      "source_location": "L20",
+      "weight": 1.0
+    },
+    {
       "source": "app_src_main_java_com_swasthai_app_ai_lfmmanager_lfmmanager",
       "target": "app_src_main_java_com_swasthai_app_ai_lfmmanager_lfmmanager_findavailableembeddingmodel",
       "relation": "method",
@@ -22090,7 +22293,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/src/main/java/com/swasthai/app/ai/LfmManager.kt",
-      "source_location": "L115",
+      "source_location": "L116",
       "weight": 1.0
     },
     {
@@ -22101,7 +22304,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/src/main/java/com/swasthai/app/ai/LfmManager.kt",
-      "source_location": "L133",
+      "source_location": "L134",
       "weight": 1.0
     },
     {
@@ -22112,7 +22315,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/src/main/java/com/swasthai/app/ai/LfmManager.kt",
-      "source_location": "L152",
+      "source_location": "L153",
       "weight": 1.0
     },
     {
@@ -22123,7 +22326,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/src/main/java/com/swasthai/app/ai/LfmManager.kt",
-      "source_location": "L203",
+      "source_location": "L204",
       "weight": 1.0
     },
     {
@@ -22134,7 +22337,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/src/main/java/com/swasthai/app/ai/LfmManager.kt",
-      "source_location": "L249",
+      "source_location": "L250",
       "weight": 1.0
     },
     {
@@ -22145,7 +22348,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/src/main/java/com/swasthai/app/ai/LfmManager.kt",
-      "source_location": "L287",
+      "source_location": "L288",
       "weight": 1.0
     },
     {
@@ -22156,7 +22359,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/src/main/java/com/swasthai/app/ai/LfmManager.kt",
-      "source_location": "L302",
+      "source_location": "L303",
       "weight": 1.0
     },
     {
@@ -22167,7 +22370,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/src/main/java/com/swasthai/app/ai/LfmManager.kt",
-      "source_location": "L317",
+      "source_location": "L318",
       "weight": 1.0
     },
     {
@@ -22178,7 +22381,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/src/main/java/com/swasthai/app/ai/LfmManager.kt",
-      "source_location": "L354",
+      "source_location": "L355",
       "weight": 1.0
     },
     {
@@ -22189,7 +22392,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/src/main/java/com/swasthai/app/ai/LfmManager.kt",
-      "source_location": "L403",
+      "source_location": "L404",
       "weight": 1.0
     },
     {
@@ -22200,7 +22403,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/src/main/java/com/swasthai/app/ai/LfmManager.kt",
-      "source_location": "L533",
+      "source_location": "L534",
       "weight": 1.0
     },
     {
@@ -22211,7 +22414,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/src/main/java/com/swasthai/app/ai/LfmManager.kt",
-      "source_location": "L95",
+      "source_location": "L96",
       "weight": 1.0
     },
     {
@@ -22783,7 +22986,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/src/main/java/com/swasthai/app/data/repository/ChatRepository.kt",
-      "source_location": "L113",
+      "source_location": "L115",
       "weight": 1.0
     },
     {
@@ -22794,7 +22997,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/src/main/java/com/swasthai/app/data/repository/ChatRepository.kt",
-      "source_location": "L257",
+      "source_location": "L293",
       "weight": 1.0
     },
     {
@@ -22805,7 +23008,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/src/main/java/com/swasthai/app/data/repository/ChatRepository.kt",
-      "source_location": "L271",
+      "source_location": "L307",
       "weight": 1.0
     },
     {
@@ -22816,7 +23019,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/src/main/java/com/swasthai/app/data/repository/ChatRepository.kt",
-      "source_location": "L304",
+      "source_location": "L341",
       "weight": 1.0
     },
     {
@@ -23245,7 +23448,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
-      "source_location": "L102",
+      "source_location": "L103",
       "weight": 1.0
     },
     {
@@ -23256,7 +23459,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
-      "source_location": "L106",
+      "source_location": "L107",
       "weight": 1.0
     },
     {
@@ -23267,7 +23470,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
-      "source_location": "L114",
+      "source_location": "L115",
       "weight": 1.0
     },
     {
@@ -23278,7 +23481,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
-      "source_location": "L118",
+      "source_location": "L119",
       "weight": 1.0
     },
     {
@@ -23289,7 +23492,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
-      "source_location": "L133",
+      "source_location": "L134",
       "weight": 1.0
     },
     {
@@ -23300,7 +23503,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
-      "source_location": "L137",
+      "source_location": "L138",
       "weight": 1.0
     },
     {
@@ -23311,7 +23514,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
-      "source_location": "L142",
+      "source_location": "L143",
       "weight": 1.0
     },
     {
@@ -23322,7 +23525,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
-      "source_location": "L146",
+      "source_location": "L147",
       "weight": 1.0
     },
     {
@@ -23333,7 +23536,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
-      "source_location": "L157",
+      "source_location": "L158",
       "weight": 1.0
     },
     {
@@ -23344,7 +23547,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
-      "source_location": "L173",
+      "source_location": "L174",
       "weight": 1.0
     },
     {
@@ -23355,7 +23558,29 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
-      "source_location": "L185",
+      "source_location": "L186",
+      "weight": 1.0
+    },
+    {
+      "source": "app_src_main_java_com_swasthai_app_ui_chat_chatviewmodel_chatviewmodel",
+      "target": "app_src_main_java_com_swasthai_app_ui_chat_chatviewmodel_chatviewmodel_selectimage",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
+      "source_location": "L194",
+      "weight": 1.0
+    },
+    {
+      "source": "app_src_main_java_com_swasthai_app_ui_chat_chatviewmodel_chatviewmodel",
+      "target": "app_src_main_java_com_swasthai_app_ui_chat_chatviewmodel_chatviewmodel_clearselectedimage",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
+      "source_location": "L198",
       "weight": 1.0
     },
     {
@@ -23366,7 +23591,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
-      "source_location": "L193",
+      "source_location": "L202",
       "weight": 1.0
     },
     {
@@ -23377,7 +23602,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
-      "source_location": "L213",
+      "source_location": "L224",
       "weight": 1.0
     },
     {
@@ -23388,7 +23613,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
-      "source_location": "L54",
+      "source_location": "L55",
       "weight": 1.0
     },
     {
@@ -23399,7 +23624,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
-      "source_location": "L60",
+      "source_location": "L61",
       "weight": 1.0
     },
     {
@@ -23410,7 +23635,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
-      "source_location": "L71",
+      "source_location": "L72",
       "weight": 1.0
     },
     {
@@ -23421,7 +23646,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatViewModel.kt",
-      "source_location": "L79",
+      "source_location": "L80",
       "weight": 1.0
     },
     {
@@ -24060,7 +24285,7 @@
       "confidence_score": 0.85,
       "context": "call",
       "source_file": "app/src/main/java/com/swasthai/app/ai/LfmManager.kt",
-      "source_location": "L159",
+      "source_location": "L160",
       "weight": 1.0
     },
     {
@@ -24072,7 +24297,7 @@
       "confidence_score": 0.85,
       "context": "call",
       "source_file": "app/src/main/java/com/swasthai/app/ai/LfmManager.kt",
-      "source_location": "L306",
+      "source_location": "L307",
       "weight": 1.0
     },
     {
@@ -24096,9 +24321,10 @@
       "confidence_score": 0.85,
       "context": "call",
       "source_file": "app/src/main/java/com/swasthai/app/ui/chat/ChatScreen.kt",
-      "source_location": "L117",
+      "source_location": "L132",
       "weight": 1.0
     }
   ],
-  "hyperedges": []
+  "hyperedges": [],
+  "built_at_commit": "07de6075465f2a3fedceb9329157412efdd7a475"
 }

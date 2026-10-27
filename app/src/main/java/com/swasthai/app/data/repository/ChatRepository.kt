@@ -100,7 +100,9 @@ class ChatRepository(
         val followUpTriggers = listOf(
             "what about", "how about", "what of", "why", "and", "is that", "does that",
             "previous", "yesterday", "that report", "the report", "this report",
-            "haemoglobin", "hemoglobin", "blood report", "my result", "those results"
+            "haemoglobin", "hemoglobin", "blood report", "my result", "those results",
+            "aur", "kya", "iska", "uska", "ye", "yeh", "report", "lab", "image", "photo",
+            "और", "क्या", "इसका", "उसका", "ये", "रिपोर्ट", "नतीजा"
         )
         return followUpTriggers.any { lower.contains(it) } || lower.split(" ").size <= 5
     }
@@ -114,29 +116,63 @@ class ChatRepository(
         conversationId: Long,
         userQuery: String,
         activeDocId: Long? = null,
-        overrideScope: ChatContextScope? = null
+        overrideScope: ChatContextScope? = null,
+        imageUri: String? = null
     ): Flow<ChatMessage> = flow {
-        // 1. Persist User Message
+        // Multi-turn prior history (captured before inserting current turn)
+        val priorHistory = conversationDao.getMessagesList(conversationId).map { it.toDomain() }
+
+        // 1. On-device OCR extraction if an image is attached
+        var imageOcrText = ""
+        if (imageUri != null && lfmManager.appContext != null) {
+            try {
+                imageOcrText = com.swasthai.app.ai.ImageTextExtractor.extractText(
+                    context = lfmManager.appContext!!,
+                    imageUri = android.net.Uri.parse(imageUri)
+                )
+            } catch (e: Throwable) {
+                android.util.Log.e("ChatRepository", "OCR extraction error: ${e.message}")
+            }
+        }
+
+        val effectiveQuery = buildString {
+            if (userQuery.isNotBlank()) {
+                append(userQuery)
+            }
+            if (imageOcrText.isNotBlank()) {
+                if (isNotEmpty()) append("\n\n")
+                append("--- ATTACHED PATIENT CLINICAL IMAGE / REPORT (ON-DEVICE OCR) ---\n")
+                append(imageOcrText)
+                append("\n--------------------------------------------------------------")
+            } else if (imageUri != null) {
+                if (isNotEmpty()) append("\n\n")
+                append("[Patient attached a clinical image/photo for evaluation. Please review observed details, differential clinical insights, red flags, and recommended next steps.]")
+            }
+            if (isEmpty()) {
+                append("Please analyze and explain this attached medical record/clinical image in detail.")
+            }
+        }
+
+        // 2. Persist User Message
         val userMsgEntity = MessageEntity(
             conversationId = conversationId,
             role = MessageRole.USER.name,
-            content = userQuery,
-            timestamp = System.currentTimeMillis()
+            content = if (userQuery.isNotBlank()) userQuery else if (imageOcrText.isNotBlank()) "Attached Medical Report" else "Attached Medical Image",
+            timestamp = System.currentTimeMillis(),
+            imageUri = imageUri
         )
         conversationDao.insertMessage(userMsgEntity)
 
-        // 2. Load Conversation Scope
+        // 3. Load Conversation Scope
         val convoEntity = conversationDao.getConversationById(conversationId)
         val activeScope = overrideScope ?: convoEntity?.toDomain()?.scope ?: ChatContextScope()
 
-        // 3. Multi-turn context and reference resolution
-        val history = conversationDao.getMessagesList(conversationId).map { it.toDomain() }
-        val priorUserTurns = history.filter { it.role == MessageRole.USER && it.content != userQuery }
-
+        // 4. Multi-turn context and reference resolution
+        val priorUserTurns = priorHistory.filter { it.role == MessageRole.USER }
         val retrievalQuery = if (isFollowUpQuery(userQuery) && priorUserTurns.isNotEmpty()) {
             "${priorUserTurns.last().content} $userQuery"
         } else {
-            userQuery
+            userQuery.ifBlank { imageOcrText.take(100) }
         }
 
         // 4. Deterministic Emergency Triage Check
@@ -187,8 +223,8 @@ class ChatRepository(
         if (lfmManager.status == ModelInferenceStatus.READY) {
             try {
                 lfmManager.generateStream(
-                    currentQuery = userQuery,
-                    history = history,
+                    currentQuery = effectiveQuery,
+                    history = priorHistory,
                     citations = citations,
                     allHistoryMeasurements = allHistoryBiomarkers,
                     responseLanguage = activeScope.responseLanguage
@@ -297,7 +333,8 @@ class ChatRepository(
             content = cleanContent,
             timestamp = timestamp,
             citations = jsonToCitations(citationsJson),
-            isStreaming = false
+            isStreaming = false,
+            imageUri = imageUri
         )
     }
 

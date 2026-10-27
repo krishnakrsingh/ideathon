@@ -24,7 +24,7 @@ import com.swasthai.app.data.local.entity.StructuredMeasurementEntity
         ChunkEmbeddingEntity::class,
         StructuredMeasurementEntity::class
     ],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 abstract class SwasthDatabase : RoomDatabase() {
