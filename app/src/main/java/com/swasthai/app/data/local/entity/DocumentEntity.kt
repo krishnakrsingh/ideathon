@@ -1,11 +1,12 @@
 package com.swasthai.app.data.local.entity
 
 import androidx.room.Entity
+import androidx.room.ColumnInfo
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "documents")
+@Entity(tableName = "documents", indices = [Index(value = ["stableId"], unique = true), Index(value = ["profileId", "importDate"])])
 data class DocumentEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val fileName: String,
@@ -15,7 +16,10 @@ data class DocumentEntity(
     val reportDate: Long? = null,
     val indexingStatus: String,
     val pageCount: Int = 1,
-    val failureReason: String? = null
+    val failureReason: String? = null,
+    @ColumnInfo(defaultValue = "''") val stableId: String = "",
+    @ColumnInfo(defaultValue = "0") val encryptionContextVersion: Int = 0,
+    @ColumnInfo(defaultValue = "'local-default-profile'") val profileId: String = DEFAULT_PERSON_PROFILE_ID
 )
 
 @Entity(
@@ -28,7 +32,7 @@ data class DocumentEntity(
             onDelete = ForeignKey.CASCADE
         )
     ],
-    indices = [Index(value = ["documentId"])]
+    indices = [Index(value = ["documentId", "pageNumber", "chunkIndex"])]
 )
 data class DocumentChunkEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,

@@ -5,7 +5,7 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "conversations")
+@Entity(tableName = "conversations", indices = [Index(value = ["profileId"])])
 data class ConversationEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val title: String,
@@ -18,7 +18,8 @@ data class ConversationEntity(
     val customStartDate: Long? = null,
     val customEndDate: Long? = null,
     val includeStructuredRecords: Boolean = true,
-    val responseLanguage: String = "AUTO"
+    val responseLanguage: String = "AUTO",
+    val profileId: String = DEFAULT_PERSON_PROFILE_ID
 )
 
 @Entity(
@@ -40,5 +41,6 @@ data class MessageEntity(
     val content: String,
     val timestamp: Long = System.currentTimeMillis(),
     val citationsJson: String = "[]",
-    val imageUri: String? = null
+    val imageUri: String? = null,
+    val turnId: String? = null
 )

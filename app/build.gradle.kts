@@ -63,6 +63,8 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.6")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.6")
     implementation("androidx.activity:activity-compose:1.9.3")
+    implementation("io.coil-kt:coil-compose:2.7.0")
+    implementation("io.coil-kt:coil-svg:2.7.0")
 
     // Compose
     implementation(platform("androidx.compose:compose-bom:2024.10.00"))
@@ -83,8 +85,10 @@ dependencies {
     // Google LiteRT-LM for MedGemma 1.5 4B IT (.litertlm)
     implementation("com.google.ai.edge.litertlm:litertlm-android:0.18.0")
 
-    // Google ML Kit On-Device Text Recognition for Medical Images/Reports
-    implementation("com.google.android.gms:play-services-mlkit-text-recognition:19.0.1")
+    // Bundled on-device OCR; Devanagari recognizer supports both Latin and Devanagari scripts offline.
+    implementation("com.google.mlkit:text-recognition-devanagari:16.0.1")
+    // Real page-aware PDF text extraction; OCR remains the on-device path for scanned pages.
+    implementation("com.tom-roush:pdfbox-android:2.0.27.0")
 
     // Google LiteRT Core for EmbeddingGemma
     implementation("com.google.ai.edge.litert:litert:2.3.0")

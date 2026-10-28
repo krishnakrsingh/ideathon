@@ -67,11 +67,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.swasthai.app.domain.model.ChatMessage
 import com.swasthai.app.domain.model.MessageRole
+import com.swasthai.app.domain.model.ModelInferenceStatus
 import com.swasthai.app.domain.model.ResponseLanguage
 import com.swasthai.app.domain.model.SourceCitation
 import com.swasthai.app.ui.components.CitationInspectionDialog
 import com.swasthai.app.ui.components.EmergencyBanner
+import com.swasthai.app.ui.components.openEmergencyDialer
 import com.swasthai.app.ui.theme.AppleBlueLight
+import com.swasthai.app.ui.theme.AppleOrangeLight
 import com.swasthai.app.ui.theme.AppleCardBorder
 import com.swasthai.app.ui.theme.AppleCardSurface
 import com.swasthai.app.ui.theme.AppleGroupedBackground
@@ -98,6 +101,7 @@ fun ChatScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val listState = rememberLazyListState()
+    val context = LocalContext.current
 
     var inspectedCitation by remember { mutableStateOf<SourceCitation?>(null) }
 
@@ -164,7 +168,10 @@ fun ChatScreen(
                             modifier = Modifier
                                 .size(6.dp)
                                 .clip(CircleShape)
-                                .background(Color(0xFF34C759))
+                                .background(
+                                    if (uiState.modelStatus == ModelInferenceStatus.READY)
+                                        Color(0xFF34C759) else AppleSystemRed
+                                )
                         )
                     }
 
@@ -252,10 +259,25 @@ fun ChatScreen(
                 .padding(padding)
                 .imePadding()
         ) {
+            if (uiState.modelStatus != ModelInferenceStatus.READY) {
+                Text(
+                    text = "Gemma 4 E2B is not ready. Local AI chat and record search are unavailable until the model is initialized. Tap to open setup.",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp, vertical = 6.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(AppleOrangeLight)
+                        .clickable(onClick = onNavigateToSettings)
+                        .padding(12.dp),
+                    color = AppleLabelPrimary,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
             // Emergency Safety Alert
             if (uiState.emergencyWarning != null) {
                 EmergencyBanner(
                     message = uiState.emergencyWarning!!,
+                    onCallEmergency = { openEmergencyDialer(context) },
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
                 )
             }
@@ -334,7 +356,8 @@ fun ChatScreen(
                             )
                             Spacer(modifier = Modifier.width(6.dp))
                             Text(
-                                text = "Analyzing...",
+                                text = uiState.currentMessages.lastOrNull { it.isStreaming }?.activityLabel
+                                    ?: "Writing your answer",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = AppleLabelSecondary,
                                 fontSize = 12.sp

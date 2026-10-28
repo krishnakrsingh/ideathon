@@ -27,7 +27,23 @@ object EmergencyTriage {
         "severe allergic reaction",
         "overdose",
         "suicide",
-        "killing myself"
+        "killing myself",
+        "chest pain",
+        "सीने में दर्द",
+        "छाती में दर्द",
+        "सांस नहीं आ रही",
+        "सांस लेने में तकलीफ",
+        "बहुत खून बह",
+        "बेहोश",
+        "चेहरा टेढ़ा",
+        "बोलने में दिक्कत",
+        "अचानक सुन्न",
+        "आत्महत्या",
+        "खुदकुशी",
+        "seene me dard",
+        "saans nahi aa rahi",
+        "saans lene mein takleef",
+        "khudkushi"
     )
 
     fun evaluate(query: String): TriageResult {

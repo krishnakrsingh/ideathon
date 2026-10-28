@@ -1,0 +1,16 @@
+{
+  "name": "@swasthai/auth",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.mjs"
+  },
+  "dependencies": {
+    "better-auth": "^1.7.14",
+    "better-sqlite3": "^13.0.3",
+    "nodemailer": "^10.2.1"
+  },
+  "allowScripts": {
+    "better-sqlite3@13.0.3": true
+  }
+}

@@ -130,54 +130,65 @@ object DocumentChunker {
     fun extractStructuredMeasurements(
         documentId: Long,
         pages: List<ExtractedPage>,
-        reportDate: Long
+        reportDate: Long,
+        testDateSource: String = "UNKNOWN"
     ): List<StructuredMeasurementEntity> {
         val measurements = mutableListOf<StructuredMeasurementEntity>()
-
-        val linePattern = Regex(
-            "([A-Za-z0-9\\s\\-()]+?)\\s*[:\\t|]\\s*([0-9]+(?:\\.[0-9]+)?)\\s*([A-Za-z/%µmcgmgdLIU]+)?(?:\\s*[(\\[]([0-9]+(?:\\.[0-9]+)?)\\s*-\\s*([0-9]+(?:\\.[0-9]+)?)[)\\]])?",
+        val number = "[+-]?(?:\\d{1,3}(?:,\\d{3})+|\\d+)(?:\\.\\d+)?"
+        val resultPattern = Regex(
+            "^\\s*(<=|>=|<|>|≤|≥)?\\s*($number)\\s*([^\\s()\\[\\]|,;]+)?\\s*(?:[(\\[]\\s*($number)\\s*(?:-|–|—|to)\\s*($number)\\s*[)\\]])?.*$",
             RegexOption.IGNORE_CASE
         )
 
         for (page in pages) {
             val lines = page.text.split("\n")
             for (line in lines) {
-                val match = linePattern.find(line.trim()) ?: continue
-                val name = match.groupValues[1].trim()
-                val valStr = match.groupValues[2].trim()
-                val unit = match.groupValues[3].trim().ifBlank { "units" }
-                val lowStr = match.groupValues.getOrNull(4)?.trim()
-                val highStr = match.groupValues.getOrNull(5)?.trim()
-
-                // Filter out non-biomarker metadata lines
-                val lowerName = name.lowercase()
-                if (name.length < 3 ||
-                    lowerName == "page" ||
-                    lowerName.contains("date") ||
-                    lowerName.contains("patient") ||
-                    lowerName.contains("specimen") ||
-                    lowerName.contains("doctor") ||
-                    lowerName.contains("hospital") ||
-                    lowerName.contains("clinic") ||
-                    lowerName.contains("laboratory")
-                ) {
-                    continue
+                val trimmed = line.trim()
+                val labeled = LAB_LABELS.firstNotNullOfOrNull { (alias, definition) ->
+                    val prefix = Regex(
+                        "^\\s*${Regex.escape(alias)}(?:\\s*[:=|\\t]\\s*|\\s+)(.+)$",
+                        RegexOption.IGNORE_CASE
+                    )
+                    prefix.find(trimmed)?.groupValues?.get(1)?.let { definition to it.trim() }
+                } ?: continue
+                val (definition, resultText) = labeled
+                val match = resultPattern.matchEntire(resultText) ?: continue
+                val rawNumeric = match.groupValues[2]
+                val numericValue = rawNumeric.replace(",", "").toDoubleOrNull() ?: continue
+                val rawUnit = match.groupValues[3].trim()
+                val rangeLow = match.groupValues[4].takeIf(String::isNotBlank)?.replace(",", "")?.toDoubleOrNull()
+                val rangeHigh = match.groupValues[5].takeIf(String::isNotBlank)?.replace(",", "")?.toDoubleOrNull()
+                val validRange = rangeLow != null && rangeHigh != null && rangeLow <= rangeHigh
+                val comparator = when (match.groupValues[1]) {
+                    "≤", "<=" -> "<="
+                    "≥", ">=" -> ">="
+                    "<" -> "<"
+                    ">" -> ">"
+                    else -> "="
                 }
-
-                val numVal = valStr.toDoubleOrNull() ?: continue
-                val low = lowStr?.toDoubleOrNull()
-                val high = highStr?.toDoubleOrNull()
-
+                val unitCode = UCUM_UNITS[rawUnit.lowercase()]
                 measurements.add(
                     StructuredMeasurementEntity(
                         documentId = documentId,
-                        biomarkerName = name,
-                        numericValue = numVal,
-                        unit = unit,
-                        referenceLow = low,
-                        referenceHigh = high,
+                        biomarkerName = definition.displayName,
+                        numericValue = numericValue,
+                        unit = rawUnit.ifBlank { "unit not stated" },
+                        referenceLow = rangeLow.takeIf { validRange },
+                        referenceHigh = rangeHigh.takeIf { validRange },
                         testDate = reportDate,
-                        rawText = line.trim()
+                        rawText = trimmed,
+                        canonicalCode = definition.loincCode,
+                        sourcePageNumber = page.pageNumber,
+                        reviewStatus = "UNREVIEWED",
+                        canonicalSystem = "http://loinc.org".takeIf { definition.loincCode != null },
+                        unitSystem = "http://unitsofmeasure.org".takeIf { unitCode != null },
+                        unitCode = unitCode,
+                        valueComparator = comparator,
+                        rawValue = match.value.trim(),
+                        testDateSource = testDateSource,
+                        referenceRangeSource = "SOURCE_REPORT".takeIf { validRange },
+                        extractionMethod = EXTRACTION_METHOD,
+                        schemaVersion = 1
                     )
                 )
             }
@@ -185,4 +196,54 @@ object DocumentChunker {
 
         return measurements
     }
+
+    private data class LabLabel(val displayName: String, val loincCode: String?)
+
+    private val LAB_LABELS = listOf(
+        "hemoglobin a1c" to LabLabel("Hemoglobin A1c", "4548-4"),
+        "glycated hemoglobin" to LabLabel("Hemoglobin A1c", "4548-4"),
+        "hba1c" to LabLabel("Hemoglobin A1c", "4548-4"),
+        "hb a1c" to LabLabel("Hemoglobin A1c", "4548-4"),
+        "fasting blood sugar" to LabLabel("Glucose (fasting)", null),
+        "fasting glucose" to LabLabel("Glucose (fasting)", null),
+        "total cholesterol" to LabLabel("Total cholesterol", "2093-3"),
+        "white blood cell count" to LabLabel("Leukocytes", "6690-2"),
+        "white blood cells" to LabLabel("Leukocytes", "6690-2"),
+        "red blood cell count" to LabLabel("Erythrocytes", "789-8"),
+        "red blood cells" to LabLabel("Erythrocytes", "789-8"),
+        "platelet count" to LabLabel("Platelets", "777-3"),
+        "hematocrit" to LabLabel("Hematocrit", "4544-3"),
+        "packed cell volume" to LabLabel("Hematocrit", "4544-3"),
+        "serum creatinine" to LabLabel("Creatinine", "2160-0"),
+        "creatinine" to LabLabel("Creatinine", "2160-0"),
+        "serum glucose" to LabLabel("Glucose", "2345-7"),
+        "blood glucose" to LabLabel("Glucose", "2345-7"),
+        "glucose" to LabLabel("Glucose", "2345-7"),
+        "triglycerides" to LabLabel("Triglyceride", "2571-8"),
+        "triglyceride" to LabLabel("Triglyceride", "2571-8"),
+        "hemoglobin" to LabLabel("Hemoglobin", "718-7"),
+        "haemoglobin" to LabLabel("Hemoglobin", "718-7"),
+        "platelets" to LabLabel("Platelets", "777-3"),
+        "wbc" to LabLabel("Leukocytes", "6690-2"),
+        "rbc" to LabLabel("Erythrocytes", "789-8"),
+        "cholesterol" to LabLabel("Total cholesterol", "2093-3"),
+        "hb" to LabLabel("Hemoglobin", "718-7"),
+        "हीमोग्लोबिन" to LabLabel("Hemoglobin", "718-7"),
+        "ग्लूकोज" to LabLabel("Glucose", "2345-7"),
+        "प्लेटलेट्स" to LabLabel("Platelets", "777-3")
+    ).sortedByDescending { it.first.length }
+
+    private val UCUM_UNITS = mapOf(
+        "mg/dl" to "mg/dL",
+        "g/dl" to "g/dL",
+        "g/l" to "g/L",
+        "mmol/l" to "mmol/L",
+        "%" to "%",
+        "10^3/ul" to "10*3/uL",
+        "10*3/ul" to "10*3/uL",
+        "10^6/ul" to "10*6/uL",
+        "10*6/ul" to "10*6/uL"
+    )
+
+    private const val EXTRACTION_METHOD = "label-allowlist-v1"
 }

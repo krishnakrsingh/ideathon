@@ -1,0 +1,13 @@
+[project]
+name = "swasthai-api"
+version = "0.1.0"
+description = "Local development API for end-to-end encrypted SwasthAI records"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.115,<1",
+    "PyJWT[crypto]>=2.10,<3",
+    "uvicorn>=0.34,<1",
+]
+
+[tool.uvicorn]
+factory = false

@@ -3,6 +3,7 @@ package com.swasthai.app.data.repository
 import android.content.Context
 import android.net.Uri
 import com.swasthai.app.ai.EmbeddingEngine
+import com.swasthai.app.ai.ImageTextExtractor
 import com.swasthai.app.data.local.dao.DocumentDao
 import com.swasthai.app.data.local.dao.MeasurementDao
 import com.swasthai.app.data.local.dao.RAGDao
@@ -14,33 +15,57 @@ import com.swasthai.app.domain.model.MedicalDocument
 import com.swasthai.app.domain.model.ModelInferenceStatus
 import com.swasthai.app.pdf.DocumentChunker
 import com.swasthai.app.pdf.PdfExtractor
+import com.swasthai.app.security.EncryptedPayloadEnvelope
+import com.swasthai.app.security.ProfileKeyManager
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
+import java.util.UUID
+import java.util.Date
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class DocumentRepository(
     private val context: Context,
     private val documentDao: DocumentDao,
     private val ragDao: RAGDao,
     private val measurementDao: MeasurementDao,
-    private val embeddingEngine: EmbeddingEngine
+    private val embeddingEngine: EmbeddingEngine,
+    private val profileKeyManager: ProfileKeyManager,
+    private val personProfileRepository: PersonProfileRepository
 ) {
+
+    companion object {
+        const val DEFAULT_LOCAL_PROFILE_ID = "local-default-profile"
+        private const val CURRENT_ENCRYPTION_CONTEXT_VERSION = 2
+        private const val MAX_PDF_BYTES = 100L * 1024 * 1024
+    }
 
     private val vaultDir = File(context.filesDir, "medical_vault").apply {
         if (!exists()) mkdirs()
     }
 
-    fun getAllDocuments(): Flow<List<MedicalDocument>> {
-        return documentDao.getAllDocuments().map { entities ->
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun getAllDocuments(profileId: String? = null): Flow<List<MedicalDocument>> {
+        val source = if (profileId == null) {
+            personProfileRepository.activeProfileId.flatMapLatest(documentDao::getAllDocuments)
+        } else documentDao.getAllDocuments(profileId)
+        return source.map { entities ->
             entities.map { it.toDomain() }
         }
     }
 
-    suspend fun getDocumentById(id: Long): MedicalDocument? = withContext(Dispatchers.IO) {
-        documentDao.getDocumentById(id)?.toDomain()
+    suspend fun getDocumentById(id: Long, profileId: String? = null): MedicalDocument? = withContext(Dispatchers.IO) {
+        documentDao.getDocumentById(id, profileId ?: personProfileRepository.activeProfileId.value)?.toDomain()
     }
 
     suspend fun getChunksForDocument(id: Long): List<DocumentChunkEntity> = withContext(Dispatchers.IO) {
@@ -51,198 +76,356 @@ class DocumentRepository(
      * Imports a PDF from content URI.
      * Preserves original file locally in vault, extracts text, chunks, indexes embeddings, and extracts biomarkers.
      */
-    suspend fun importDocument(uri: Uri, fileName: String): Result<MedicalDocument> = withContext(Dispatchers.IO) {
+    suspend fun importDocument(uri: Uri, fileName: String, profileId: String? = null): Result<MedicalDocument> = withContext(Dispatchers.IO) {
+        val stagingFile = File.createTempFile("incoming-", ".pdf", context.cacheDir)
         try {
-            val safeFileName = "${System.currentTimeMillis()}_$fileName"
-            val destinationFile = File(vaultDir, safeFileName)
-
             context.contentResolver.openInputStream(uri)?.use { input ->
-                FileOutputStream(destinationFile).use { output ->
-                    input.copyTo(output)
+                FileOutputStream(stagingFile).use { output ->
+                    copyPdfBounded(input, output)
+                    output.fd.sync()
                 }
             } ?: return@withContext Result.failure(Exception("Cannot read document from URI"))
 
-            processAndIndexFile(destinationFile, fileName)
+            processAndIndexFile(stagingFile, fileName, profileId ?: personProfileRepository.activeProfileId.value)
+        } catch (cancelled: CancellationException) {
+            throw cancelled
         } catch (e: Exception) {
             Result.failure(e)
+        } finally {
+            stagingFile.delete()
         }
     }
 
-    /**
-     * Imports a verified clinical sample laboratory panel (CBC & Metabolic Panel)
-     * into the app vault, extracting 12+ real clinical biomarkers and indexing chunks.
-     */
-    suspend fun importSampleDocument(): Result<MedicalDocument> = withContext(Dispatchers.IO) {
-        try {
-            val fileName = "Sample_Comprehensive_Health_Panel.pdf"
-            val safeFileName = "${System.currentTimeMillis()}_$fileName"
-            val destinationFile = File(vaultDir, safeFileName)
-
-            val samplePdfBytes = generateSamplePdfBytes()
-            FileOutputStream(destinationFile).use { output ->
-                output.write(samplePdfBytes)
-            }
-
-            processAndIndexFile(destinationFile, "Comprehensive Health Panel (Sample).pdf")
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-
-    private suspend fun processAndIndexFile(destinationFile: File, displayFileName: String): Result<MedicalDocument> {
+    private suspend fun processAndIndexFile(plaintextInput: File, displayFileName: String, profileId: String): Result<MedicalDocument> {
         // 1. Insert initial document record (PENDING)
         val docEntity = DocumentEntity(
             fileName = displayFileName,
-            localFilePath = destinationFile.absolutePath,
-            fileSize = destinationFile.length(),
+            localFilePath = "",
+            fileSize = 0,
             importDate = System.currentTimeMillis(),
-            indexingStatus = IndexingStatus.PENDING.name
+            indexingStatus = IndexingStatus.PENDING.name,
+            stableId = UUID.randomUUID().toString(),
+            encryptionContextVersion = CURRENT_ENCRYPTION_CONTEXT_VERSION,
+            profileId = profileId
         )
         val docId = documentDao.insertDocument(docEntity)
+        val timelineFolder = SimpleDateFormat("yyyy/MM", Locale.ROOT).format(Date(docEntity.importDate))
+        val profileFolder = UUID.nameUUIDFromBytes(profileId.toByteArray(Charsets.UTF_8)).toString()
+        val recordDir = File(vaultDir, "profiles/$profileFolder/$timelineFolder")
+        if (!recordDir.isDirectory && !recordDir.mkdirs()) {
+            documentDao.deleteDocumentById(docId, profileId)
+            return Result.failure(IllegalStateException("Could not create the profile record folder"))
+        }
+        val encryptedFile = File(recordDir, "record_${docEntity.stableId}.swai")
+        val encryptedTemp = File(recordDir, ".record_$docId.${UUID.randomUUID()}.part")
+        val extractionFile = File(context.cacheDir, "extract_$docId.${UUID.randomUUID()}.pdf")
+        val key = try {
+            profileKeyManager.getOrCreateProfileKey(profileId)
+        } catch (cancelled: CancellationException) {
+            withContext(NonCancellable) {
+                ragDao.deleteEmbeddingsForDocument(docId)
+                measurementDao.deleteMeasurementsForDocument(docId)
+                documentDao.deleteDocumentById(docId, profileId)
+                encryptedFile.delete()
+                encryptedTemp.delete()
+            }
+            throw cancelled
+        } catch (error: Exception) {
+            documentDao.deleteDocumentById(docId, profileId)
+            return Result.failure(error)
+        }
 
-        // 2. Extract text locally
-        val extraction = PdfExtractor.extractTextFromPdf(destinationFile)
+        try {
+            // Encrypt before extraction/indexing. The only plaintext copies are temporary app-private files.
+            EncryptedPayloadEnvelope.encryptFile(plaintextInput, encryptedTemp, key, recordAad(profileId, docEntity.stableId))
+            moveReplacing(encryptedTemp, encryptedFile)
+            plaintextInput.delete()
+            EncryptedPayloadEnvelope.decryptFile(encryptedFile, extractionFile, key, recordAad(profileId, docEntity.stableId))
 
-        if (extraction.isScannedOnly || extraction.pages.isEmpty()) {
-            val failedEntity = docEntity.copy(
-                id = docId,
-                indexingStatus = IndexingStatus.FAILED.name,
-                failureReason = extraction.failureReason ?: "No extractable text"
+            val extraction = PdfExtractor.extractTextFromPdf(extractionFile)
+            var ocrFailureReason: String? = null
+            val ocrResult = try {
+                ImageTextExtractor.extractMissingPdfPages(
+                    extractionFile,
+                    extraction.pages.mapTo(mutableSetOf()) { it.pageNumber }
+                )
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (error: Exception) {
+                android.util.Log.w("DocumentRepository", "Local PDF OCR failed for document $docId", error)
+                ocrFailureReason = error.localizedMessage ?: error.javaClass.simpleName
+                null
+            }
+            val renderedPageCount = ocrResult?.pageCount
+            val extractedPages = (extraction.pages + ocrResult?.pages.orEmpty())
+                .distinctBy { it.pageNumber }
+                .filter { renderedPageCount == null || it.pageNumber <= renderedPageCount }
+                .sortedBy { it.pageNumber }
+            if (extractedPages.isEmpty()) {
+                val failure = "This PDF contains no readable text after local OCR. Try a clearer scan or another copy."
+                documentDao.updateDocument(
+                    docEntity.copy(
+                        id = docId,
+                        localFilePath = encryptedFile.absolutePath,
+                        fileSize = encryptedFile.length(),
+                        indexingStatus = IndexingStatus.FAILED.name,
+                        failureReason = failure
+                    )
+                )
+                return Result.failure(IllegalArgumentException(failure))
+            }
+
+            val chunks = DocumentChunker.chunkPages(docId, extractedPages)
+            val chunkIds = documentDao.insertChunks(chunks)
+            val detectedReportDate = extraction.reportDate ?: PdfExtractor.detectReportDate(
+                extractedPages.joinToString("\n") { it.text }
             )
-            documentDao.updateDocument(failedEntity)
-            return Result.success(failedEntity.toDomain())
-        }
+            val resolvedReportDate = detectedReportDate ?: docEntity.importDate
+            val sourcePageCount = renderedPageCount ?: extraction.pageCount
+                ?: extractedPages.maxOfOrNull { it.pageNumber } ?: extractedPages.size
+            val extractedPageNumbers = extractedPages.mapTo(mutableSetOf()) { it.pageNumber }
+            val pagesWithoutText = (1..sourcePageCount).filterNot { it in extractedPageNumbers }
+            val failedOcrPages = ocrResult?.failedPageNumbers.orEmpty()
+            val incomplete = pagesWithoutText.isNotEmpty() || failedOcrPages.isNotEmpty()
+            val extractionNote = buildList {
+                if (pagesWithoutText.isNotEmpty()) {
+                    add("No searchable text was extracted from page${if (pagesWithoutText.size == 1) "" else "s"} ${pagesWithoutText.take(12).joinToString(", ")}${if (pagesWithoutText.size > 12) " and ${pagesWithoutText.size - 12} more" else ""}.")
+                }
+                if (failedOcrPages.isNotEmpty()) add("OCR failed on page${if (failedOcrPages.size == 1) "" else "s"} ${failedOcrPages.take(12).joinToString(", ")}.")
+                if (pagesWithoutText.isNotEmpty()) ocrFailureReason?.let { add("OCR could not run: $it") }
+            }.joinToString(" ").takeIf { it.isNotBlank() }
+            val measurements = DocumentChunker.extractStructuredMeasurements(
+                documentId = docId,
+                pages = extractedPages,
+                reportDate = resolvedReportDate,
+                testDateSource = if (detectedReportDate != null) "REPORT_DATE" else "IMPORT_DATE_FALLBACK"
+            )
+            if (measurements.isNotEmpty()) measurementDao.insertMeasurements(measurements)
 
-        // 3. Split into semantic chunks
-        val chunks = DocumentChunker.chunkPages(docId, extraction.pages)
-        val chunkIds = documentDao.insertChunks(chunks)
-
-        // 4. Extract structured biomarkers
-        val measurements = DocumentChunker.extractStructuredMeasurements(
-            documentId = docId,
-            pages = extraction.pages,
-            reportDate = extraction.reportDate ?: System.currentTimeMillis()
-        )
-        if (measurements.isNotEmpty()) {
-            measurementDao.insertMeasurements(measurements)
-        }
-
-        // 5. Generate embeddings if embedding engine is ready
-        var finalStatus = IndexingStatus.EXTRACTED
-        if (embeddingEngine.status == ModelInferenceStatus.READY) {
-            val embeddings = mutableListOf<ChunkEmbeddingEntity>()
-            for ((idx, chunk) in chunks.withIndex()) {
-                val assignedId = chunkIds.getOrElse(idx) { chunk.id }
-                val vec = embeddingEngine.generateEmbedding(chunk.text, isQuery = false)
-                if (vec != null) {
-                    embeddings.add(
-                        ChunkEmbeddingEntity(
+            var finalStatus = IndexingStatus.EXTRACTED
+            if (embeddingEngine.status == ModelInferenceStatus.READY) {
+                val embeddings = mutableListOf<ChunkEmbeddingEntity>()
+                for ((idx, chunk) in chunks.withIndex()) {
+                    val assignedId = chunkIds.getOrElse(idx) { chunk.id }
+                    val vector = embeddingEngine.generateEmbedding(chunk.text, isQuery = false)
+                    if (vector != null) {
+                        embeddings += ChunkEmbeddingEntity(
                             chunkId = assignedId,
                             documentId = docId,
-                            dimension = vec.size,
-                            embeddingBlob = EmbeddingEngine.floatsToByteArray(vec)
+                            dimension = vector.size,
+                            embeddingBlob = EmbeddingEngine.floatsToByteArray(vector)
                         )
+                    }
+                }
+                if (embeddings.isNotEmpty()) {
+                    ragDao.insertEmbeddings(embeddings)
+                    finalStatus = IndexingStatus.INDEXED
+                }
+            }
+
+            if (incomplete) finalStatus = IndexingStatus.PARTIAL
+
+            val completed = docEntity.copy(
+                id = docId,
+                localFilePath = encryptedFile.absolutePath,
+                fileSize = encryptedFile.length(),
+                pageCount = sourcePageCount,
+                reportDate = resolvedReportDate,
+                indexingStatus = finalStatus.name,
+                failureReason = extractionNote
+            )
+            documentDao.updateDocument(completed)
+            return Result.success(completed.toDomain())
+        } catch (error: Exception) {
+            ragDao.deleteEmbeddingsForDocument(docId)
+            measurementDao.deleteMeasurementsForDocument(docId)
+            documentDao.deleteDocumentById(docId, profileId)
+            encryptedFile.delete()
+            return Result.failure(error)
+        } finally {
+            encryptedTemp.delete()
+            extractionFile.delete()
+            plaintextInput.delete()
+        }
+    }
+
+    /** One-time, crash-tolerant migration of previously stored plaintext PDFs. */
+    suspend fun encryptExistingPlaintextReports() = withContext(Dispatchers.IO) {
+        cleanupAbandonedPlaintextStaging()
+        for (document in documentDao.getAllDocumentsList()) {
+            val key = profileKeyManager.getOrCreateProfileKey(document.profileId)
+            val file = File(document.localFilePath)
+            if (!file.isFile) continue
+            if (hasEncryptedEnvelope(file)) {
+                if (document.encryptionContextVersion != CURRENT_ENCRYPTION_CONTEXT_VERSION) {
+                    val plaintextTemp = File(context.cacheDir, "migrate_${UUID.randomUUID()}.pdf")
+                    val encryptedTemp = File(file.parentFile, ".${file.name}.${UUID.randomUUID()}.part")
+                    try {
+                        val legacyContexts = buildList {
+                            add(recordAad(document.profileId, document.stableId))
+                            if (document.encryptionContextVersion == 0) add(byteArrayOf())
+                            add(legacyRecordAad(document.profileId, document.id))
+                        }.distinctBy(ByteArray::contentHashCode)
+                        val decrypted = legacyContexts.any { oldContext ->
+                            runCatching {
+                                EncryptedPayloadEnvelope.decryptFile(file, plaintextTemp, key, oldContext)
+                            }.isSuccess
+                        }
+                        check(decrypted) { "Existing encrypted report could not be authenticated" }
+                        EncryptedPayloadEnvelope.encryptFile(
+                            plaintextTemp,
+                            encryptedTemp,
+                            key,
+                            recordAad(document.profileId, document.stableId)
+                        )
+                        moveReplacing(encryptedTemp, file)
+                    } finally {
+                        plaintextTemp.delete()
+                        encryptedTemp.delete()
+                    }
+                }
+                if (document.fileSize != file.length()) {
+                    documentDao.updateDocument(
+                        document.copy(
+                            fileSize = file.length(),
+                            encryptionContextVersion = CURRENT_ENCRYPTION_CONTEXT_VERSION
+                        )
+                    )
+                } else if (document.encryptionContextVersion != CURRENT_ENCRYPTION_CONTEXT_VERSION) {
+                    documentDao.updateDocument(
+                        document.copy(encryptionContextVersion = CURRENT_ENCRYPTION_CONTEXT_VERSION)
+                    )
+                }
+                continue
+            }
+            val encryptedTemp = File(file.parentFile, ".${file.name}.${UUID.randomUUID()}.part")
+            try {
+                EncryptedPayloadEnvelope.encryptFile(file, encryptedTemp, key, recordAad(document.profileId, document.stableId))
+                moveReplacing(encryptedTemp, file)
+                documentDao.updateDocument(
+                    document.copy(
+                        fileSize = file.length(),
+                        encryptionContextVersion = CURRENT_ENCRYPTION_CONTEXT_VERSION
+                    )
+                )
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (error: Exception) {
+                encryptedTemp.delete()
+                android.util.Log.e("DocumentRepository", "Could not encrypt stored report ${document.id}", error)
+                throw error
+            }
+        }
+    }
+
+    suspend fun cleanupAbandonedPlaintextStaging() = withContext(Dispatchers.IO) {
+        context.cacheDir.listFiles()
+            ?.filter { it.name.startsWith("incoming-") || it.name.startsWith("extract_") || it.name.startsWith("migrate_") }
+            ?.forEach(File::delete)
+        vaultDir.walkTopDown()
+            .filter { it.isFile && it.name.endsWith(".part") }
+            .forEach(File::delete)
+    }
+
+    private fun copyPdfBounded(input: java.io.InputStream, output: FileOutputStream) {
+        val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
+        var total = 0L
+        while (true) {
+            val count = input.read(buffer)
+            if (count < 0) break
+            total += count
+            require(total <= MAX_PDF_BYTES) { "Report exceeds the 100 MB import limit" }
+            output.write(buffer, 0, count)
+        }
+    }
+
+    private fun hasEncryptedEnvelope(file: File): Boolean = runCatching {
+        file.inputStream().use { input ->
+            val headerAndNonceAndTag = ByteArray(EncryptedPayloadEnvelope.HEADER_AND_NONCE_AND_TAG_BYTES)
+            var offset = 0
+            while (offset < headerAndNonceAndTag.size) {
+                val read = input.read(headerAndNonceAndTag, offset, headerAndNonceAndTag.size - offset)
+                if (read < 0) return false
+                offset += read
+            }
+            EncryptedPayloadEnvelope.hasSupportedEnvelopeHeader(headerAndNonceAndTag)
+        }
+    }.getOrDefault(false)
+
+    private fun moveReplacing(source: File, destination: File) {
+        try {
+            Files.move(source.toPath(), destination.toPath(), StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING)
+        } catch (_: java.nio.file.AtomicMoveNotSupportedException) {
+            Files.move(source.toPath(), destination.toPath(), StandardCopyOption.REPLACE_EXISTING)
+        }
+    }
+
+    private fun recordAad(profileId: String, stableDocumentId: String) =
+        "swasthai-record-v2:$profileId:$stableDocumentId".toByteArray(Charsets.UTF_8)
+
+    private fun legacyRecordAad(profileId: String, documentId: Long) =
+        "swasthai-record-v1:$profileId:$documentId".toByteArray(Charsets.UTF_8)
+
+    /** Backfills vectors for locally stored chunks after the embedding model becomes available. */
+    suspend fun indexMissingEmbeddings() = withContext(Dispatchers.IO) {
+        if (embeddingEngine.status != ModelInferenceStatus.READY) return@withContext
+
+        for (document in documentDao.getAllDocumentsList()) {
+            val chunks = documentDao.getChunksForDocument(document.id)
+            if (chunks.isEmpty()) continue
+
+            val existing = ragDao.getEmbeddingsForDocument(document.id)
+            val staleIds = existing
+                .filter { it.dimension != EmbeddingEngine.EMBEDDING_DIMENSION || it.embeddingBlob.size != EmbeddingEngine.EMBEDDING_DIMENSION * Float.SIZE_BYTES }
+                .map { it.chunkId }
+                .toSet()
+            if (staleIds.isNotEmpty()) ragDao.deleteEmbeddingsForDocument(document.id)
+
+            val indexedIds = if (staleIds.isEmpty()) existing.map { it.chunkId }.toSet() else emptySet()
+            val missing = chunks.filterNot { it.id in indexedIds }
+            val embeddings = missing.mapNotNull { chunk ->
+                embeddingEngine.generateEmbedding(chunk.text, isQuery = false)?.let { vector ->
+                    ChunkEmbeddingEntity(
+                        chunkId = chunk.id,
+                        documentId = document.id,
+                        dimension = vector.size,
+                        embeddingBlob = EmbeddingEngine.floatsToByteArray(vector)
                     )
                 }
             }
-            if (embeddings.isNotEmpty()) {
-                ragDao.insertEmbeddings(embeddings)
-                finalStatus = IndexingStatus.INDEXED
+            if (embeddings.isNotEmpty()) ragDao.insertEmbeddings(embeddings)
+            if ((embeddings.isNotEmpty() || indexedIds.isNotEmpty()) && document.indexingStatus != IndexingStatus.PARTIAL.name) {
+                documentDao.updateDocument(document.copy(indexingStatus = IndexingStatus.INDEXED.name))
             }
         }
-
-        val updatedEntity = docEntity.copy(
-            id = docId,
-            pageCount = extraction.pages.size,
-            reportDate = extraction.reportDate,
-            indexingStatus = finalStatus.name
-        )
-        documentDao.updateDocument(updatedEntity)
-
-        return Result.success(updatedEntity.toDomain())
-    }
-
-    private fun generateSamplePdfBytes(): ByteArray {
-        val lines = listOf(
-            "METROPOLITAN CLINICAL HEALTH LABORATORIES",
-            "Patient Diagnostic Health Panel & Laboratory Report",
-            "Report Date: 15/10/2026",
-            "Specimen Type: Whole Blood / Fasting Serum",
-            "",
-            "COMPLETE BLOOD COUNT (CBC) WITH DIFFERENTIAL",
-            "Hemoglobin: 14.8 g/dL (13.5 - 17.5)",
-            "RBC Count: 5.10 x10^6/uL (4.50 - 5.90)",
-            "White Blood Cells (WBC): 6.8 x10^3/uL (4.5 - 11.0)",
-            "Platelets: 245 x10^3/uL (150 - 450)",
-            "Hematocrit: 44.2 % (41.0 - 50.0)",
-            "",
-            "COMPREHENSIVE METABOLIC & GLYCEMIC PANEL",
-            "Fasting Blood Sugar: 92 mg/dL (70 - 99)",
-            "Serum Creatinine: 0.95 mg/dL (0.70 - 1.30)",
-            "Blood Urea Nitrogen (BUN): 14 mg/dL (7 - 20)",
-            "ALT (SGPT): 24 U/L (7 - 56)",
-            "AST (SGOT): 22 U/L (8 - 48)",
-            "",
-            "LIPID CARDIOVASCULAR PANEL",
-            "Total Cholesterol: 185 mg/dL (100 - 199)",
-            "HDL Cholesterol: 55 mg/dL (40 - 60)",
-            "LDL Cholesterol: 108 mg/dL (50 - 99)",
-            "Triglycerides: 130 mg/dL (50 - 149)",
-            "",
-            "MICRONUTRIENT & ENDOCRINE STATUS",
-            "Vitamin D (25-OH): 38 ng/mL (30 - 100)",
-            "Vitamin B12: 450 pg/mL (200 - 900)",
-            "Thyroid Stimulating Hormone (TSH): 2.1 uIU/mL (0.4 - 4.0)",
-            "",
-            "CLINICAL SUMMARY & PHYSICIAN NOTES:",
-            "Patient demonstrates balanced metabolic and hematologic parameters.",
-            "All vital organ markers fall within expected normal physiological limits.",
-            "Continue standard healthy diet, daily hydration, and routine physical activity."
-        )
-
-        val streamContent = buildString {
-            append("BT\n/F1 12 Tf\n50 720 Td\n")
-            for (line in lines) {
-                val escaped = line.replace("(", "\\(").replace(")", "\\)")
-                append("($escaped) Tj\nT*\n")
-            }
-            append("ET\n")
-        }
-
-        val pdf = buildString {
-            append("%PDF-1.4\n")
-            append("1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n")
-            append("2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n")
-            append("3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>\nendobj\n")
-            append("4 0 obj\n<< /Length ${streamContent.length} >>\nstream\n")
-            append(streamContent)
-            append("endstream\nendobj\n")
-            append("5 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj\n")
-            append("xref\n0 6\n0000000000 65535 f \n0000000010 00000 n \n0000000060 00000 n \n0000000117 00000 n \n0000000234 00000 n \n0000000450 00000 n \n")
-            append("trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n540\n%%EOF\n")
-        }
-
-        return pdf.toByteArray(Charsets.ISO_8859_1)
     }
 
     /**
      * Deletes a document and cascades deletion of its local file, chunks, embeddings, and measurements.
      */
-    suspend fun deleteDocument(id: Long): Boolean = withContext(Dispatchers.IO) {
-        val doc = documentDao.getDocumentById(id) ?: return@withContext false
+    suspend fun deleteDocument(id: Long, profileId: String? = null): Boolean = withContext(Dispatchers.IO) {
+        val activeProfileId = profileId ?: personProfileRepository.activeProfileId.value
+        val doc = documentDao.getDocumentById(id, activeProfileId) ?: return@withContext false
 
         // Delete physical file
-        try {
-            val file = File(doc.localFilePath)
-            if (file.exists()) {
-                file.delete()
-            }
-        } catch (_: Exception) {}
+        val file = File(doc.localFilePath)
+        if (file.exists() && !file.delete()) return@withContext false
 
         // Cascade delete in Room
-        documentDao.deleteDocumentById(id)
+        documentDao.deleteDocumentById(id, activeProfileId)
         measurementDao.deleteMeasurementsForDocument(id)
         true
+    }
+
+    suspend fun deleteAllDocuments(profileId: String? = null): Int = withContext(Dispatchers.IO) {
+        val activeProfileId = profileId ?: personProfileRepository.activeProfileId.value
+        val documents = documentDao.getAllDocumentsList(activeProfileId)
+        for (document in documents) {
+            check(deleteDocument(document.id, activeProfileId)) {
+                "Could not delete report ${document.fileName}; it remains in the vault."
+            }
+        }
+        documents.size
     }
 
     private fun DocumentEntity.toDomain(): MedicalDocument {

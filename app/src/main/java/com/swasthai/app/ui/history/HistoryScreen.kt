@@ -320,7 +320,6 @@ fun AppleMeasurementTrendCard(
     documentTitle: String,
     dateFormat: SimpleDateFormat
 ) {
-    val isOut = measurement.isOutOfRange
     val name = measurement.biomarkerName
 
     val (iconVector, iconTint, iconBg) = when {
@@ -375,7 +374,7 @@ fun AppleMeasurementTrendCard(
                     )
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(
-                        text = "${dateFormat.format(Date(measurement.testDate))} • $documentTitle",
+                        text = "${dateFormat.format(Date(measurement.testDate))}${if (measurement.testDateSource == "IMPORT_DATE_FALLBACK") " (import date; report date unavailable)" else ""} • $documentTitle • Page ${measurement.sourcePageNumber ?: "unknown"}",
                         fontSize = 11.sp,
                         color = AppleLabelSecondary
                     )
@@ -384,10 +383,10 @@ fun AppleMeasurementTrendCard(
                 Column(horizontalAlignment = Alignment.End) {
                     Row(verticalAlignment = Alignment.Bottom) {
                         Text(
-                            text = "${measurement.numericValue}",
+                            text = "${when (measurement.valueComparator) { "<" -> "< "; "<=" -> "≤ "; ">" -> "> "; ">=" -> "≥ "; else -> "" }}${measurement.numericValue}",
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
-                            color = if (isOut) AppleSystemOrange else AppleLabelPrimary
+                            color = AppleLabelPrimary
                         )
                         Spacer(modifier = Modifier.width(3.dp))
                         Text(
@@ -403,14 +402,14 @@ fun AppleMeasurementTrendCard(
                         modifier = Modifier
                             .padding(top = 2.dp)
                             .clip(RoundedCornerShape(6.dp))
-                            .background(if (isOut) AppleOrangeLight else AppleGreenLight)
+                            .background(AppleBlueLight)
                             .padding(horizontal = 6.dp, vertical = 2.dp)
                     ) {
                         Text(
-                            text = if (isOut) "Review" else "Normal",
+                            text = "Unreviewed extraction",
                             fontSize = 10.sp,
                             fontWeight = FontWeight.Bold,
-                            color = if (isOut) AppleSystemOrange else AppleSystemGreen
+                            color = AppleSystemBlue
                         )
                     }
                 }
@@ -424,17 +423,12 @@ fun AppleMeasurementTrendCard(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "Ref: ${measurement.referenceLow} - ${measurement.referenceHigh} ${measurement.unit}",
+                        text = "Reported range: ${measurement.referenceLow} - ${measurement.referenceHigh} ${measurement.unit}",
                         fontSize = 11.sp,
                         color = AppleLabelTertiary
                     )
-                    Text(
-                        text = if (isOut) "Outside Target" else "Within Standard Target",
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = if (isOut) AppleSystemOrange else AppleSystemGreen
-                    )
                 }
+                Text("Verify this transcription against the cited report page.", fontSize = 11.sp, color = AppleLabelTertiary)
             }
         }
     }

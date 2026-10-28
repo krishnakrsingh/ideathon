@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -62,7 +64,10 @@ fun MainAppContent(app: SwasthApplication) {
                     app.chatRepository,
                     app.documentRepository,
                     app.historyRepository,
-                    app.lfmManager
+                    app.gemma4ToolCallingModel,
+                    app.personProfileRepository,
+                    app.medicationReminderRepository,
+                    app.cycleTrackingRepository
                 ) as T
             }
         }
@@ -75,7 +80,7 @@ fun MainAppContent(app: SwasthApplication) {
                 return ChatViewModel(
                     app.chatRepository,
                     app.documentRepository,
-                    app.lfmManager
+                    app.gemma4ToolCallingModel
                 ) as T
             }
         }
@@ -104,8 +109,12 @@ fun MainAppContent(app: SwasthApplication) {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 @Suppress("UNCHECKED_CAST")
                 return SettingsViewModel(
-                    app.lfmManager,
-                    app.embeddingEngine
+                    app.embeddingEngine,
+                    app.documentRepository,
+                    app.gemma4ToolCallingModel,
+                    app.gemmaModelArtifactManager,
+                    app.accountFamilyRepository,
+                    app.deviceKeyManager
                 ) as T
             }
         }
@@ -131,6 +140,9 @@ fun MainAppContent(app: SwasthApplication) {
                         viewModel = homeViewModel,
                         onNavigateToChat = { convoId ->
                             navController.navigate(Screen.Chat.createRoute(convoId))
+                        },
+                        onNavigateToHistory = {
+                            navController.navigate(Screen.History.route)
                         },
                         onNavigateToVault = {
                             navController.navigate(Screen.Vault.route)
@@ -171,11 +183,17 @@ fun MainAppContent(app: SwasthApplication) {
                 }
 
                 composable(Screen.Integrations.route) {
-                    IntegrationsScreen()
+                    val documents by app.documentRepository.getAllDocuments().collectAsState(initial = emptyList())
+                    val aiModelStatus by app.gemma4ToolCallingModel.statusFlow.collectAsState()
+                    IntegrationsScreen(
+                        localRecordCount = documents.size,
+                        modelStatus = aiModelStatus,
+                        onOpenRecords = { navController.navigate(Screen.Vault.route) }
+                    )
                 }
 
-                composable("history") {
-                    IntegrationsScreen()
+                composable(Screen.History.route) {
+                    HistoryScreen(viewModel = historyViewModel)
                 }
 
                 composable(Screen.Settings.route) {

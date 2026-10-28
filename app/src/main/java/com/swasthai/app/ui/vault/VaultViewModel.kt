@@ -84,17 +84,6 @@ class VaultViewModel(
         }
     }
 
-    fun importSampleDocument() {
-        _uiState.value = _uiState.value.copy(isImporting = true, errorMessage = null)
-        viewModelScope.launch {
-            val result = documentRepository.importSampleDocument()
-            _uiState.value = _uiState.value.copy(
-                isImporting = false,
-                errorMessage = result.exceptionOrNull()?.localizedMessage
-            )
-        }
-    }
-
     fun deleteDocument(id: Long) {
         viewModelScope.launch {
             documentRepository.deleteDocument(id)

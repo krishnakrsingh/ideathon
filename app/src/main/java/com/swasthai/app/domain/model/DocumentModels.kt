@@ -4,6 +4,7 @@ enum class IndexingStatus {
     PENDING,
     EXTRACTED,
     INDEXED,
+    PARTIAL,
     FAILED
 }
 

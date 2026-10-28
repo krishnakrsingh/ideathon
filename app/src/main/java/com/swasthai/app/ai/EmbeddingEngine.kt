@@ -1,6 +1,16 @@
 package com.swasthai.app.ai
 
+import android.content.Context
+import com.google.ai.edge.litertlm.Backend
+import com.google.ai.edge.litertlm.EmbeddingEngineConfig
+import com.google.ai.edge.litertlm.EmbeddingOptions
+import com.google.ai.edge.litertlm.InputData
 import com.swasthai.app.domain.model.ModelInferenceStatus
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -12,39 +22,40 @@ data class ScoredChunk(
     val score: Float
 )
 
-class EmbeddingEngine(
-    var lfmManager: LfmManager? = null
-) {
+/** Local EmbeddingGemma 2 runtime. A missing or invalid model never produces synthetic vectors. */
+class EmbeddingEngine(private val context: Context? = null) : AutoCloseable {
 
+    @Volatile
     var status: ModelInferenceStatus = ModelInferenceStatus.NOT_INSTALLED
         private set
 
+    @Volatile
     var modelFilePath: String? = null
         private set
 
+    @Volatile
     var lastError: String? = null
         private set
 
+    private val engineMutex = Mutex()
+    private var runtime: com.google.ai.edge.litertlm.EmbeddingEngine? = null
+
     companion object {
-        const val EMBEDDING_DIMENSION = 1024
+        const val EMBEDDING_DIMENSION = 768
+        const val MODEL_FILE_NAME = "embeddinggemma-2-text-270m.litertlm"
         const val QUERY_PREFIX = "task: search result | query: "
         const val DOCUMENT_PREFIX = "title: none | text: "
 
         fun floatsToByteArray(floats: FloatArray): ByteArray {
-            val buffer = ByteBuffer.allocate(floats.size * 4).order(ByteOrder.LITTLE_ENDIAN)
-            for (f in floats) {
-                buffer.putFloat(f)
-            }
+            val buffer = ByteBuffer.allocate(floats.size * Float.SIZE_BYTES).order(ByteOrder.LITTLE_ENDIAN)
+            floats.forEach(buffer::putFloat)
             return buffer.array()
         }
 
         fun byteArrayToFloats(bytes: ByteArray): FloatArray {
+            if (bytes.size % Float.SIZE_BYTES != 0) return FloatArray(0)
             val buffer = ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN)
-            val floats = FloatArray(bytes.size / 4)
-            for (i in floats.indices) {
-                floats[i] = buffer.float
-            }
-            return floats
+            return FloatArray(bytes.size / Float.SIZE_BYTES) { buffer.float }
         }
 
         fun cosineSimilarity(v1: FloatArray, v2: FloatArray): Float {
@@ -60,95 +71,89 @@ class EmbeddingEngine(
                 norm2 += b * b
             }
             val denominator = sqrt(norm1) * sqrt(norm2)
-            if (denominator <= 1e-9) return 0.0f
-            return (dot / denominator).toFloat()
+            return if (denominator <= 1e-9) 0.0f else (dot / denominator).toFloat()
         }
     }
 
-    /**
-     * Initializes the embedding model from a local model file.
-     */
-    fun initialize(modelPath: String): Boolean {
+    fun findAvailableModelFile(): File? {
+        val candidates = listOfNotNull(
+            context?.getExternalFilesDir(null)?.let { File(it, MODEL_FILE_NAME) },
+            context?.filesDir?.let { File(it, MODEL_FILE_NAME) },
+            File("/sdcard/Download/$MODEL_FILE_NAME"),
+            File("/storage/emulated/0/Download/$MODEL_FILE_NAME"),
+            File("/sdcard/Download/SwasthAI/$MODEL_FILE_NAME"),
+            File("/storage/emulated/0/Download/SwasthAI/$MODEL_FILE_NAME")
+        )
+        return candidates.firstOrNull { it.isFile && it.length() > 0L }
+    }
+
+    suspend fun initialize(modelPath: String): Boolean = engineMutex.withLock {
         val file = File(modelPath)
-        if (!file.exists() || file.length() == 0L) {
+        if (!file.isFile || file.length() == 0L) {
             status = ModelInferenceStatus.NOT_INSTALLED
-            lastError = "Model file does not exist at: $modelPath"
-            return false
+            lastError = "EmbeddingGemma model file not found at: $modelPath"
+            return@withLock false
         }
 
-        modelFilePath = modelPath
         status = ModelInferenceStatus.INITIALIZING
-
-        return try {
-            status = ModelInferenceStatus.READY
-            lastError = null
-            true
-        } catch (e: Exception) {
-            status = ModelInferenceStatus.ERROR
-            lastError = "Failed to initialize Embedding model: ${e.localizedMessage}"
-            false
+        lastError = null
+        withContext(Dispatchers.IO) {
+            try {
+                runtime?.close()
+                val candidate = com.google.ai.edge.litertlm.EmbeddingEngine(
+                    EmbeddingEngineConfig(
+                        modelPath = file.absolutePath,
+                        backend = Backend.CPU()
+                    )
+                )
+                candidate.initialize()
+                runtime = candidate
+                modelFilePath = file.absolutePath
+                status = ModelInferenceStatus.READY
+                true
+            } catch (error: CancellationException) {
+                throw error
+            } catch (error: Throwable) {
+                runtime = null
+                status = ModelInferenceStatus.ERROR
+                lastError = "Failed to initialize EmbeddingGemma: ${error.localizedMessage ?: error.javaClass.simpleName}"
+                false
+            }
         }
     }
 
-    /**
-     * Generates embedding for text.
-     * When Liquid AI LFM2.5-Embedding-350M-Q4_0.gguf is ready, generates genuine 1024-dim vector.
-     * Otherwise provides fallback for testing.
-     */
-    fun generateEmbedding(text: String, isQuery: Boolean): FloatArray? {
-        // 1. Try real Liquid AI LFM2.5 Embedding
-        val lfm = lfmManager
-        if (lfm != null && lfm.embeddingStatus == ModelInferenceStatus.READY) {
-            val vec = kotlinx.coroutines.runBlocking { lfm.generateEmbedding(text) }
-            if (vec != null) return vec
+    suspend fun generateEmbedding(text: String, isQuery: Boolean): FloatArray? = engineMutex.withLock {
+        if (status != ModelInferenceStatus.READY || text.isBlank()) return@withLock null
+        val model = runtime ?: return@withLock null
+        withContext(Dispatchers.IO) {
+            try {
+                val prefix = if (isQuery) QUERY_PREFIX else DOCUMENT_PREFIX
+                model.computeEmbedding(
+                    listOf(InputData.Text(prefix + text)),
+                    EmbeddingOptions(normalize = true, outputSize = EMBEDDING_DIMENSION)
+                ).embedding.takeIf { it.size == EMBEDDING_DIMENSION && it.all(Float::isFinite) }
+            } catch (error: CancellationException) {
+                throw error
+            } catch (error: Throwable) {
+                lastError = "Embedding failed: ${error.localizedMessage ?: error.javaClass.simpleName}"
+                null
+            }
         }
-
-        if (status != ModelInferenceStatus.READY && lfm?.embeddingStatus != ModelInferenceStatus.READY) {
-            return computeDeterministicVector(text, EMBEDDING_DIMENSION)
-        }
-        val formatted = if (isQuery) "$QUERY_PREFIX$text" else "$DOCUMENT_PREFIX$text"
-        return computeDeterministicVector(formatted, EMBEDDING_DIMENSION)
     }
 
-    /**
-     * Top-K cosine similarity ranking over candidate chunk embeddings.
-     */
     fun rankChunks(
         queryVector: FloatArray,
         candidates: List<Pair<Long, ByteArray>>,
         topK: Int = 5
-    ): List<ScoredChunk> {
-        val scoredList = mutableListOf<ScoredChunk>()
+    ): List<ScoredChunk> = candidates.mapNotNull { (chunkId, blob) ->
+        val vector = byteArrayToFloats(blob)
+        if (vector.size != queryVector.size) null
+        else ScoredChunk(chunkId, 0, cosineSimilarity(queryVector, vector))
+    }.sortedByDescending { it.score }.take(topK)
 
-        for ((chunkId, blob) in candidates) {
-            val chunkVector = byteArrayToFloats(blob)
-            val score = cosineSimilarity(queryVector, chunkVector)
-            scoredList.add(ScoredChunk(chunkId = chunkId, documentId = 0, score = score))
-        }
-
-        return scoredList
-            .sortedByDescending { it.score }
-            .take(topK)
-    }
-
-    private fun computeDeterministicVector(text: String, dim: Int): FloatArray {
-        // High-entropy token hash projection for baseline verification
-        val vector = FloatArray(dim)
-        val hash = text.hashCode()
-        val words = text.lowercase().split(Regex("\\s+"))
-        for (i in 0 until dim) {
-            var valSum = 0f
-            for ((wIdx, word) in words.withIndex()) {
-                val termHash = (word.hashCode() xor ((i + 1) * 31) xor (wIdx * 17))
-                valSum += ((termHash % 1000) / 1000f)
-            }
-            vector[i] = valSum / words.size.coerceAtLeast(1)
-        }
-        // Normalize L2
-        var norm = 0.0
-        for (v in vector) norm += v * v
-        val sqrtNorm = sqrt(norm).toFloat().coerceAtLeast(1e-6f)
-        for (i in vector.indices) vector[i] /= sqrtNorm
-        return vector
+    override fun close() {
+        runtime?.close()
+        runtime = null
+        status = ModelInferenceStatus.NOT_INSTALLED
     }
 }

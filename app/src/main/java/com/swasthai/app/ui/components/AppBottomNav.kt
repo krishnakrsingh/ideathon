@@ -18,10 +18,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,6 +34,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.swasthai.app.ui.navigation.Screen
@@ -43,6 +48,8 @@ import com.swasthai.app.ui.theme.AppleSystemBlue
 fun AppBottomNav(
     navController: NavController
 ) {
+    val context = LocalContext.current
+    var confirmEmergencyCall by remember { mutableStateOf(false) }
     val items = listOf(
         Screen.Home,
         Screen.Vault,
@@ -52,7 +59,28 @@ fun AppBottomNav(
 
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
 
-    // Floating pill wrapper
+    if (confirmEmergencyCall) {
+        AlertDialog(
+            onDismissRequest = { confirmEmergencyCall = false },
+            title = { Text("Call emergency services?") },
+            text = { Text("This opens your phone dialer with 112. Use it when someone needs immediate help.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    confirmEmergencyCall = false
+                    openEmergencyDialer(context)
+                }) {
+                    Text("Open dialer")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { confirmEmergencyCall = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
+    // Persistent emergency action sits above the main navigation.
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -60,21 +88,36 @@ fun AppBottomNav(
             .padding(horizontal = 16.dp, vertical = 8.dp),
         contentAlignment = Alignment.Center
     ) {
-        // Floating pill capsule
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .shadow(
-                    elevation = 14.dp,
-                    shape = RoundedCornerShape(32.dp),
-                    spotColor = Color(0x1E000000),
-                    ambientColor = Color(0x0F000000)
-                )
-                .clip(RoundedCornerShape(32.dp))
-                .background(AppleCardSurface)
-                .border(1.dp, AppleCardBorder, RoundedCornerShape(32.dp))
-                .padding(horizontal = 6.dp, vertical = 6.dp)
-        ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = "Emergency 112",
+                color = Color.White,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .clip(RoundedCornerShape(18.dp))
+                    .background(Color(0xFFD92D20))
+                    .clickable { confirmEmergencyCall = true }
+                    .padding(horizontal = 18.dp, vertical = 8.dp)
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Floating pill capsule
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .shadow(
+                        elevation = 14.dp,
+                        shape = RoundedCornerShape(32.dp),
+                        spotColor = Color(0x1E000000),
+                        ambientColor = Color(0x0F000000)
+                    )
+                    .clip(RoundedCornerShape(32.dp))
+                    .background(AppleCardSurface)
+                    .border(1.dp, AppleCardBorder, RoundedCornerShape(32.dp))
+                    .padding(horizontal = 6.dp, vertical = 6.dp)
+            ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -143,6 +186,7 @@ fun AppBottomNav(
                         }
                     }
                 }
+            }
             }
         }
     }

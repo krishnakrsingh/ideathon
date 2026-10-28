@@ -1,9 +1,21 @@
 package com.swasthai.app.domain.model
 
+import com.swasthai.app.data.local.entity.DEFAULT_PERSON_PROFILE_ID
+
 enum class MessageRole {
     USER,
     ASSISTANT,
     SYSTEM
+}
+
+enum class ChatTurnStatus {
+    PREPARING,
+    RETRIEVING,
+    GENERATING,
+    COMPLETED,
+    FAILED,
+    CANCELLED,
+    INTERRUPTED
 }
 
 enum class ModelInferenceStatus {
@@ -35,6 +47,7 @@ enum class ResponseLanguage {
 }
 
 data class ChatContextScope(
+    val profileId: String = DEFAULT_PERSON_PROFILE_ID,
     val mode: ScopeMode = ScopeMode.ALL_HISTORY,
     val selectedDocumentIds: Set<Long> = emptySet(),
     val timeRange: TimeRangeFilter = TimeRangeFilter.ALL_TIME,
@@ -93,7 +106,8 @@ data class ChatMessage(
     val timestamp: Long = System.currentTimeMillis(),
     val citations: List<SourceCitation> = emptyList(),
     val isStreaming: Boolean = false,
-    val imageUri: String? = null
+    val imageUri: String? = null,
+    val activityLabel: String? = null
 )
 
 data class Conversation(

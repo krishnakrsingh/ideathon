@@ -1,0 +1,7 @@
+Metadata-Version: 2.4
+Name: swasthai-api
+Version: 0.1.0
+Summary: Local development API for end-to-end encrypted SwasthAI records
+Requires-Python: >=3.11
+Requires-Dist: fastapi<1,>=0.115
+Requires-Dist: uvicorn<1,>=0.34

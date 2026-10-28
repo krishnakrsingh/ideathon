@@ -1,18 +1,14 @@
 package com.swasthai.app.ui.home
 
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,1128 +16,631 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Air
 import androidx.compose.material.icons.filled.AutoAwesome
-import androidx.compose.material.icons.filled.Chat
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Description
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Folder
-import androidx.compose.material.icons.filled.HealthAndSafety
-import androidx.compose.material.icons.filled.Lightbulb
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.MonitorHeart
-import androidx.compose.material.icons.filled.Science
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Shield
-import androidx.compose.material.icons.filled.WaterDrop
-import androidx.compose.material.icons.filled.WbSunny
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.swasthai.app.domain.model.Conversation
 import com.swasthai.app.domain.model.IndexingStatus
+import com.swasthai.app.domain.model.MedicalDocument
 import com.swasthai.app.domain.model.ModelInferenceStatus
-import com.swasthai.app.domain.safety.EmergencyTriage
-import com.swasthai.app.ui.components.AppTopBar
-import com.swasthai.app.ui.theme.AppleActivityCyan
-import com.swasthai.app.ui.theme.AppleActivityGreen
-import com.swasthai.app.ui.theme.AppleActivityRed
-import com.swasthai.app.ui.theme.AppleBlueLight
-import com.swasthai.app.ui.theme.AppleCardBorder
-import com.swasthai.app.ui.theme.AppleCardSurface
-import com.swasthai.app.ui.theme.AppleGreenLight
-import com.swasthai.app.ui.theme.AppleGroupedBackground
-import com.swasthai.app.ui.theme.AppleHealthTeal
-import com.swasthai.app.ui.theme.AppleIndigoLight
-import com.swasthai.app.ui.theme.AppleLabelPrimary
-import com.swasthai.app.ui.theme.AppleLabelQuaternary
-import com.swasthai.app.ui.theme.AppleLabelSecondary
-import com.swasthai.app.ui.theme.AppleLabelTertiary
-import com.swasthai.app.ui.theme.AppleOrangeLight
-import com.swasthai.app.ui.theme.ApplePinkLight
-import com.swasthai.app.ui.theme.ApplePurpleLight
-import com.swasthai.app.ui.theme.AppleRedLight
-import com.swasthai.app.ui.theme.AppleSearchFill
-import com.swasthai.app.ui.theme.AppleSeparator
-import com.swasthai.app.ui.theme.AppleSystemBlue
-import com.swasthai.app.ui.theme.AppleSystemGreen
-import com.swasthai.app.ui.theme.AppleSystemIndigo
-import com.swasthai.app.ui.theme.AppleSystemOrange
-import com.swasthai.app.ui.theme.AppleSystemPurple
-import com.swasthai.app.ui.theme.AppleSystemRed
-import com.swasthai.app.ui.theme.AppleTealLight
-import com.swasthai.app.ui.theme.AppleYellowLight
+import com.swasthai.app.domain.model.StructuredMeasurement
+import com.swasthai.app.data.local.entity.PersonProfileEntity
+import com.swasthai.app.data.local.entity.MedicationReminderEntity
+import com.swasthai.app.data.repository.MenstrualFlow
+import com.swasthai.app.data.repository.PersonProfileRepository
+import com.swasthai.app.ui.components.DiceBearAvatar
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.time.Instant
+import java.time.LocalDate
+import java.time.Period
+import java.time.ZoneOffset
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel,
     onNavigateToChat: (Long?) -> Unit,
+    onNavigateToHistory: () -> Unit,
     onNavigateToVault: () -> Unit,
     onNavigateToSettings: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val dateFormat = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
-    val todayHeaderFormat = SimpleDateFormat("EEEE, d MMMM", Locale.getDefault())
-    val todayDateString = todayHeaderFormat.format(Date()).uppercase()
+    val dateFormat = SimpleDateFormat("d MMM yyyy", Locale.getDefault())
+    var profileMenuExpanded by remember { mutableStateOf(false) }
+    var addProfileDialog by remember { mutableStateOf(false) }
+    var newProfileName by remember { mutableStateOf("") }
+    var newProfileRelationship by remember { mutableStateOf("") }
+    var newProfileDateOfBirth by remember { mutableStateOf("") }
+    var newProfileSexAtBirth by remember { mutableStateOf<String?>(null) }
+    var newProfileAvatarSeed by remember { mutableStateOf("avatar-01") }
+    var sexMenuExpanded by remember { mutableStateOf(false) }
+    var addReminderDialog by remember { mutableStateOf(false) }
+    var reminderName by remember { mutableStateOf("") }
+    var reminderInstructions by remember { mutableStateOf("") }
+    var reminderTime by remember { mutableStateOf("09:00") }
+    var cycleLogDialog by remember { mutableStateOf(false) }
+    var cycleDate by remember { mutableStateOf(LocalDate.now().toString()) }
+    var cycleFlow by remember { mutableStateOf(MenstrualFlow.LIGHT) }
+    var cycleFlowMenuExpanded by remember { mutableStateOf(false) }
+    var isPeriodStart by remember { mutableStateOf(false) }
+    var cycleSymptoms by remember { mutableStateOf(emptySet<String>()) }
+    val context = LocalContext.current
+    val notificationPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { }
+    val activeProfile = uiState.profiles.firstOrNull { it.id == uiState.activeProfileId }
 
-    Scaffold(
-        containerColor = AppleGroupedBackground
-    ) { padding ->
+    Scaffold(containerColor = MaterialTheme.colorScheme.background) { padding ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding)
-                .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(padding),
+            contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 20.dp, vertical = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(18.dp)
         ) {
-            // 1. Apple Health Home Header
             item {
-                Spacer(modifier = Modifier.height(16.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column {
-                        Text(
-                            text = todayDateString,
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = AppleLabelSecondary,
-                            letterSpacing = 0.6.sp
-                        )
-                        Text(
-                            text = "Home",
-                            style = MaterialTheme.typography.headlineMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = AppleLabelPrimary
-                        )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text("YOUR HEALTH RECORDS", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
+                        Text("Home", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
                     }
-
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        // On-device privacy indicator chip
-                        Row(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(12.dp))
-                                .background(AppleTealLight)
-                                .clickable { onNavigateToSettings() }
-                                .padding(horizontal = 8.dp, vertical = 6.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Shield,
-                                contentDescription = "On-Device",
-                                tint = AppleHealthTeal,
-                                modifier = Modifier.size(13.dp)
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = "Private AI",
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                color = AppleHealthTeal
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.width(8.dp))
-
-                        // Settings Icon Button
-                        Box(
-                            modifier = Modifier
-                                .size(36.dp)
-                                .clip(CircleShape)
-                                .background(AppleCardSurface)
-                                .border(0.5.dp, AppleCardBorder, CircleShape)
-                                .clickable { onNavigateToSettings() },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Settings,
-                                contentDescription = "Settings",
-                                tint = AppleLabelPrimary,
-                                modifier = Modifier.size(18.dp)
-                            )
-                        }
+                    IconButton(onClick = onNavigateToSettings) {
+                        Icon(Icons.Default.Settings, contentDescription = "Settings")
                     }
                 }
             }
 
-            // 2. Apple Health Daily Vitals Ring & Status Card
             item {
-                AppleHealthScoreCard(
-                    score = 94,
-                    measurementsCount = uiState.latestMeasurements.size,
-                    documentsCount = uiState.recentDocuments.size,
-                    onOpenRecords = onNavigateToVault
-                )
-            }
-
-            // 3. Clinical Assistant Primary Companion Card
-            item {
-                AppleAssistantCard(
-                    modelStatus = uiState.medGemmaStatus,
-                    onNewConsultation = {
-                        viewModel.createNewChat { newId ->
-                            onNavigateToChat(newId)
-                        }
-                    },
-                    onOpenVault = onNavigateToVault,
-                    onOpenSettings = onNavigateToSettings
-                )
-            }
-
-            // 4. Quick Clinical Consultation Prompts
-            item {
-                Column(modifier = Modifier.fillMaxWidth()) {
+                Card(shape = RoundedCornerShape(18.dp)) {
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                        modifier = Modifier.fillMaxWidth().padding(14.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
-                        Text(
-                            text = "ASK AI DOC",
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = AppleLabelSecondary,
-                            letterSpacing = 0.5.sp,
-                            modifier = Modifier.padding(start = 4.dp)
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    FlowRow(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        val prompts = listOf(
-                            "Explain my lab results" to Icons.Default.Description,
-                            "What is normal blood pressure?" to Icons.Default.MonitorHeart,
-                            "How to improve hemoglobin" to Icons.Default.Science,
-                            "Tips for healthy blood sugar" to Icons.Default.WaterDrop
-                        )
-
-                        prompts.forEach { (promptText, icon) ->
-                            Row(
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(14.dp))
-                                    .background(AppleCardSurface)
-                                    .border(0.5.dp, AppleCardBorder, RoundedCornerShape(14.dp))
-                                    .clickable {
-                                        viewModel.createNewChat(initialQuery = promptText) { newId ->
-                                            onNavigateToChat(newId)
+                        DiceBearAvatar(activeProfile?.avatarSeed ?: "avatar-01", 48.dp)
+                        Column(Modifier.weight(1f)) {
+                            Text("HEALTH PROFILE", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
+                            Text(activeProfile?.displayName ?: "Me", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                            if (activeProfile?.relationship != null) {
+                                Text(activeProfile.relationship, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            }
+                            activeProfile?.let(::profileAgeLabel)?.let { age ->
+                                Text(age, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            }
+                        }
+                        androidx.compose.material3.TextButton(onClick = { profileMenuExpanded = true }) {
+                            Text("Switch")
+                        }
+                        DropdownMenu(
+                            expanded = profileMenuExpanded,
+                            onDismissRequest = { profileMenuExpanded = false }
+                        ) {
+                            uiState.profiles.forEach { profile ->
+                                DropdownMenuItem(
+                                    text = {
+                                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                            DiceBearAvatar(profile.avatarSeed, 32.dp)
+                                            Text("${profile.displayName} · ${profile.relationship}")
                                         }
+                                    },
+                                    onClick = {
+                                        profileMenuExpanded = false
+                                        viewModel.selectProfile(profile.id)
                                     }
-                                    .padding(horizontal = 12.dp, vertical = 9.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(
-                                    imageVector = icon,
-                                    contentDescription = null,
-                                    tint = AppleSystemBlue,
-                                    modifier = Modifier.size(15.dp)
-                                )
-                                Spacer(modifier = Modifier.width(6.dp))
-                                Text(
-                                    text = promptText,
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.Medium,
-                                    color = AppleLabelPrimary
                                 )
                             }
                         }
+                        Button(onClick = { addProfileDialog = true }) {
+                            Text("Add local profile")
+                        }
                     }
+                }
+                if (uiState.profileError != null) {
+                    Text(
+                        uiState.profileError.orEmpty(),
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(start = 8.dp, top = 4.dp)
+                    )
                 }
             }
 
-            // 5. Individual Vitals & Biomarkers Widget Grid
-            item {
-                Text(
-                    text = "VITALS & HEALTH HIGHLIGHTS",
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = AppleLabelSecondary,
-                    letterSpacing = 0.5.sp,
-                    modifier = Modifier.padding(start = 4.dp)
-                )
-            }
-
-            item {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    // Row 1: Heart Rate & Blood Pressure
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
-                        VitalMetricWidget(
-                            modifier = Modifier.weight(1f),
-                            title = "Heart Rate",
-                            value = "72",
-                            unit = "BPM",
-                            subtitle = "Resting • Normal (60-100)",
-                            icon = Icons.Default.Favorite,
-                            iconColor = AppleSystemRed,
-                            iconBg = AppleRedLight,
-                            statusText = "Normal",
-                            statusColor = AppleSystemGreen,
-                            statusBg = AppleGreenLight,
-                            onClick = {
-                                viewModel.createNewChat("Explain resting heart rate ranges and cardiovascular health") {
-                                    onNavigateToChat(it)
-                                }
-                            }
-                        )
-
-                        VitalMetricWidget(
-                            modifier = Modifier.weight(1f),
-                            title = "Blood Pressure",
-                            value = "120/80",
-                            unit = "mmHg",
-                            subtitle = "Optimal target range",
-                            icon = Icons.Default.MonitorHeart,
-                            iconColor = AppleHealthTeal,
-                            iconBg = AppleTealLight,
-                            statusText = "Optimal",
-                            statusColor = AppleSystemGreen,
-                            statusBg = AppleGreenLight,
-                            onClick = {
-                                viewModel.createNewChat("Explain normal blood pressure ranges and systolic vs diastolic") {
-                                    onNavigateToChat(it)
-                                }
-                            }
-                        )
-                    }
-
-                    // Row 2: Blood Glucose & Oxygen Saturation
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
-                        VitalMetricWidget(
-                            modifier = Modifier.weight(1f),
-                            title = "Blood Glucose",
-                            value = "95",
-                            unit = "mg/dL",
-                            subtitle = "Fasting • Target 70-99",
-                            icon = Icons.Default.WaterDrop,
-                            iconColor = AppleSystemOrange,
-                            iconBg = AppleOrangeLight,
-                            statusText = "In Range",
-                            statusColor = AppleSystemGreen,
-                            statusBg = AppleGreenLight,
-                            onClick = {
-                                viewModel.createNewChat("What are healthy fasting blood sugar levels and tips for glycemic control?") {
-                                    onNavigateToChat(it)
-                                }
-                            }
-                        )
-
-                        VitalMetricWidget(
-                            modifier = Modifier.weight(1f),
-                            title = "Oxygen (SpO2)",
-                            value = "99",
-                            unit = "%",
-                            subtitle = "Healthy lung saturation",
-                            icon = Icons.Default.Air,
-                            iconColor = AppleSystemBlue,
-                            iconBg = AppleBlueLight,
-                            statusText = "Excellent",
-                            statusColor = AppleSystemBlue,
-                            statusBg = AppleBlueLight,
-                            onClick = {
-                                viewModel.createNewChat("What is normal oxygen saturation (SpO2) and pulse oximetry?") {
-                                    onNavigateToChat(it)
-                                }
-                            }
-                        )
-                    }
-
-                    // Row 3: Hemoglobin & Vitamin D3
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
-                        // Check if real extracted measurements exist
-                        val hemoMeasurement = uiState.latestMeasurements.find {
-                            it.biomarkerName.contains("Hemoglobin", ignoreCase = true)
-                        }
-
-                        VitalMetricWidget(
-                            modifier = Modifier.weight(1f),
-                            title = "Hemoglobin",
-                            value = hemoMeasurement?.let { String.format("%.1f", it.numericValue) } ?: "14.8",
-                            unit = hemoMeasurement?.unit ?: "g/dL",
-                            subtitle = "Healthy oxygen capacity",
-                            icon = Icons.Default.Science,
-                            iconColor = AppleSystemPurple,
-                            iconBg = ApplePurpleLight,
-                            statusText = if (hemoMeasurement?.isOutOfRange == true) "Review" else "Normal",
-                            statusColor = if (hemoMeasurement?.isOutOfRange == true) AppleSystemOrange else AppleSystemGreen,
-                            statusBg = if (hemoMeasurement?.isOutOfRange == true) AppleOrangeLight else AppleGreenLight,
-                            onClick = {
-                                viewModel.createNewChat("Explain hemoglobin levels, normal ranges, and red blood cell health") {
-                                    onNavigateToChat(it)
-                                }
-                            }
-                        )
-
-                        val vitDMeasurement = uiState.latestMeasurements.find {
-                            it.biomarkerName.contains("Vitamin D", ignoreCase = true)
-                        }
-
-                        VitalMetricWidget(
-                            modifier = Modifier.weight(1f),
-                            title = "Vitamin D3",
-                            value = vitDMeasurement?.let { String.format("%.0f", it.numericValue) } ?: "38",
-                            unit = vitDMeasurement?.unit ?: "ng/mL",
-                            subtitle = "Optimal (>30 ng/mL)",
-                            icon = Icons.Default.WbSunny,
-                            iconColor = AppleSystemOrange,
-                            iconBg = AppleYellowLight,
-                            statusText = "Sufficient",
-                            statusColor = AppleSystemGreen,
-                            statusBg = AppleGreenLight,
-                            onClick = {
-                                viewModel.createNewChat("Explain optimal Vitamin D3 levels and how to improve Vitamin D") {
-                                    onNavigateToChat(it)
-                                }
-                            }
-                        )
-                    }
-                }
-            }
-
-            // 6. Today's Clinical Insight Card
             item {
                 Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .border(0.5.dp, Color(0xFFD6E4FF), RoundedCornerShape(16.dp)),
-                    colors = CardDefaults.cardColors(containerColor = AppleBlueLight),
-                    shape = RoundedCornerShape(16.dp),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+                    shape = RoundedCornerShape(24.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
                 ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Box(
-                                modifier = Modifier
-                                    .size(32.dp)
-                                    .clip(CircleShape)
-                                    .background(Color.White),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Lightbulb,
-                                    contentDescription = null,
-                                    tint = AppleSystemBlue,
-                                    modifier = Modifier.size(18.dp)
-                                )
-                            }
-                            Spacer(modifier = Modifier.width(10.dp))
-                            Text(
-                                text = "Daily Health Summary",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = AppleSystemBlue
-                            )
+                    Column(Modifier.fillMaxWidth().padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                            Text("Ask about your records", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
                         }
-
-                        Spacer(modifier = Modifier.height(10.dp))
-
                         Text(
-                            text = if (uiState.latestMeasurements.isNotEmpty()) {
-                                "Based on your verified lab records, your biomarkers are well-balanced. Hemoglobin and metabolic indicators fall within normal clinical parameters. Continue regular hydration and 30 minutes of daily activity."
-                            } else {
-                                "All baseline vitals are within normal reference thresholds. You can import PDF lab reports anytime into your Records vault for detailed on-device clinical insights."
-                            },
-                            fontSize = 13.sp,
-                            lineHeight = 19.sp,
-                            color = AppleLabelPrimary
+                            "Choose what to discuss in AI chat. Answers can cite the reports you have added.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
+                        Button(
+                            onClick = { viewModel.createNewChat { onNavigateToChat(it) } },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("Start a consultation")
+                        }
+                        OutlinedButton(onClick = onNavigateToVault, modifier = Modifier.fillMaxWidth()) {
+                            Icon(Icons.Default.Add, contentDescription = null)
+                            Text(" Add a medical record")
+                        }
                     }
                 }
             }
 
-            // 7. Recent Health Records Section
             item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Recent Health Records",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = AppleLabelPrimary
+                SectionHeading(
+                    title = "Medicine reminders",
+                    action = "Add",
+                    onAction = { addReminderDialog = true }
+                )
+            }
+            if (uiState.medicationReminders.isEmpty()) {
+                item {
+                    EmptyState(
+                        text = "Set a daily reminder using the medicine schedule provided by your clinician.",
+                        action = "Add reminder",
+                        onAction = { addReminderDialog = true }
                     )
-                    Text(
-                        text = "View All",
-                        fontSize = 13.sp,
-                        color = AppleSystemBlue,
-                        fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier.clickable { onNavigateToVault() }
+                }
+            } else {
+                items(uiState.medicationReminders, key = { "reminder-${it.id}" }) { reminder ->
+                    MedicationReminderRow(
+                        reminder = reminder,
+                        onDelete = { viewModel.deleteMedicationReminder(reminder.id) }
                     )
                 }
             }
 
+            if (activeProfile?.sexAtBirth == "Female") {
+                item {
+                    SectionHeading(title = "Cycle health", action = "Log day", onAction = { cycleLogDialog = true })
+                }
+                item {
+                    Card(shape = RoundedCornerShape(16.dp)) {
+                        Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Text("Private cycle log", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                            val estimate = uiState.cycleSummary.nextPeriodEstimate
+                            Text(
+                                estimate?.let { "Estimated next period: ${it.format(DateTimeFormatter.ofPattern("d MMM yyyy"))} · based on ${uiState.cycleSummary.intervalsUsed} logged intervals" }
+                                    ?: "Log period start dates to see a simple estimate.",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                            Text("Estimate only. Not for diagnosis, pregnancy planning, or contraception.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            uiState.cycleSummary.recentLogs.take(5).forEach { log ->
+                                Text("${log.date} · ${log.flow.name.lowercase()}${if (log.isPeriodStart) " · period start" else ""}", style = MaterialTheme.typography.bodySmall)
+                            }
+                            if (uiState.cycleError != null) Text(uiState.cycleError.orEmpty(), color = MaterialTheme.colorScheme.error)
+                        }
+                    }
+                }
+            }
+
+            item {
+                Card(shape = RoundedCornerShape(16.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        androidx.compose.material3.Surface(
+                            shape = CircleShape,
+                            color = MaterialTheme.colorScheme.secondaryContainer,
+                            modifier = Modifier.size(40.dp)
+                        ) {
+                            Icon(Icons.Default.AutoAwesome, contentDescription = null, modifier = Modifier.padding(10.dp), tint = MaterialTheme.colorScheme.secondary)
+                        }
+                        Column(Modifier.weight(1f)) {
+                            Text("On-device medical AI", fontWeight = FontWeight.SemiBold)
+                            Text(modelStatusLabel(uiState.aiModelStatus), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                        IconButton(onClick = onNavigateToSettings) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "Model settings")
+                        }
+                    }
+                }
+            }
+
+            item {
+                SectionHeading(title = "Recent records", action = "View all", onAction = onNavigateToVault)
+            }
             if (uiState.recentDocuments.isEmpty()) {
-                item {
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .border(0.5.dp, AppleCardBorder, RoundedCornerShape(16.dp)),
-                        colors = CardDefaults.cardColors(containerColor = AppleCardSurface),
-                        shape = RoundedCornerShape(16.dp),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(24.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .size(48.dp)
-                                    .clip(CircleShape)
-                                    .background(AppleBlueLight),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Description,
-                                    contentDescription = null,
-                                    tint = AppleSystemBlue,
-                                    modifier = Modifier.size(24.dp)
-                                )
-                            }
-                            Spacer(modifier = Modifier.height(12.dp))
-                            Text(
-                                text = "No medical reports imported yet",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.SemiBold,
-                                color = AppleLabelPrimary
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(
-                                text = "Import PDF blood tests, lipid panels, or doctor notes",
-                                fontSize = 12.sp,
-                                color = AppleLabelSecondary
-                            )
-                            Spacer(modifier = Modifier.height(14.dp))
-                            Button(
-                                onClick = onNavigateToVault,
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = AppleSystemBlue,
-                                    contentColor = Color.White
-                                ),
-                                shape = RoundedCornerShape(12.dp)
-                            ) {
-                                Text("Add Health Record", fontWeight = FontWeight.SemiBold)
-                            }
-                        }
-                    }
-                }
+                item { EmptyState(text = "Your reports will appear here after you add them.", action = "Add a record", onAction = onNavigateToVault) }
             } else {
-                items(uiState.recentDocuments) { doc ->
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .border(0.5.dp, AppleCardBorder, RoundedCornerShape(14.dp))
-                            .clickable { onNavigateToVault() },
-                        colors = CardDefaults.cardColors(containerColor = AppleCardSurface),
-                        shape = RoundedCornerShape(14.dp),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(14.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .size(40.dp)
-                                    .clip(RoundedCornerShape(10.dp))
-                                    .background(AppleBlueLight),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Description,
-                                    contentDescription = null,
-                                    tint = AppleSystemBlue,
-                                    modifier = Modifier.size(20.dp)
-                                )
-                            }
-                            Spacer(modifier = Modifier.width(12.dp))
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    text = doc.fileName,
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = AppleLabelPrimary
-                                )
-                                Spacer(modifier = Modifier.height(2.dp))
-                                Text(
-                                    text = "${dateFormat.format(Date(doc.importDate))} • ${doc.pageCount} page(s)",
-                                    fontSize = 11.sp,
-                                    color = AppleLabelSecondary
-                                )
-                            }
-                            val (badgeBg, badgeText, label) = when (doc.indexingStatus) {
-                                IndexingStatus.INDEXED -> Triple(AppleGreenLight, AppleSystemGreen, "Analyzed")
-                                IndexingStatus.EXTRACTED -> Triple(AppleBlueLight, AppleSystemBlue, "Ready")
-                                IndexingStatus.PENDING -> Triple(AppleSearchFill, AppleLabelSecondary, "Reading...")
-                                IndexingStatus.FAILED -> Triple(AppleOrangeLight, AppleSystemOrange, "Scan Only")
-                            }
-                            Box(
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(8.dp))
-                                    .background(badgeBg)
-                                    .padding(horizontal = 8.dp, vertical = 4.dp)
-                            ) {
-                                Text(
-                                    text = label,
-                                    fontSize = 11.sp,
-                                    color = badgeText,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
-                        }
-                    }
+                items(uiState.recentDocuments.take(3), key = { "doc-${it.id}" }) { document ->
+                    DocumentRow(document = document, dateFormat = dateFormat, onClick = onNavigateToVault)
                 }
             }
 
-            // 8. Recent Consultations Section
-            item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Recent Consultations",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = AppleLabelPrimary
-                    )
+            item { SectionHeading(title = "Recent measurements", action = "Timeline", onAction = onNavigateToHistory) }
+            if (uiState.latestMeasurements.isEmpty()) {
+                item { EmptyState(text = "Measurements will show after readable reports are processed.", action = "Open records", onAction = onNavigateToVault) }
+            } else {
+                items(uiState.latestMeasurements.take(4), key = { "measurement-${it.id}" }) { measurement ->
+                    MeasurementRow(measurement = measurement, dateFormat = dateFormat)
                 }
             }
 
+            item { SectionHeading(title = "Recent conversations", action = null, onAction = {}) }
             if (uiState.recentConversations.isEmpty()) {
-                item {
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .border(0.5.dp, AppleCardBorder, RoundedCornerShape(14.dp)),
-                        colors = CardDefaults.cardColors(containerColor = AppleCardSurface),
-                        shape = RoundedCornerShape(14.dp),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(18.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = "No previous consultations yet",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = AppleLabelSecondary
-                            )
-                        }
-                    }
-                }
+                item { EmptyState(text = "Your consultations will appear here.", action = "Start a chat", onAction = { viewModel.createNewChat { onNavigateToChat(it) } }) }
             } else {
-                items(uiState.recentConversations) { convo ->
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .border(0.5.dp, AppleCardBorder, RoundedCornerShape(14.dp))
-                            .clickable { onNavigateToChat(convo.id) },
-                        colors = CardDefaults.cardColors(containerColor = AppleCardSurface),
-                        shape = RoundedCornerShape(14.dp),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(14.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .size(36.dp)
-                                    .clip(RoundedCornerShape(10.dp))
-                                    .background(AppleTealLight),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Filled.Chat,
-                                    contentDescription = null,
-                                    tint = AppleHealthTeal,
-                                    modifier = Modifier.size(18.dp)
-                                )
+                items(uiState.recentConversations.take(3), key = { "chat-${it.id}" }) { conversation ->
+                    ConversationRow(conversation = conversation, dateFormat = dateFormat, onClick = { onNavigateToChat(conversation.id) })
+                }
+            }
+
+            item { Spacer(Modifier.height(8.dp)) }
+        }
+    }
+
+    if (addProfileDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                addProfileDialog = false
+                viewModel.clearProfileError()
+            },
+            title = { Text("Add an on-device profile") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text("This creates a separate profile on this device only. For a person with their own account, use Settings → Account & Family to join your family ID.")
+                    OutlinedTextField(
+                        value = newProfileName,
+                        onValueChange = { newProfileName = it },
+                        label = { Text("Name") },
+                        singleLine = true
+                    )
+                    Text("Choose an avatar", style = MaterialTheme.typography.labelMedium)
+                    PersonProfileRepository.AVATAR_SEEDS.chunked(4).forEach { seeds ->
+                        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                            seeds.forEach { seed ->
+                                Surface(
+                                    onClick = { newProfileAvatarSeed = seed },
+                                    shape = CircleShape,
+                                    border = BorderStroke(
+                                        if (seed == newProfileAvatarSeed) 2.dp else 1.dp,
+                                        if (seed == newProfileAvatarSeed) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant
+                                    )
+                                ) {
+                                    DiceBearAvatar(seed = seed, size = 48.dp, modifier = Modifier.padding(2.dp))
+                                }
                             }
-                            Spacer(modifier = Modifier.width(12.dp))
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    text = convo.title,
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = AppleLabelPrimary
-                                )
-                                Spacer(modifier = Modifier.height(2.dp))
-                                Text(
-                                    text = dateFormat.format(Date(convo.updatedAt)),
-                                    fontSize = 11.sp,
-                                    color = AppleLabelSecondary
-                                )
-                            }
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
-                                contentDescription = null,
-                                tint = AppleLabelTertiary,
-                                modifier = Modifier.size(14.dp)
-                            )
                         }
                     }
+                    OutlinedTextField(
+                        value = newProfileRelationship,
+                        onValueChange = { newProfileRelationship = it },
+                        label = { Text("Relationship (for example, parent)") },
+                        singleLine = true
+                    )
+                    OutlinedTextField(
+                        value = newProfileDateOfBirth,
+                        onValueChange = { newProfileDateOfBirth = it },
+                        label = { Text("Date of birth (YYYY-MM-DD, optional)") },
+                        supportingText = { Text("Used to tailor local explanations; no age-based range is invented.") },
+                        singleLine = true
+                    )
+                    Column {
+                        OutlinedButton(onClick = { sexMenuExpanded = true }) {
+                            Text("Sex at birth: ${newProfileSexAtBirth ?: "not specified"}")
+                        }
+                        DropdownMenu(
+                            expanded = sexMenuExpanded,
+                            onDismissRequest = { sexMenuExpanded = false }
+                        ) {
+                            listOf("Not specified", "Female", "Male", "Intersex", "Prefer not to say").forEach { option ->
+                                DropdownMenuItem(
+                                    text = { Text(option) },
+                                    onClick = {
+                                        newProfileSexAtBirth = option.takeUnless { it == "Not specified" }
+                                        sexMenuExpanded = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+                    if (uiState.profileError != null) {
+                        Text(uiState.profileError.orEmpty(), color = MaterialTheme.colorScheme.error)
+                    }
                 }
+            },
+            confirmButton = {
+                Button(onClick = {
+                    viewModel.createProfile(
+                        newProfileName,
+                        newProfileRelationship,
+                        newProfileDateOfBirth,
+                        newProfileSexAtBirth,
+                        newProfileAvatarSeed
+                    ) {
+                        newProfileName = ""
+                        newProfileRelationship = ""
+                        newProfileDateOfBirth = ""
+                        newProfileSexAtBirth = null
+                        newProfileAvatarSeed = "avatar-01"
+                        addProfileDialog = false
+                    }
+                }) { Text("Create profile") }
+            },
+            dismissButton = {
+                OutlinedButton(onClick = {
+                    addProfileDialog = false
+                    viewModel.clearProfileError()
+                }) { Text("Cancel") }
             }
+        )
+    }
 
-            // 9. Apple Medical Disclaimer Footer
-            item {
-                Text(
-                    text = EmergencyTriage.MEDICAL_DISCLAIMER,
-                    fontSize = 11.sp,
-                    color = AppleLabelTertiary,
-                    lineHeight = 15.sp,
-                    modifier = Modifier.padding(vertical = 8.dp)
-                )
-                Spacer(modifier = Modifier.height(30.dp))
+    if (addReminderDialog) {
+        AlertDialog(
+            onDismissRequest = { addReminderDialog = false },
+            title = { Text("Add medicine reminder") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text("Repeats daily for ${activeProfile?.displayName ?: "Me"}. Enter the schedule exactly as prescribed.")
+                    OutlinedTextField(
+                        value = reminderName,
+                        onValueChange = { reminderName = it },
+                        label = { Text("Medicine name") },
+                        singleLine = true
+                    )
+                    OutlinedTextField(
+                        value = reminderInstructions,
+                        onValueChange = { reminderInstructions = it },
+                        label = { Text("Dose note (optional)") },
+                        supportingText = { Text("This is a reminder note, not a dose recommendation.") },
+                        singleLine = true
+                    )
+                    OutlinedTextField(
+                        value = reminderTime,
+                        onValueChange = { reminderTime = it },
+                        label = { Text("Time (24-hour HH:mm)") },
+                        singleLine = true
+                    )
+                    Text("Notifications and exact alarm access are controlled by Android settings.", style = MaterialTheme.typography.bodySmall)
+                    if (uiState.reminderError != null) {
+                        Text(uiState.reminderError.orEmpty(), color = MaterialTheme.colorScheme.error)
+                    }
+                }
+            },
+            confirmButton = {
+                Button(onClick = {
+                    viewModel.createMedicationReminder(reminderName, reminderInstructions, reminderTime) {
+                        reminderName = ""
+                        reminderInstructions = ""
+                        reminderTime = "09:00"
+                        addReminderDialog = false
+                        if (Build.VERSION.SDK_INT >= 33 &&
+                            context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+                        ) {
+                            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                        }
+                    }
+                }) { Text("Save daily reminder") }
+            },
+            dismissButton = {
+                OutlinedButton(onClick = { addReminderDialog = false }) { Text("Cancel") }
             }
-        }
+        )
+    }
+
+    if (cycleLogDialog && activeProfile?.sexAtBirth == "Female") {
+        AlertDialog(
+            onDismissRequest = { cycleLogDialog = false; viewModel.clearCycleError() },
+            title = { Text("Log cycle day") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedTextField(value = cycleDate, onValueChange = { cycleDate = it }, label = { Text("Date (YYYY-MM-DD)") }, singleLine = true)
+                    OutlinedButton(onClick = { cycleFlowMenuExpanded = true }) { Text("Flow: ${cycleFlow.name.lowercase()}") }
+                    DropdownMenu(expanded = cycleFlowMenuExpanded, onDismissRequest = { cycleFlowMenuExpanded = false }) {
+                        MenstrualFlow.entries.forEach { flow ->
+                            DropdownMenuItem(text = { Text(flow.name.lowercase()) }, onClick = { cycleFlow = flow; cycleFlowMenuExpanded = false })
+                        }
+                    }
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Checkbox(checked = isPeriodStart, onCheckedChange = { isPeriodStart = it })
+                        Text("Period started today")
+                    }
+                    com.swasthai.app.data.repository.CycleTrackingRepository.SYMPTOM_TAGS.forEach { symptom ->
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Checkbox(checked = symptom in cycleSymptoms, onCheckedChange = { checked ->
+                                cycleSymptoms = if (checked) cycleSymptoms + symptom else cycleSymptoms - symptom
+                            })
+                            Text(symptom.replaceFirstChar { it.uppercase() })
+                        }
+                    }
+                    Text("Saved encrypted on this device for this profile.", style = MaterialTheme.typography.bodySmall)
+                    if (uiState.cycleError != null) Text(uiState.cycleError.orEmpty(), color = MaterialTheme.colorScheme.error)
+                }
+            },
+            confirmButton = {
+                Button(onClick = {
+                    viewModel.logCycleDay(cycleDate, cycleFlow, isPeriodStart, cycleSymptoms) {
+                        cycleLogDialog = false
+                        cycleDate = LocalDate.now().toString()
+                        cycleFlow = MenstrualFlow.LIGHT
+                        isPeriodStart = false
+                        cycleSymptoms = emptySet()
+                    }
+                }) { Text("Save log") }
+            },
+            dismissButton = { OutlinedButton(onClick = { cycleLogDialog = false; viewModel.clearCycleError() }) { Text("Cancel") } }
+        )
     }
 }
 
-/**
- * Apple Health Daily Readiness & Score Card with visual circular rings
- */
 @Composable
-fun AppleHealthScoreCard(
-    score: Int,
-    measurementsCount: Int,
-    documentsCount: Int,
-    onOpenRecords: () -> Unit
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .border(0.5.dp, AppleCardBorder, RoundedCornerShape(20.dp)),
-        colors = CardDefaults.cardColors(containerColor = AppleCardSurface),
-        shape = RoundedCornerShape(20.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
-    ) {
+private fun SectionHeading(title: String, action: String?, onAction: () -> Unit) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+        if (action != null) Text(action, color = MaterialTheme.colorScheme.primary, modifier = Modifier.clickable(onClick = onAction).padding(6.dp))
+    }
+}
+
+@Composable
+private fun EmptyState(text: String, action: String, onAction: () -> Unit) {
+    Card(shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(18.dp),
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(
-                        modifier = Modifier
-                            .size(8.dp)
-                            .clip(CircleShape)
-                            .background(AppleSystemGreen)
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(
-                        text = "HEALTH SCORE",
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = AppleSystemGreen,
-                        letterSpacing = 0.5.sp
-                    )
-                }
+            Text(text, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f), color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(action, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary, modifier = Modifier.clickable(onClick = onAction).padding(4.dp))
+        }
+    }
+}
 
-                Spacer(modifier = Modifier.height(4.dp))
-
-                Row(verticalAlignment = Alignment.Bottom) {
-                    Text(
-                        text = "$score",
-                        fontSize = 32.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = AppleLabelPrimary
-                    )
-                    Text(
-                        text = " / 100",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = AppleLabelSecondary,
-                        modifier = Modifier.padding(bottom = 3.dp)
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(4.dp))
-
-                Text(
-                    text = "Optimal Vitals & Biomarkers",
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = AppleLabelPrimary
-                )
-
-                Text(
-                    text = if (documentsCount > 0) "$documentsCount records • $measurementsCount verified metrics" else "Standard reference baselines",
-                    fontSize = 11.sp,
-                    color = AppleLabelSecondary
-                )
+@Composable
+private fun DocumentRow(document: MedicalDocument, dateFormat: SimpleDateFormat, onClick: () -> Unit) {
+    Card(modifier = Modifier.fillMaxWidth().clickable(onClick = onClick), shape = RoundedCornerShape(16.dp)) {
+        Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Icon(Icons.Default.Description, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+            Column(Modifier.weight(1f)) {
+                Text(document.fileName, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(dateFormat.format(Date(document.importDate)), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
+            Text(indexingLabel(document.indexingStatus), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
+        }
+    }
+}
 
-            // Circular Visual Health Rings (Apple Activity Style)
-            Box(
-                modifier = Modifier.size(72.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Canvas(modifier = Modifier.fillMaxSize()) {
-                    val strokeWidth = 6.dp.toPx()
-
-                    // Ring 1: Red (Cardiovascular)
-                    drawCircle(
-                        color = AppleRedLight,
-                        radius = size.minDimension / 2 - strokeWidth / 2,
-                        style = Stroke(width = strokeWidth)
-                    )
-                    drawArc(
-                        color = AppleActivityRed,
-                        startAngle = -90f,
-                        sweepAngle = 290f,
-                        useCenter = false,
-                        style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
-                    )
-
-                    // Ring 2: Green (Metabolic)
-                    drawCircle(
-                        color = AppleGreenLight,
-                        radius = size.minDimension / 2 - strokeWidth * 1.8f,
-                        style = Stroke(width = strokeWidth)
-                    )
-                    drawArc(
-                        color = AppleSystemGreen,
-                        startAngle = -90f,
-                        sweepAngle = 320f,
-                        useCenter = false,
-                        style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
-                    )
-
-                    // Ring 3: Teal (Rest & Hydration)
-                    drawCircle(
-                        color = AppleTealLight,
-                        radius = size.minDimension / 2 - strokeWidth * 3.1f,
-                        style = Stroke(width = strokeWidth)
-                    )
-                    drawArc(
-                        color = AppleHealthTeal,
-                        startAngle = -90f,
-                        sweepAngle = 260f,
-                        useCenter = false,
-                        style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
+@Composable
+private fun MeasurementRow(measurement: StructuredMeasurement, dateFormat: SimpleDateFormat) {
+    Card(shape = RoundedCornerShape(16.dp)) {
+        Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Column(Modifier.weight(1f)) {
+                Text(measurement.biomarkerName, fontWeight = FontWeight.SemiBold)
+                val dateHint = if (measurement.testDateSource == "IMPORT_DATE_FALLBACK") " · report date unavailable" else ""
+                Text(dateFormat.format(Date(measurement.testDate)) + dateHint, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            Column(horizontalAlignment = Alignment.End) {
+                val valuePrefix = when (measurement.valueComparator) {
+                    "<" -> "< "
+                    "<=" -> "≤ "
+                    ">" -> "> "
+                    ">=" -> "≥ "
+                    else -> ""
+                }
+                Text("$valuePrefix${measurement.numericValue} ${measurement.unit}", fontWeight = FontWeight.Bold)
+                if (measurement.referenceLow != null && measurement.referenceHigh != null) {
+                    Text(
+                        "Reported range ${measurement.referenceLow}–${measurement.referenceHigh} · verify",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-
-                Icon(
-                    imageVector = Icons.Default.Favorite,
-                    contentDescription = null,
-                    tint = AppleActivityRed,
-                    modifier = Modifier.size(16.dp)
-                )
+                Text("Unreviewed extraction", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
     }
 }
 
-/**
- * Apple Health Companion AI Card
- */
 @Composable
-fun AppleAssistantCard(
-    modelStatus: ModelInferenceStatus,
-    onNewConsultation: () -> Unit,
-    onOpenVault: () -> Unit,
-    onOpenSettings: () -> Unit
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .border(0.5.dp, AppleCardBorder, RoundedCornerShape(18.dp)),
-        colors = CardDefaults.cardColors(containerColor = AppleCardSurface),
-        shape = RoundedCornerShape(18.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
-    ) {
-        Column(modifier = Modifier.padding(18.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(
-                    modifier = Modifier
-                        .size(42.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(AppleBlueLight),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.AutoAwesome,
-                        contentDescription = null,
-                        tint = AppleSystemBlue,
-                        modifier = Modifier.size(24.dp)
-                    )
-                }
-                Spacer(modifier = Modifier.width(12.dp))
-                Column {
-                    Text(
-                        text = "AI Doc",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = AppleLabelPrimary
-                    )
-                    Text(
-                        text = "Full Medical History Grounded • Private AI",
-                        fontSize = 11.sp,
-                        color = AppleLabelSecondary
-                    )
-                }
+private fun ConversationRow(conversation: Conversation, dateFormat: SimpleDateFormat, onClick: () -> Unit) {
+    Card(modifier = Modifier.fillMaxWidth().clickable(onClick = onClick), shape = RoundedCornerShape(16.dp)) {
+        Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Icon(Icons.AutoMirrored.Filled.Chat, contentDescription = null, tint = MaterialTheme.colorScheme.secondary)
+            Column(Modifier.weight(1f)) {
+                Text(conversation.title, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(dateFormat.format(Date(conversation.updatedAt)), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
+            Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+    }
+}
 
-            Spacer(modifier = Modifier.height(14.dp))
-
-            // Friendly Status Banner
-            val isReady = modelStatus == ModelInferenceStatus.READY
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(AppleSearchFill)
-                    .clickable { onOpenSettings() }
-                    .padding(horizontal = 12.dp, vertical = 10.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(
-                        modifier = Modifier
-                            .size(8.dp)
-                            .clip(CircleShape)
-                            .background(if (isReady) AppleSystemGreen else AppleSystemOrange)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = if (isReady) "AI Doc Ready" else "AI Engine Standby",
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 13.sp,
-                        color = AppleLabelPrimary
-                    )
-                }
-
+@Composable
+private fun MedicationReminderRow(reminder: MedicationReminderEntity, onDelete: () -> Unit) {
+    Card(shape = RoundedCornerShape(16.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Icon(Icons.Default.Notifications, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+            Column(Modifier.weight(1f)) {
+                Text(reminder.medicationName, fontWeight = FontWeight.SemiBold)
                 Text(
-                    text = if (isReady) "Private" else "Configure",
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = if (isReady) AppleSystemGreen else AppleSystemBlue
+                    listOfNotNull(reminder.instructions.takeIf(String::isNotBlank), "Daily · ${"%02d:%02d".format(reminder.hour, reminder.minute)}").joinToString(" · "),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-
-            Spacer(modifier = Modifier.height(14.dp))
-
-            // Action Buttons
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                Button(
-                    onClick = onNewConsultation,
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(48.dp),
-                    contentPadding = PaddingValues(horizontal = 6.dp, vertical = 0.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = AppleSystemBlue,
-                        contentColor = Color.White
-                    ),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = "Consult AI Doc",
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 12.5.sp,
-                        maxLines = 1
-                    )
-                }
-
-                OutlinedButton(
-                    onClick = onOpenVault,
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(48.dp),
-                    contentPadding = PaddingValues(horizontal = 6.dp, vertical = 0.dp),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = AppleSystemBlue
-                    ),
-                    border = BorderStroke(0.5.dp, AppleSeparator),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Icon(Icons.Default.Folder, contentDescription = null, modifier = Modifier.size(16.dp))
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = "Health Records",
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 12.5.sp,
-                        maxLines = 1
-                    )
-                }
+            IconButton(onClick = onDelete) {
+                Icon(Icons.Default.DeleteOutline, contentDescription = "Delete reminder")
             }
         }
     }
 }
 
-/**
- * Individual Apple Health Metric Widget (Heart Rate, Blood Pressure, Glucose, etc.)
- */
-@Composable
-fun VitalMetricWidget(
-    modifier: Modifier = Modifier,
-    title: String,
-    value: String,
-    unit: String,
-    subtitle: String,
-    icon: ImageVector,
-    iconColor: Color,
-    iconBg: Color,
-    statusText: String,
-    statusColor: Color,
-    statusBg: Color,
-    onClick: (() -> Unit)? = null
-) {
-    Card(
-        modifier = modifier
-            .border(0.5.dp, AppleCardBorder, RoundedCornerShape(18.dp))
-            .then(
-                if (onClick != null) {
-                    Modifier.clickable { onClick() }
-                } else {
-                    Modifier
-                }
-            ),
-        colors = CardDefaults.cardColors(containerColor = AppleCardSurface),
-        shape = RoundedCornerShape(18.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
-    ) {
-        Column(modifier = Modifier.padding(14.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(34.dp)
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(iconBg),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = icon,
-                        contentDescription = null,
-                        tint = iconColor,
-                        modifier = Modifier.size(18.dp)
-                    )
-                }
+private fun profileAgeLabel(profile: PersonProfileEntity): String? {
+    val dob = profile.dateOfBirth ?: return null
+    val birthDate = Instant.ofEpochMilli(dob).atZone(ZoneOffset.UTC).toLocalDate()
+    val age = Period.between(birthDate, LocalDate.now(ZoneOffset.UTC)).years
+    return if (age >= 0) "$age years" else null
+}
 
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(statusBg)
-                        .padding(horizontal = 7.dp, vertical = 3.dp)
-                ) {
-                    Text(
-                        text = statusText,
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = statusColor
-                    )
-                }
-            }
+private fun indexingLabel(status: IndexingStatus): String = when (status) {
+    IndexingStatus.PENDING -> "Processing"
+    IndexingStatus.EXTRACTED -> "Text ready"
+    IndexingStatus.INDEXED -> "Indexed"
+    IndexingStatus.PARTIAL -> "Partial text"
+    IndexingStatus.FAILED -> "Needs review"
+}
 
-            Spacer(modifier = Modifier.height(10.dp))
-
-            Text(
-                text = title,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Medium,
-                color = AppleLabelSecondary
-            )
-
-            Spacer(modifier = Modifier.height(2.dp))
-
-            Row(verticalAlignment = Alignment.Bottom) {
-                Text(
-                    text = value,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = AppleLabelPrimary
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    text = unit,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = AppleLabelSecondary,
-                    modifier = Modifier.padding(bottom = 2.dp)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            Text(
-                text = subtitle,
-                fontSize = 11.sp,
-                color = AppleLabelTertiary,
-                maxLines = 1
-            )
-        }
-    }
+private fun modelStatusLabel(status: ModelInferenceStatus): String = when (status) {
+    ModelInferenceStatus.NOT_INSTALLED -> "Model not installed"
+    ModelInferenceStatus.INITIALIZING -> "Loading Gemma 4…"
+    ModelInferenceStatus.READY -> "Gemma 4 ready on this device"
+    ModelInferenceStatus.GENERATING -> "Gemma 4 is responding"
+    ModelInferenceStatus.ERROR -> "Could not start Gemma 4"
 }

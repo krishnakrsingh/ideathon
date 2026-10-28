@@ -2,7 +2,7 @@ package com.swasthai.app.ui.chat
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.swasthai.app.ai.LfmManager
+import com.swasthai.app.ai.Gemma4ToolCallingModel
 import com.swasthai.app.data.repository.ChatRepository
 import com.swasthai.app.data.repository.DocumentRepository
 import com.swasthai.app.domain.model.ChatContextScope
@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Job
 
 data class ChatUiState(
     val conversations: List<Conversation> = emptyList(),
@@ -34,27 +35,32 @@ data class ChatUiState(
     val emergencyWarning: String? = null,
     val selectedImageUri: String? = null
 ) {
-    val medGemmaStatus: ModelInferenceStatus get() = modelStatus
+    val toolModelStatus: ModelInferenceStatus get() = modelStatus
 }
 
 class ChatViewModel(
     private val chatRepository: ChatRepository,
     private val documentRepository: DocumentRepository,
-    private val lfmManager: LfmManager
+    private val gemma4ToolCallingModel: Gemma4ToolCallingModel
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ChatUiState())
     val uiState: StateFlow<ChatUiState> = _uiState.asStateFlow()
+    private var messageCollectionJob: Job? = null
 
     init {
         loadConversations()
         loadDocuments()
-        updateModelStatus()
+        viewModelScope.launch {
+            gemma4ToolCallingModel.statusFlow.collect { status ->
+                _uiState.value = _uiState.value.copy(modelStatus = status)
+            }
+        }
     }
 
     fun updateModelStatus() {
         _uiState.value = _uiState.value.copy(
-            modelStatus = lfmManager.status
+            modelStatus = gemma4ToolCallingModel.status
         )
     }
 
@@ -62,6 +68,17 @@ class ChatViewModel(
         viewModelScope.launch {
             chatRepository.getConversations().collect { convos ->
                 _uiState.value = _uiState.value.copy(conversations = convos)
+                val currentId = _uiState.value.currentConversationId
+                if (currentId != null && convos.none { it.id == currentId }) {
+                    messageCollectionJob?.cancel()
+                    _uiState.value = _uiState.value.copy(
+                        currentConversationId = null,
+                        currentMessages = emptyList(),
+                        activeDocumentId = null,
+                        currentScope = ChatContextScope(),
+                        isStreaming = false
+                    )
+                }
                 if (_uiState.value.currentConversationId == null && convos.isNotEmpty()) {
                     selectConversation(convos.first().id)
                 }
@@ -78,14 +95,24 @@ class ChatViewModel(
     }
 
     fun selectConversation(id: Long) {
-        _uiState.value = _uiState.value.copy(currentConversationId = id)
-        viewModelScope.launch {
+        if (_uiState.value.currentConversationId == id && messageCollectionJob?.isActive == true) return
+        messageCollectionJob?.cancel()
+        _uiState.value = _uiState.value.copy(
+            currentConversationId = id,
+            currentMessages = emptyList(),
+            activeDocumentId = null,
+            isStreaming = false
+        )
+        messageCollectionJob = viewModelScope.launch {
             val convo = chatRepository.getConversationById(id)
-            if (convo != null) {
-                _uiState.value = _uiState.value.copy(currentScope = convo.scope)
-            }
+            if (convo == null || _uiState.value.currentConversationId != id) return@launch
+            _uiState.value = _uiState.value.copy(
+                currentScope = convo.scope,
+                activeDocumentId = convo.activeDocumentId
+            )
 
             chatRepository.getMessages(id).collect { messages ->
+                if (_uiState.value.currentConversationId != id) return@collect
                 if (!_uiState.value.isStreaming) {
                     _uiState.value = _uiState.value.copy(currentMessages = messages)
                 } else {
@@ -200,8 +227,11 @@ class ChatViewModel(
     }
 
     fun sendMessage() {
+        if (_uiState.value.isStreaming) return
         val text = _uiState.value.inputText.trim()
         val imageUri = _uiState.value.selectedImageUri
+        val submittedScope = _uiState.value.currentScope
+        val submittedDocumentId = _uiState.value.activeDocumentId
         if (text.isBlank() && imageUri == null) return
 
         val titleText = if (text.isNotBlank()) text.take(30) else "Medical Image Consultation"
@@ -210,18 +240,24 @@ class ChatViewModel(
             viewModelScope.launch {
                 val newId = chatRepository.createConversation(
                     title = titleText,
-                    activeDocumentId = _uiState.value.activeDocumentId,
-                    scope = _uiState.value.currentScope
+                    activeDocumentId = submittedDocumentId,
+                    scope = submittedScope
                 )
                 selectConversation(newId)
-                executeSend(newId, text, imageUri)
+                executeSend(newId, text, imageUri, submittedScope, submittedDocumentId)
             }
         } else {
-            executeSend(convoId, text, imageUri)
+            executeSend(convoId, text, imageUri, submittedScope, submittedDocumentId)
         }
     }
 
-    private fun executeSend(conversationId: Long, text: String, imageUri: String?) {
+    private fun executeSend(
+        conversationId: Long,
+        text: String,
+        imageUri: String?,
+        submittedScope: ChatContextScope,
+        submittedDocumentId: Long?
+    ) {
         _uiState.value = _uiState.value.copy(
             inputText = "",
             selectedImageUri = null,
@@ -232,10 +268,11 @@ class ChatViewModel(
             chatRepository.sendMessage(
                 conversationId = conversationId,
                 userQuery = text,
-                activeDocId = _uiState.value.activeDocumentId,
-                overrideScope = _uiState.value.currentScope,
+                activeDocId = submittedDocumentId,
+                overrideScope = submittedScope,
                 imageUri = imageUri
             ).collect { msg ->
+                if (_uiState.value.currentConversationId != conversationId) return@collect
                 val currentList = _uiState.value.currentMessages.toMutableList()
                 val existingIndex = currentList.indexOfFirst {
                     (msg.id > 0 && it.id == msg.id) || (it.role == MessageRole.ASSISTANT && it.isStreaming)
@@ -249,7 +286,7 @@ class ChatViewModel(
                 _uiState.value = _uiState.value.copy(
                     currentMessages = currentList,
                     isStreaming = msg.isStreaming,
-                    modelStatus = lfmManager.status
+                    modelStatus = gemma4ToolCallingModel.status
                 )
             }
         }

@@ -27,7 +27,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.ChatBubbleOutline
 import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.Description
@@ -145,9 +144,6 @@ fun VaultScreen(
                         }
                     },
                     actions = {
-                        TextButton(onClick = { viewModel.importSampleDocument() }) {
-                            Text("Sample Panel", color = AppleHealthTeal, fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
-                        }
                         TextButton(onClick = { pdfPickerLauncher.launch(arrayOf("application/pdf")) }) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Icon(Icons.Default.Add, contentDescription = null, tint = AppleSystemBlue, modifier = Modifier.size(16.dp))
@@ -307,28 +303,12 @@ fun VaultScreen(
                         )
                         Spacer(modifier = Modifier.height(6.dp))
                         Text(
-                            text = "Import PDF blood tests or load a verified sample lab panel to test RAG and AI consultation immediately.",
+                            text = "Import a PDF report to build this profile’s private, searchable medical timeline.",
                             fontSize = 13.sp,
                             color = AppleLabelSecondary,
                             textAlign = androidx.compose.ui.text.style.TextAlign.Center
                         )
                         Spacer(modifier = Modifier.height(16.dp))
-
-                        Button(
-                            onClick = { viewModel.importSampleDocument() },
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = AppleHealthTeal,
-                                contentColor = Color.White
-                            ),
-                            shape = RoundedCornerShape(12.dp),
-                            modifier = Modifier.fillMaxWidth(0.85f)
-                        ) {
-                            Icon(Icons.Default.AutoAwesome, contentDescription = null, modifier = Modifier.size(16.dp))
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text("Load Sample Lab Panel (12+ Tests)", fontWeight = FontWeight.SemiBold)
-                        }
-
-                        Spacer(modifier = Modifier.height(10.dp))
 
                         OutlinedButton(
                             onClick = { pdfPickerLauncher.launch(arrayOf("application/pdf")) },
@@ -414,6 +394,7 @@ fun AppleHealthDocumentCard(
                 val (badgeBg, badgeText, statusLabel) = when (document.indexingStatus) {
                     IndexingStatus.INDEXED -> Triple(AppleGreenLight, AppleSystemGreen, "Indexed for AI Doc")
                     IndexingStatus.EXTRACTED -> Triple(AppleGreenLight, AppleSystemGreen, "Indexed for AI Doc")
+                    IndexingStatus.PARTIAL -> Triple(AppleOrangeLight, AppleSystemOrange, "Some pages not searchable")
                     IndexingStatus.PENDING -> Triple(AppleSearchFill, AppleLabelSecondary, "Analyzing...")
                     IndexingStatus.FAILED -> Triple(AppleOrangeLight, AppleSystemOrange, "Scan Only")
                 }

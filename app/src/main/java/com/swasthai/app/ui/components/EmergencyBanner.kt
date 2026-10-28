@@ -1,5 +1,8 @@
 package com.swasthai.app.ui.components
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -20,6 +23,8 @@ import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -46,6 +51,7 @@ import com.swasthai.app.ui.theme.AppleSystemRed
 @Composable
 fun EmergencyBanner(
     message: String,
+    onCallEmergency: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -87,9 +93,27 @@ fun EmergencyBanner(
                     color = AppleSystemRed,
                     fontWeight = FontWeight.SemiBold
                 )
+                Spacer(modifier = Modifier.height(10.dp))
+                EmergencyCallButton(onClick = onCallEmergency)
             }
         }
     }
+}
+
+@Composable
+fun EmergencyCallButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
+    Button(
+        onClick = onClick,
+        modifier = modifier,
+        colors = ButtonDefaults.buttonColors(containerColor = AppleSystemRed),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Text("Open dialer · 112", fontWeight = FontWeight.Bold)
+    }
+}
+
+fun openEmergencyDialer(context: Context) {
+    context.startActivity(Intent(Intent.ACTION_DIAL, Uri.parse("tel:112")))
 }
 
 @Composable

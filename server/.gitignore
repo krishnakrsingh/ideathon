@@ -1,0 +1,6 @@
+.venv/
+node_modules/
+.local-data/
+.env.local
+__pycache__/
+*.py[cod]

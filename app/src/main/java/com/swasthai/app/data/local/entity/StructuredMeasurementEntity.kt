@@ -4,6 +4,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import androidx.room.ColumnInfo
 
 @Entity(
     tableName = "structured_measurements",
@@ -30,12 +31,17 @@ data class StructuredMeasurementEntity(
     val referenceLow: Double? = null,
     val referenceHigh: Double? = null,
     val testDate: Long,
-    val rawText: String
-) {
-    val isOutOfRange: Boolean
-        get() {
-            val low = referenceLow
-            val high = referenceHigh
-            return (low != null && numericValue < low) || (high != null && numericValue > high)
-        }
-}
+    val rawText: String,
+    val canonicalCode: String? = null,
+    val sourcePageNumber: Int? = null,
+    @ColumnInfo(defaultValue = "'UNREVIEWED'") val reviewStatus: String = "UNREVIEWED",
+    val canonicalSystem: String? = null,
+    val unitSystem: String? = null,
+    val unitCode: String? = null,
+    @ColumnInfo(defaultValue = "'EQ'") val valueComparator: String = "EQ",
+    @ColumnInfo(defaultValue = "''") val rawValue: String = "",
+    @ColumnInfo(defaultValue = "'UNKNOWN'") val testDateSource: String = "UNKNOWN",
+    val referenceRangeSource: String? = null,
+    @ColumnInfo(defaultValue = "'legacy-v1'") val extractionMethod: String = "legacy-v1",
+    @ColumnInfo(defaultValue = "1") val schemaVersion: Int = 1
+)
