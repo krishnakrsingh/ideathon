@@ -54,10 +54,12 @@ fun AppBottomNav(
         Screen.Home,
         Screen.Vault,
         Screen.Chat,
-        Screen.Integrations
+        Screen.History
     )
 
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
+
+    if (currentRoute?.startsWith("chat") == true) return
 
     if (confirmEmergencyCall) {
         AlertDialog(

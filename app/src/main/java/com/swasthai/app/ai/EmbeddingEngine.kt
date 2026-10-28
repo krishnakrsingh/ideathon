@@ -23,7 +23,7 @@ data class ScoredChunk(
 )
 
 /** Local EmbeddingGemma 2 runtime. A missing or invalid model never produces synthetic vectors. */
-class EmbeddingEngine(private val context: Context? = null) : AutoCloseable {
+class EmbeddingEngine @JvmOverloads constructor(private val context: Context? = null) : AutoCloseable {
 
     @Volatile
     var status: ModelInferenceStatus = ModelInferenceStatus.NOT_INSTALLED

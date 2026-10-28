@@ -33,6 +33,8 @@ import java.util.UUID
 import java.util.Date
 import java.text.SimpleDateFormat
 import java.util.Locale
+import java.security.MessageDigest
+import org.json.JSONObject
 
 class DocumentRepository(
     private val context: Context,
@@ -96,15 +98,21 @@ class DocumentRepository(
         }
     }
 
-    private suspend fun processAndIndexFile(plaintextInput: File, displayFileName: String, profileId: String): Result<MedicalDocument> {
-        // 1. Insert initial document record (PENDING)
+    private suspend fun processAndIndexFile(
+        plaintextInput: File,
+        displayFileName: String,
+        profileId: String,
+        customStableId: String? = null,
+        existingEncryptedFile: File? = null
+    ): Result<MedicalDocument> {
+        val assignedStableId = customStableId ?: UUID.randomUUID().toString()
         val docEntity = DocumentEntity(
             fileName = displayFileName,
             localFilePath = "",
             fileSize = 0,
             importDate = System.currentTimeMillis(),
             indexingStatus = IndexingStatus.PENDING.name,
-            stableId = UUID.randomUUID().toString(),
+            stableId = assignedStableId,
             encryptionContextVersion = CURRENT_ENCRYPTION_CONTEXT_VERSION,
             profileId = profileId
         )
@@ -116,7 +124,7 @@ class DocumentRepository(
             documentDao.deleteDocumentById(docId, profileId)
             return Result.failure(IllegalStateException("Could not create the profile record folder"))
         }
-        val encryptedFile = File(recordDir, "record_${docEntity.stableId}.swai")
+        val encryptedFile = existingEncryptedFile ?: File(recordDir, "record_${docEntity.stableId}.swai")
         val encryptedTemp = File(recordDir, ".record_$docId.${UUID.randomUUID()}.part")
         val extractionFile = File(context.cacheDir, "extract_$docId.${UUID.randomUUID()}.pdf")
         val key = try {
@@ -126,7 +134,7 @@ class DocumentRepository(
                 ragDao.deleteEmbeddingsForDocument(docId)
                 measurementDao.deleteMeasurementsForDocument(docId)
                 documentDao.deleteDocumentById(docId, profileId)
-                encryptedFile.delete()
+                if (existingEncryptedFile == null) encryptedFile.delete()
                 encryptedTemp.delete()
             }
             throw cancelled
@@ -136,10 +144,11 @@ class DocumentRepository(
         }
 
         try {
-            // Encrypt before extraction/indexing. The only plaintext copies are temporary app-private files.
-            EncryptedPayloadEnvelope.encryptFile(plaintextInput, encryptedTemp, key, recordAad(profileId, docEntity.stableId))
-            moveReplacing(encryptedTemp, encryptedFile)
-            plaintextInput.delete()
+            if (existingEncryptedFile == null) {
+                EncryptedPayloadEnvelope.encryptFile(plaintextInput, encryptedTemp, key, recordAad(profileId, docEntity.stableId))
+                moveReplacing(encryptedTemp, encryptedFile)
+                plaintextInput.delete()
+            }
             EncryptedPayloadEnvelope.decryptFile(encryptedFile, extractionFile, key, recordAad(profileId, docEntity.stableId))
 
             val extraction = PdfExtractor.extractTextFromPdf(extractionFile)
@@ -427,6 +436,119 @@ class DocumentRepository(
         }
         documents.size
     }
+
+    data class SyncSummary(
+        val uploadedCount: Int,
+        val downloadedCount: Int,
+        val errors: List<String> = emptyList()
+    )
+
+    suspend fun syncEncryptedCloudRecords(
+        accountFamilyRepo: AccountFamilyRepository,
+        profileId: String? = null
+    ): SyncSummary = withContext(Dispatchers.IO) {
+        val targetProfileId = profileId ?: personProfileRepository.activeProfileId.value
+        val key = try {
+            profileKeyManager.getOrCreateProfileKey(targetProfileId)
+        } catch (e: Exception) {
+            return@withContext SyncSummary(0, 0, listOf("Profile key unavailable: ${e.message}"))
+        }
+
+        var uploaded = 0
+        var downloaded = 0
+        val errors = mutableListOf<String>()
+
+        // 1. Upload local documents
+        val localDocs = documentDao.getAllDocumentsList(targetProfileId)
+        for (doc in localDocs) {
+            val file = File(doc.localFilePath)
+            if (!file.isFile || file.length() == 0L) continue
+            try {
+                val fileBytes = file.readBytes()
+                val sha256Bytes = MessageDigest.getInstance("SHA-256").digest(fileBytes)
+                val sha256Hex = sha256Bytes.joinToString("") { "%02x".format(it) }
+
+                val metaJson = JSONObject()
+                    .put("file_name", doc.fileName)
+                    .put("file_size", doc.fileSize)
+                    .put("page_count", doc.pageCount)
+                    .put("report_date", doc.reportDate ?: doc.importDate)
+                    .put("stable_id", doc.stableId)
+
+                val encMeta = EncryptedPayloadEnvelope.encrypt(
+                    metaJson.toString().toByteArray(Charsets.UTF_8),
+                    key,
+                    recordMetadataAad(targetProfileId)
+                )
+                val encMetaB64 = android.util.Base64.encodeToString(encMeta, android.util.Base64.NO_WRAP)
+
+                val cloudRecordId = accountFamilyRepo.createCloudRecord(
+                    profileId = targetProfileId,
+                    encryptedMetadataBase64 = encMetaB64,
+                    ciphertextSha256 = sha256Hex,
+                    ciphertextSize = file.length(),
+                    cryptoVersion = 1
+                )
+                val ok = accountFamilyRepo.uploadRecordCiphertext(cloudRecordId, file, sha256Hex)
+                if (ok) uploaded++
+            } catch (err: Exception) {
+                android.util.Log.d("DocumentRepository", "Cloud upload skipped for ${doc.fileName}: ${err.message}")
+            }
+        }
+
+        // 2. Download cloud records
+        try {
+            val cloudRecords = accountFamilyRepo.listCloudRecords(targetProfileId)
+            for (cloudRec in cloudRecords) {
+                val recordId = cloudRec.getString("record_id")
+                val encMetaB64 = cloudRec.getString("encrypted_metadata")
+                val encMetaBytes = android.util.Base64.decode(encMetaB64, android.util.Base64.NO_WRAP)
+
+                val metaJson = try {
+                    val decrypted = EncryptedPayloadEnvelope.decrypt(encMetaBytes, key, recordMetadataAad(targetProfileId))
+                    JSONObject(decrypted.toString(Charsets.UTF_8))
+                } catch (e: Exception) {
+                    null
+                }
+
+                val stableId = metaJson?.optString("stable_id")?.takeIf(String::isNotBlank) ?: "cloud-$recordId"
+                if (documentDao.getDocumentByStableId(stableId) != null) continue
+
+                val fileName = metaJson?.optString("file_name")?.takeIf(String::isNotBlank) ?: "cloud-report-$recordId.pdf"
+                val timelineFolder = SimpleDateFormat("yyyy/MM", Locale.ROOT).format(Date())
+                val profileFolder = UUID.nameUUIDFromBytes(targetProfileId.toByteArray(Charsets.UTF_8)).toString()
+                val recordDir = File(vaultDir, "profiles/$profileFolder/$timelineFolder").apply { mkdirs() }
+                val encryptedFile = File(recordDir, "record_$stableId.swai")
+
+                val downloadedOk = accountFamilyRepo.downloadRecordCiphertext(recordId, encryptedFile)
+                if (downloadedOk && encryptedFile.isFile && encryptedFile.length() > 0L) {
+                    val tempPlain = File(context.cacheDir, "temp_cloud_$stableId.pdf")
+                    try {
+                        EncryptedPayloadEnvelope.decryptFile(encryptedFile, tempPlain, key, recordAad(targetProfileId, stableId))
+                        val result = processAndIndexFile(
+                            plaintextInput = tempPlain,
+                            displayFileName = fileName,
+                            profileId = targetProfileId,
+                            customStableId = stableId,
+                            existingEncryptedFile = encryptedFile
+                        )
+                        if (result.isSuccess) downloaded++
+                    } catch (e: Exception) {
+                        errors.add("Failed to decrypt and index cloud record $recordId: ${e.message}")
+                    } finally {
+                        tempPlain.delete()
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            errors.add("Failed to list cloud records: ${e.message}")
+        }
+
+        SyncSummary(uploaded, downloaded, errors)
+    }
+
+    private fun recordMetadataAad(profileId: String) =
+        "swasthai.record_metadata.v1:$profileId".toByteArray(Charsets.UTF_8)
 
     private fun DocumentEntity.toDomain(): MedicalDocument {
         return MedicalDocument(

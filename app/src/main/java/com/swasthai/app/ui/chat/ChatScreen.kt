@@ -33,6 +33,7 @@ import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AddPhotoAlternate
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.HealthAndSafety
@@ -142,70 +143,63 @@ fun ChatScreen(
 
     Scaffold(
         topBar = {
-            // ULTRA COMPACT SLEEK APPLE HEADER (saves 70dp vertical space)
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(AppleSystemBackground)
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 10.dp, vertical = 3.dp),
+                    modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // App Name & Live Status Dot
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            text = "AI Doc",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = AppleLabelPrimary,
-                            fontSize = 15.sp
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Box(
-                            modifier = Modifier
-                                .size(6.dp)
-                                .clip(CircleShape)
-                                .background(
-                                    if (uiState.modelStatus == ModelInferenceStatus.READY)
-                                        Color(0xFF34C759) else AppleSystemRed
-                                )
-                        )
+                    Column(Modifier.weight(1f)) {
+                        Text("Health assistant", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = AppleLabelPrimary)
+                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                            Box(Modifier.size(7.dp).clip(CircleShape).background(if (uiState.modelStatus == ModelInferenceStatus.READY || uiState.modelStatus == ModelInferenceStatus.GENERATING) Color(0xFF34C759) else AppleSystemRed))
+                            Text("Gemma 4 E2B · on this device", style = MaterialTheme.typography.labelSmall, color = AppleLabelSecondary)
+                        }
                     }
+                    IconButton(onClick = { viewModel.createNewConversation() }) {
+                        Icon(Icons.Default.Add, contentDescription = "New chat", tint = AppleSystemBlue)
+                    }
+                    IconButton(onClick = { openEmergencyDialer(context) }) {
+                        Icon(Icons.Default.Call, contentDescription = "Call emergency services", tint = AppleSystemRed)
+                    }
+                    if (uiState.currentConversationId != null) {
+                        IconButton(onClick = { viewModel.deleteCurrentConversation() }) {
+                            Icon(Icons.Default.DeleteOutline, contentDescription = "Delete chat", tint = AppleLabelSecondary)
+                        }
+                    }
+                }
 
-                    Spacer(modifier = Modifier.width(6.dp))
-
-                    // Inline Compact Context Scope Pill
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
                     Row(
                         modifier = Modifier
                             .weight(1f)
-                            .clip(RoundedCornerShape(10.dp))
+                            .clip(RoundedCornerShape(14.dp))
                             .background(AppleSearchFill)
                             .clickable { viewModel.openContextSheet(true) }
-                            .padding(horizontal = 7.dp, vertical = 4.dp),
+                            .padding(horizontal = 12.dp, vertical = 9.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
                             imageVector = Icons.Default.Tune,
                             contentDescription = null,
                             tint = AppleSystemBlue,
-                            modifier = Modifier.size(11.dp)
+                            modifier = Modifier.size(16.dp)
                         )
-                        Spacer(modifier = Modifier.width(4.dp))
+                        Spacer(modifier = Modifier.width(7.dp))
                         Text(
                             text = uiState.currentScope.formatScopePill(uiState.availableDocuments),
-                            fontSize = 10.sp,
+                            fontSize = 12.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = AppleLabelPrimary,
-                            maxLines = 1
+                            maxLines = 1,
+                            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                         )
                     }
-
-                    Spacer(modifier = Modifier.width(4.dp))
-
-                    // Quick Language Pill
                     val langLabel = when (uiState.currentScope.responseLanguage) {
                         ResponseLanguage.AUTO -> "Auto"
                         ResponseLanguage.ENGLISH -> "EN"
@@ -213,42 +207,19 @@ fun ChatScreen(
                     }
                     Box(
                         modifier = Modifier
-                            .clip(RoundedCornerShape(8.dp))
+                            .clip(RoundedCornerShape(14.dp))
                             .background(AppleTealLight)
                             .clickable { viewModel.openContextSheet(true) }
-                            .padding(horizontal = 6.dp, vertical = 3.dp)
+                            .padding(horizontal = 12.dp, vertical = 9.dp)
                     ) {
                         Text(
                             text = langLabel,
-                            fontSize = 10.sp,
+                            fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
                             color = AppleHealthTeal
                         )
                     }
-
-                    // Header Action Buttons
-                    IconButton(
-                        onClick = { viewModel.createNewConversation() },
-                        modifier = Modifier.size(28.dp)
-                    ) {
-                        Icon(Icons.Default.Add, contentDescription = "New", tint = AppleSystemBlue, modifier = Modifier.size(17.dp))
-                    }
-                    if (uiState.currentConversationId != null) {
-                        IconButton(
-                            onClick = { viewModel.deleteCurrentConversation() },
-                            modifier = Modifier.size(28.dp)
-                        ) {
-                            Icon(Icons.Default.DeleteOutline, contentDescription = "Delete", tint = AppleSystemRed, modifier = Modifier.size(16.dp))
-                        }
-                    }
                 }
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(0.5.dp)
-                        .background(AppleSeparator)
-                )
             }
         },
         containerColor = AppleGroupedBackground
@@ -280,6 +251,31 @@ fun ChatScreen(
                     onCallEmergency = { openEmergencyDialer(context) },
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
                 )
+            }
+
+            if (uiState.isStreaming) {
+                val activity = uiState.currentMessages.lastOrNull { it.isStreaming }?.activityLabel
+                val detail = activity ?: "Thinking through your question"
+                val headline = when {
+                    detail.contains("report", ignoreCase = true) || detail.contains("record", ignoreCase = true) -> "Looking through your records"
+                    detail.contains("search", ignoreCase = true) || detail.contains("brows", ignoreCase = true) -> "Searching your health history"
+                    detail.contains("writing", ignoreCase = true) -> "Preparing your answer"
+                    else -> "Gemma is thinking"
+                }
+                androidx.compose.material3.Surface(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 6.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    color = AppleTealLight
+                ) {
+                    Row(Modifier.padding(horizontal = 14.dp, vertical = 11.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                        CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp, color = AppleHealthTeal)
+                        Column(Modifier.weight(1f)) {
+                            Text(headline, style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.SemiBold, color = AppleLabelPrimary)
+                            Text(detail, style = MaterialTheme.typography.bodySmall, color = AppleLabelSecondary, maxLines = 1)
+                        }
+                        Text("ON-DEVICE", style = MaterialTheme.typography.labelSmall, color = AppleHealthTeal, fontWeight = FontWeight.Bold)
+                    }
+                }
             }
 
             // Messages Stream
@@ -337,32 +333,6 @@ fun ChatScreen(
                             message = message,
                             onCitationClick = { inspectedCitation = it }
                         )
-                    }
-                }
-
-                // Streaming / Generating Indicator
-                if (uiState.isStreaming) {
-                    item {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 2.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(14.dp),
-                                strokeWidth = 1.8.dp,
-                                color = AppleSystemBlue
-                            )
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Text(
-                                text = uiState.currentMessages.lastOrNull { it.isStreaming }?.activityLabel
-                                    ?: "Writing your answer",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = AppleLabelSecondary,
-                                fontSize = 12.sp
-                            )
-                        }
                     }
                 }
 

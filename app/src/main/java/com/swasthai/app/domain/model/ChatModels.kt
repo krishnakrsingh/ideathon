@@ -46,7 +46,7 @@ enum class ResponseLanguage {
     HINDI
 }
 
-data class ChatContextScope(
+data class ChatContextScope @JvmOverloads constructor(
     val profileId: String = DEFAULT_PERSON_PROFILE_ID,
     val mode: ScopeMode = ScopeMode.ALL_HISTORY,
     val selectedDocumentIds: Set<Long> = emptySet(),

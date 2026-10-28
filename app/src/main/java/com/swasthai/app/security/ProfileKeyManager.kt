@@ -45,6 +45,20 @@ class ProfileKeyManager(context: Context) {
         return SecretKeySpec(raw, "AES")
     }
 
+    @Synchronized
+    fun importProfileKey(profileId: String, rawKey: ByteArray) {
+        require(rawKey.size == PROFILE_KEY_BYTES) { "Invalid profile key length" }
+        storeProfileKey(profileId, rawKey)
+    }
+
+    fun hasProfileKey(profileId: String): Boolean {
+        return preferences.getString(preferenceKey(profileId), null) != null
+    }
+
+    fun getRawProfileKey(profileId: String): ByteArray {
+        return getOrCreateProfileKey(profileId).encoded
+    }
+
     /** Generates a phrase once and returns a server-storable envelope; the phrase is never persisted. */
     @Synchronized
     fun createRecoverySetup(profileId: String): RecoverySetup {

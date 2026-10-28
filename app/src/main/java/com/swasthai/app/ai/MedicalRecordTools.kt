@@ -46,12 +46,15 @@ class MedicalRecordToolDefinitions(
 
     @Tool(description = "Read extracted report text in bounded pages/chunk groups. Use page_number 0 to scan the whole report from chunk_offset 0; continue with the returned next_offset while has_more is true. Use a positive page_number to read only that page. The document ID is checked against the active profile and frozen scope.")
     fun read_medical_document(
-        @ToolParam(description = "Report ID returned by list_medical_files") document_id: Long,
+        @ToolParam(description = "Report ID returned by list_medical_files, as text") document_id: String,
         @ToolParam(description = "Page number to read, or 0 to scan the report in chunk groups") page_number: Int,
         @ToolParam(description = "Zero-based chunk offset; use next_offset returned by a prior call") chunk_offset: Int,
         @ToolParam(description = "Number of text chunks to read, from 1 to 8") limit: Int
-    ): String = execute("read_medical_document") {
-        ragPipeline.readMedicalDocument(document_id, page_number, targetDocumentId, scope, chunk_offset, limit)
+    ): String {
+        val parsedDocumentId = document_id.toLongOrNull() ?: return error("invalid_document_id")
+        return execute("read_medical_document") {
+            ragPipeline.readMedicalDocument(parsedDocumentId, page_number, targetDocumentId, scope, chunk_offset, limit)
+        }
     }
 
     @Tool(description = "Search report text for evidence relevant to a focused clinical question. Returns source-linked excerpts from the current profile and frozen scope only.")

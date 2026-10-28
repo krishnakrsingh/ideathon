@@ -62,6 +62,8 @@ class Gemma4ToolCallingModel(private val context: Context) : AutoCloseable {
     fun findAvailableModelFile(): File? = listOfNotNull(
         context.getExternalFilesDir(null)?.let { File(it, MODEL_FILE_NAME) },
         File(context.filesDir, MODEL_FILE_NAME),
+        File("/sdcard/Download/$MODEL_FILE_NAME"),
+        File("/storage/emulated/0/Download/$MODEL_FILE_NAME"),
         File("/sdcard/Android/data/com.swasthai.app/files/$MODEL_FILE_NAME"),
         File("/storage/emulated/0/Android/data/com.swasthai.app/files/$MODEL_FILE_NAME")
     ).firstOrNull { it.isFile && it.length() > 0L }
@@ -144,7 +146,7 @@ class Gemma4ToolCallingModel(private val context: Context) : AutoCloseable {
                     tools = tools,
                     automaticToolCalling = true,
                     maxOutputToken = 768,
-                    thinkingConfig = ThinkingConfig(enableThinking = false, thinkingTokenBudget = 0)
+                    thinkingConfig = ThinkingConfig(enableThinking = true, thinkingTokenBudget = 128)
                 )
             )
             try {

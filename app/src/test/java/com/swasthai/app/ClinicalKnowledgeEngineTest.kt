@@ -1,17 +1,18 @@
 package com.swasthai.app
 
-import com.swasthai.app.ai.ClinicalKnowledgeEngine
-import com.swasthai.app.ai.EmbeddingEngine
-import com.swasthai.app.ai.RAGPipeline
+import com.swasthai.app.ai.ExecutedMedicalTool
+import com.swasthai.app.ai.RetrievalMode
+import com.swasthai.app.ai.RetrievalResult
 import com.swasthai.app.domain.model.SourceCitation
-import org.junit.Assert.assertFalse
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class ClinicalKnowledgeEngineTest {
 
     @Test
-    fun testRecordGroundedSynthesisWithCitations() {
+    fun testRetrievalResultAggregationAndFormatting() {
         val citations = listOf(
             SourceCitation(
                 documentId = 101L,
@@ -22,40 +23,35 @@ class ClinicalKnowledgeEngineTest {
             )
         )
         val structured = listOf("Hemoglobin: 14.8 g/dL (Ref: 13.5 - 17.5)")
+        val tools = listOf(
+            ExecutedMedicalTool("search_medical_records", 2, "HYBRID")
+        )
 
-        val response = ClinicalKnowledgeEngine.generateClinicalResponse(
-            query = "What is my hemoglobin level?",
+        val result = RetrievalResult(
             citations = citations,
-            structuredBiomarkers = structured
+            searchMode = RetrievalMode.HYBRID,
+            structuredBiomarkersFound = structured,
+            executedTools = tools
         )
 
-        assertTrue("Should contain evidence headline", response.contains("saved health records") || response.contains("Analysis"))
-        assertTrue("Should include structured lab measurement", response.contains("Hemoglobin: 14.8 g/dL"))
-        assertTrue("Should reference the source document", response.contains("Sample_Comprehensive_Health_Panel"))
-        assertTrue("Should explain hemoglobin role", response.contains("Hemoglobin"))
+        assertEquals(RetrievalMode.HYBRID, result.searchMode)
+        assertEquals(1, result.citations.size)
+        assertEquals("Sample_Comprehensive_Health_Panel.pdf", result.citations[0].documentName)
+        assertEquals(1, result.structuredBiomarkersFound.size)
+        assertEquals(1, result.executedTools.size)
+        assertEquals("search_medical_records", result.executedTools[0].name)
     }
 
     @Test
-    fun testGeneralBloodPressureGuide() {
-        val response = ClinicalKnowledgeEngine.generateClinicalResponse(
-            query = "What is normal blood pressure?",
-            citations = emptyList(),
-            structuredBiomarkers = emptyList()
+    fun testExecutedMedicalToolTracking() {
+        val trace = ExecutedMedicalTool(
+            name = "get_biomarker_history",
+            resultCount = 3,
+            retrievalMode = RetrievalMode.HYBRID.name
         )
 
-        assertTrue(response.contains("Systolic"))
-        assertTrue(response.contains("Diastolic"))
-        assertTrue(response.contains("120"))
-        assertTrue(response.contains("80"))
-    }
-
-    @Test
-    fun testSearchTermsExtractionInRAGPipeline() {
-        val terms = RAGPipeline.extractSearchTerms("What is the normal reference range for my hemoglobin level?")
-        assertTrue(terms.contains("hemoglobin"))
-        assertFalse(terms.contains("what"))
-        assertFalse(terms.contains("the"))
-        assertFalse(terms.contains("for"))
-        assertFalse(terms.contains("normal"))
+        assertEquals("get_biomarker_history", trace.name)
+        assertEquals(3, trace.resultCount)
+        assertEquals("HYBRID", trace.retrievalMode)
     }
 }

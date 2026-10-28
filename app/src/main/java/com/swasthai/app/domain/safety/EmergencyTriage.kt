@@ -28,7 +28,6 @@ object EmergencyTriage {
         "overdose",
         "suicide",
         "killing myself",
-        "chest pain",
         "सीने में दर्द",
         "छाती में दर्द",
         "सांस नहीं आ रही",

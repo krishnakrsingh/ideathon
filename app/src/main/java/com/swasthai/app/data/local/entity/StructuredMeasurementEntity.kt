@@ -44,4 +44,8 @@ data class StructuredMeasurementEntity(
     val referenceRangeSource: String? = null,
     @ColumnInfo(defaultValue = "'legacy-v1'") val extractionMethod: String = "legacy-v1",
     @ColumnInfo(defaultValue = "1") val schemaVersion: Int = 1
-)
+) {
+    val isOutOfRange: Boolean
+        get() = (referenceLow != null && numericValue < referenceLow) ||
+                (referenceHigh != null && numericValue > referenceHigh)
+}

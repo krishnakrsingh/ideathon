@@ -20,6 +20,12 @@ class PersonProfileRepository(context: Context, private val profileDao: PersonPr
 
     suspend fun getProfile(profileId: String): PersonProfileEntity? = profileDao.getProfile(profileId)
 
+    /** Restore the local owner profile when the saved selection no longer exists. */
+    suspend fun reconcileActiveProfile() {
+        if (profileDao.getProfile(_activeProfileId.value) != null) return
+        selectProfile(DEFAULT_PERSON_PROFILE_ID)
+    }
+
     suspend fun createProfile(
         displayName: String,
         relationship: String,

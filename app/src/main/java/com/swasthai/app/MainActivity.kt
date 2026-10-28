@@ -114,7 +114,10 @@ fun MainAppContent(app: SwasthApplication) {
                     app.gemma4ToolCallingModel,
                     app.gemmaModelArtifactManager,
                     app.accountFamilyRepository,
-                    app.deviceKeyManager
+                    app.deviceKeyManager,
+                    app.profileKeyManager,
+                    app.doctorShareRepository,
+                    app.personProfileRepository
                 ) as T
             }
         }

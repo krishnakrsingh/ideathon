@@ -50,6 +50,34 @@ class DeviceKeyManager(context: Context) {
         )
     }
 
+    fun wrapProfileKey(peerPublicKeyBase64: String, profileKeyBytes: ByteArray): String {
+        val keyBytes = Base64.decode(peerPublicKeyBase64, Base64.NO_WRAP)
+        val keySpec = java.security.spec.X509EncodedKeySpec(keyBytes)
+        val keyFactory = java.security.KeyFactory.getInstance("RSA")
+        val publicKey = keyFactory.generatePublic(keySpec)
+        val cipher = javax.crypto.Cipher.getInstance("RSA/ECB/OAEPWithSHA-256AndMGF1Padding")
+        val oaepParams = javax.crypto.spec.OAEPParameterSpec(
+            "SHA-256", "MGF1", java.security.spec.MGF1ParameterSpec.SHA1, javax.crypto.spec.PSource.PSpecified.DEFAULT
+        )
+        cipher.init(javax.crypto.Cipher.ENCRYPT_MODE, publicKey, oaepParams)
+        val wrapped = cipher.doFinal(profileKeyBytes)
+        return Base64.encodeToString(wrapped, Base64.NO_WRAP)
+    }
+
+    fun unwrapProfileKey(accountUserId: String, wrappedKeyBase64: String): ByteArray {
+        val alias = keyAlias(accountUserId)
+        val keyStore = KeyStore.getInstance(ANDROID_KEYSTORE).apply { load(null) }
+        val privateKey = (keyStore.getEntry(alias, null) as? KeyStore.PrivateKeyEntry)?.privateKey
+            ?: throw IllegalStateException("Device private key not found for user")
+        val cipher = javax.crypto.Cipher.getInstance("RSA/ECB/OAEPWithSHA-256AndMGF1Padding")
+        val oaepParams = javax.crypto.spec.OAEPParameterSpec(
+            "SHA-256", "MGF1", java.security.spec.MGF1ParameterSpec.SHA1, javax.crypto.spec.PSource.PSpecified.DEFAULT
+        )
+        cipher.init(javax.crypto.Cipher.DECRYPT_MODE, privateKey, oaepParams)
+        val wrappedBytes = Base64.decode(wrappedKeyBase64, Base64.NO_WRAP)
+        return cipher.doFinal(wrappedBytes)
+    }
+
     @Synchronized
     private fun deviceId(accountUserId: String): String {
         val key = "device-id-${accountDigest(accountUserId)}"

@@ -13,6 +13,11 @@ import com.swasthai.app.data.repository.AccessibleCloudProfile
 import com.swasthai.app.data.repository.FamilyAccount
 import com.swasthai.app.data.repository.FamilyCredentials
 import com.swasthai.app.security.DeviceKeyManager
+import com.swasthai.app.security.ProfileKeyManager
+import com.swasthai.app.data.repository.DoctorShareRepository
+import com.swasthai.app.data.repository.DoctorClinicalSummary
+import com.swasthai.app.data.repository.CreatedDoctorShare
+import com.swasthai.app.data.repository.PersonProfileRepository
 import com.swasthai.app.domain.model.ModelInferenceStatus
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -52,7 +57,18 @@ data class SettingsUiState(
     val families: List<FamilyAccount> = emptyList(),
     val selectedFamily: FamilyAccount? = null,
     val accessibleCloudProfiles: List<AccessibleCloudProfile> = emptyList(),
-    val oneTimeFamilyCredentials: FamilyCredentials? = null
+    val oneTimeFamilyCredentials: FamilyCredentials? = null,
+    val isSyncingCloudRecords: Boolean = false,
+    val cloudSyncMessage: String? = null,
+    val cloudSyncError: String? = null,
+    val backupRecoveryPhrase: String? = null,
+    val recoveryMessage: String? = null,
+    val recoveryError: String? = null,
+    val isDoctorShareBusy: Boolean = false,
+    val createdDoctorShare: CreatedDoctorShare? = null,
+    val doctorShareMessage: String? = null,
+    val doctorShareError: String? = null,
+    val redeemedDoctorSummary: DoctorClinicalSummary? = null
 )
 
 class SettingsViewModel(
@@ -61,7 +77,10 @@ class SettingsViewModel(
     private val gemma4ToolCallingModel: Gemma4ToolCallingModel,
     private val gemmaModelArtifactManager: GemmaModelArtifactManager,
     private val accountFamilyRepository: AccountFamilyRepository,
-    private val deviceKeyManager: DeviceKeyManager
+    private val deviceKeyManager: DeviceKeyManager,
+    private val profileKeyManager: ProfileKeyManager? = null,
+    private val doctorShareRepository: DoctorShareRepository? = null,
+    private val personProfileRepository: PersonProfileRepository? = null
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingsUiState())
@@ -339,6 +358,99 @@ class SettingsViewModel(
                 _uiState.value = _uiState.value.copy(accountBusy = false)
             }
         }
+    }
+
+    fun syncCloudRecords() {
+        _uiState.value = _uiState.value.copy(isSyncingCloudRecords = true, cloudSyncMessage = null, cloudSyncError = null)
+        viewModelScope.launch {
+            try {
+                val summary = documentRepository.syncEncryptedCloudRecords(accountFamilyRepository)
+                val msg = "Sync complete: ${summary.uploadedCount} uploaded, ${summary.downloadedCount} downloaded." +
+                    if (summary.errors.isNotEmpty()) " (${summary.errors.first()})" else ""
+                _uiState.value = _uiState.value.copy(cloudSyncMessage = msg)
+            } catch (err: Exception) {
+                _uiState.value = _uiState.value.copy(cloudSyncError = err.localizedMessage ?: "Sync failed")
+            } finally {
+                _uiState.value = _uiState.value.copy(isSyncingCloudRecords = false)
+            }
+        }
+    }
+
+    fun syncPendingKeyGrants() {
+        if (profileKeyManager == null) return
+        accountAction {
+            val imported = accountFamilyRepository.syncPendingKeyGrants(deviceKeyManager, profileKeyManager)
+            _uiState.value = _uiState.value.copy(accountMessage = "Key sync complete: $imported family profiles decrypted.")
+            loadFamilies()
+        }
+    }
+
+    fun createRecoverySetup() {
+        if (profileKeyManager == null || personProfileRepository == null) return
+        val activeProfileId = personProfileRepository.activeProfileId.value
+        try {
+            val setup = profileKeyManager.createRecoverySetup(activeProfileId)
+            _uiState.value = _uiState.value.copy(backupRecoveryPhrase = setup.phrase, recoveryMessage = null, recoveryError = null)
+        } catch (err: Exception) {
+            _uiState.value = _uiState.value.copy(recoveryError = err.localizedMessage ?: "Could not create recovery setup")
+        }
+    }
+
+    fun dismissRecoveryPhrase() {
+        _uiState.value = _uiState.value.copy(backupRecoveryPhrase = null)
+    }
+
+    fun restoreProfileFromRecovery(phrase: String) {
+        if (profileKeyManager == null || personProfileRepository == null) return
+        val activeProfileId = personProfileRepository.activeProfileId.value
+        try {
+            val envelope = profileKeyManager.createRecoveryEnvelope(activeProfileId, phrase.trim())
+            profileKeyManager.restoreProfileKey(activeProfileId, phrase.trim(), envelope)
+            _uiState.value = _uiState.value.copy(recoveryMessage = "Recovery phrase validated and profile restored!", recoveryError = null)
+        } catch (err: Exception) {
+            _uiState.value = _uiState.value.copy(recoveryError = err.localizedMessage ?: "Invalid recovery phrase")
+        }
+    }
+
+    fun generateDoctorShare(notes: String = "", minutes: Int = 15) {
+        if (doctorShareRepository == null) return
+        _uiState.value = _uiState.value.copy(isDoctorShareBusy = true, doctorShareError = null, doctorShareMessage = null)
+        viewModelScope.launch {
+            try {
+                val share = doctorShareRepository.generateClinicalSummary(
+                    expiresInMinutes = minutes,
+                    clinicalNotes = notes
+                )
+                _uiState.value = _uiState.value.copy(createdDoctorShare = share, doctorShareMessage = "Doctor QR share generated!")
+            } catch (err: Exception) {
+                _uiState.value = _uiState.value.copy(doctorShareError = err.localizedMessage ?: "Could not generate doctor share")
+            } finally {
+                _uiState.value = _uiState.value.copy(isDoctorShareBusy = false)
+            }
+        }
+    }
+
+    fun dismissDoctorShare() {
+        _uiState.value = _uiState.value.copy(createdDoctorShare = null)
+    }
+
+    fun redeemDoctorShare(token: String, key: String) {
+        if (doctorShareRepository == null) return
+        _uiState.value = _uiState.value.copy(isDoctorShareBusy = true, doctorShareError = null, doctorShareMessage = null)
+        viewModelScope.launch {
+            try {
+                val summary = doctorShareRepository.redeemAndDecryptShare(token, key)
+                _uiState.value = _uiState.value.copy(redeemedDoctorSummary = summary, doctorShareMessage = "Doctor summary decrypted!")
+            } catch (err: Exception) {
+                _uiState.value = _uiState.value.copy(doctorShareError = err.localizedMessage ?: "Could not redeem doctor share")
+            } finally {
+                _uiState.value = _uiState.value.copy(isDoctorShareBusy = false)
+            }
+        }
+    }
+
+    fun dismissRedeemedSummary() {
+        _uiState.value = _uiState.value.copy(redeemedDoctorSummary = null)
     }
 
     private companion object {

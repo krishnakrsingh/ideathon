@@ -83,6 +83,13 @@ fun SettingsScreen(
     var showClearConfirm by remember { mutableStateOf(false) }
     var memberToRemove by remember { mutableStateOf<Pair<String, String>?>(null) }
     var familyToLeave by remember { mutableStateOf<String?>(null) }
+    var showRestoreDialog by remember { mutableStateOf(false) }
+    var restorePhraseInput by remember { mutableStateOf("") }
+    var showDoctorShareDialog by remember { mutableStateOf(false) }
+    var doctorNotesInput by remember { mutableStateOf("") }
+    var showRedeemDialog by remember { mutableStateOf(false) }
+    var redeemTokenInput by remember { mutableStateOf("") }
+    var redeemKeyInput by remember { mutableStateOf("") }
 
     if (showClearConfirm) {
         AlertDialog(
@@ -144,6 +151,205 @@ fun SettingsScreen(
                 }) { Text("Leave", color = AppleSystemRed) }
             },
             dismissButton = { TextButton(onClick = { familyToLeave = null }) { Text("Cancel") } }
+        )
+    }
+
+    uiState.backupRecoveryPhrase?.let { phrase ->
+        AlertDialog(
+            onDismissRequest = viewModel::dismissRecoveryPhrase,
+            title = { Text("24-Word Vault Recovery Phrase", fontWeight = FontWeight.Bold, color = AppleLabelPrimary) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        "Write down these 24 words in order and store them offline. Anyone with these words can restore your profile key and decrypt your health records.",
+                        fontSize = 12.sp,
+                        color = AppleLabelSecondary
+                    )
+                    SelectionContainer {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(AppleSearchFill, RoundedCornerShape(8.dp))
+                                .padding(12.dp)
+                        ) {
+                            Text(phrase, fontSize = 13.sp, fontWeight = FontWeight.Medium, color = AppleLabelPrimary, lineHeight = 20.sp)
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                Button(onClick = viewModel::dismissRecoveryPhrase) {
+                    Text("I have safely saved this")
+                }
+            }
+        )
+    }
+
+    if (showRestoreDialog) {
+        AlertDialog(
+            onDismissRequest = { showRestoreDialog = false },
+            title = { Text("Restore Profile Key", fontWeight = FontWeight.Bold, color = AppleLabelPrimary) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("Enter your 24-word recovery phrase to restore your encryption key on this device.", fontSize = 12.sp, color = AppleLabelSecondary)
+                    OutlinedTextField(
+                        value = restorePhraseInput,
+                        onValueChange = { restorePhraseInput = it },
+                        label = { Text("24 recovery words") },
+                        modifier = Modifier.fillMaxWidth(),
+                        maxLines = 4
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showRestoreDialog = false
+                        viewModel.restoreProfileFromRecovery(restorePhraseInput)
+                        restorePhraseInput = ""
+                    },
+                    enabled = restorePhraseInput.trim().split("\\s+".toRegex()).size == 24
+                ) {
+                    Text("Restore Key")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showRestoreDialog = false }) { Text("Cancel") }
+            }
+        )
+    }
+
+    uiState.createdDoctorShare?.let { share ->
+        AlertDialog(
+            onDismissRequest = viewModel::dismissDoctorShare,
+            title = { Text("Doctor Summary QR Ready", fontWeight = FontWeight.Bold, color = AppleLabelPrimary) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text(
+                        "Your clinical summary has been encrypted with a one-time key. It expires in 15 minutes and can only be redeemed once.",
+                        fontSize = 12.sp,
+                        color = AppleLabelSecondary
+                    )
+                    SelectionContainer {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(AppleBlueLight, RoundedCornerShape(8.dp))
+                                .padding(10.dp),
+                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Text("Share URL (for Doctor's scanner):", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                            Text(share.qrPayloadUrl, fontSize = 11.sp, color = AppleSystemBlue)
+                            Spacer(Modifier.height(4.dp))
+                            Text("Token: ${share.token}", fontSize = 11.sp)
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                Button(onClick = viewModel::dismissDoctorShare) { Text("Done") }
+            }
+        )
+    }
+
+    if (showDoctorShareDialog) {
+        AlertDialog(
+            onDismissRequest = { showDoctorShareDialog = false },
+            title = { Text("Create Doctor Summary Share", fontWeight = FontWeight.Bold, color = AppleLabelPrimary) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("Generates an ephemeral, encrypted snapshot of recent lab biomarkers, active medications, and records with a one-time key for a clinical visit.", fontSize = 12.sp, color = AppleLabelSecondary)
+                    OutlinedTextField(
+                        value = doctorNotesInput,
+                        onValueChange = { doctorNotesInput = it },
+                        label = { Text("Optional Clinical Note / Chief Complaint") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showDoctorShareDialog = false
+                        viewModel.generateDoctorShare(doctorNotesInput)
+                        doctorNotesInput = ""
+                    },
+                    enabled = !uiState.isDoctorShareBusy
+                ) {
+                    Text("Create Share")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDoctorShareDialog = false }) { Text("Cancel") }
+            }
+        )
+    }
+
+    if (showRedeemDialog) {
+        AlertDialog(
+            onDismissRequest = { showRedeemDialog = false },
+            title = { Text("Redeem Doctor Summary", fontWeight = FontWeight.Bold, color = AppleLabelPrimary) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("Enter or scan the one-time token and decryption key from the patient's QR code.", fontSize = 12.sp, color = AppleLabelSecondary)
+                    OutlinedTextField(
+                        value = redeemTokenInput,
+                        onValueChange = { redeemTokenInput = it },
+                        label = { Text("One-time Token") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    OutlinedTextField(
+                        value = redeemKeyInput,
+                        onValueChange = { redeemKeyInput = it },
+                        label = { Text("Decryption Key (Base64)") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showRedeemDialog = false
+                        viewModel.redeemDoctorShare(redeemTokenInput, redeemKeyInput)
+                        redeemTokenInput = ""
+                        redeemKeyInput = ""
+                    },
+                    enabled = redeemTokenInput.isNotBlank() && redeemKeyInput.isNotBlank() && !uiState.isDoctorShareBusy
+                ) {
+                    Text("Redeem & Decrypt")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showRedeemDialog = false }) { Text("Cancel") }
+            }
+        )
+    }
+
+    uiState.redeemedDoctorSummary?.let { summary ->
+        AlertDialog(
+            onDismissRequest = viewModel::dismissRedeemedSummary,
+            title = { Text("Clinical Summary: ${summary.patientName}", fontWeight = FontWeight.Bold, color = AppleLabelPrimary) },
+            text = {
+                Column(modifier = Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("Relationship: ${summary.relationship}", fontSize = 12.sp, color = AppleLabelSecondary)
+                    if (summary.clinicalNotes.isNotBlank()) {
+                        Text("Patient Notes: ${summary.clinicalNotes}", fontSize = 12.sp, fontWeight = FontWeight.Medium, color = AppleLabelPrimary)
+                    }
+                    Text("Recent Biomarkers (${summary.biomarkers.size}):", fontWeight = FontWeight.SemiBold, fontSize = 12.sp)
+                    summary.biomarkers.forEach { b ->
+                        Text("• ${b.name}: ${b.value} ${b.unit}${if (b.isOutOfRange) " (OUT OF RANGE)" else ""}", fontSize = 11.sp, color = if (b.isOutOfRange) AppleSystemRed else AppleLabelPrimary)
+                    }
+                    Text("Active Medications (${summary.medications.size}):", fontWeight = FontWeight.SemiBold, fontSize = 12.sp)
+                    summary.medications.forEach { m ->
+                        Text("• ${m.medicationName} (${m.instructions}) - %02d:%02d".format(m.hour, m.minute), fontSize = 11.sp, color = AppleLabelPrimary)
+                    }
+                }
+            },
+            confirmButton = {
+                Button(onClick = viewModel::dismissRedeemedSummary) { Text("Close") }
+            }
         )
     }
 
@@ -366,6 +572,93 @@ fun SettingsScreen(
                             }
                         }
                     }
+                }
+            }
+
+            SettingsSectionHeader(title = "END-TO-END ENCRYPTED CLOUD SYNC & RECOVERY")
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .border(0.5.dp, AppleCardBorder, RoundedCornerShape(16.dp)),
+                colors = CardDefaults.cardColors(containerColor = AppleCardSurface),
+                shape = RoundedCornerShape(16.dp),
+                elevation = CardDefaults.cardElevation(0.dp)
+            ) {
+                Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text("Encrypted Cloud Vault", fontWeight = FontWeight.SemiBold, color = AppleLabelPrimary)
+                    Text(
+                        "Reports and clinical metrics are encrypted client-side using AES-GCM before uploading. The server only holds opaque ciphertext envelopes.",
+                        fontSize = 12.sp,
+                        color = AppleLabelSecondary
+                    )
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Button(
+                            onClick = viewModel::syncCloudRecords,
+                            enabled = !uiState.isSyncingCloudRecords && uiState.signedInEmail != null
+                        ) {
+                            Text(if (uiState.isSyncingCloudRecords) "Syncing…" else "Sync Cloud Records")
+                        }
+                        if (uiState.signedInEmail != null) {
+                            OutlinedButton(onClick = viewModel::syncPendingKeyGrants, enabled = !uiState.accountBusy) {
+                                Text("Sync Key Grants")
+                            }
+                        }
+                    }
+                    if (uiState.isSyncingCloudRecords) {
+                        LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+                    }
+                    uiState.cloudSyncMessage?.let { Text(it, color = AppleSystemBlue, fontSize = 12.sp) }
+                    uiState.cloudSyncError?.let { Text(it, color = AppleSystemRed, fontSize = 12.sp) }
+
+                    SettingsDivider()
+                    Text("24-Word Recovery Phrase", fontWeight = FontWeight.SemiBold, color = AppleLabelPrimary)
+                    Text(
+                        "Generate your offline recovery words or restore access on a new device. Never share your recovery words with anyone.",
+                        fontSize = 12.sp,
+                        color = AppleLabelSecondary
+                    )
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        OutlinedButton(onClick = viewModel::createRecoverySetup) {
+                            Text("View Recovery Phrase")
+                        }
+                        TextButton(onClick = { showRestoreDialog = true }) {
+                            Text("Restore Profile")
+                        }
+                    }
+                    uiState.recoveryMessage?.let { Text(it, color = AppleSystemBlue, fontSize = 12.sp) }
+                    uiState.recoveryError?.let { Text(it, color = AppleSystemRed, fontSize = 12.sp) }
+                }
+            }
+
+            SettingsSectionHeader(title = "DOCTOR QR CLINICAL SUMMARY SHARE")
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .border(0.5.dp, AppleCardBorder, RoundedCornerShape(16.dp)),
+                colors = CardDefaults.cardColors(containerColor = AppleCardSurface),
+                shape = RoundedCornerShape(16.dp),
+                elevation = CardDefaults.cardElevation(0.dp)
+            ) {
+                Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text("Instant Doctor Consult Share", fontWeight = FontWeight.SemiBold, color = AppleLabelPrimary)
+                    Text(
+                        "Generates a 15-minute, single-use QR code containing recent lab biomarkers, active medications, and notes. Encrypted with a one-time key in the URL fragment.",
+                        fontSize = 12.sp,
+                        color = AppleLabelSecondary
+                    )
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Button(
+                            onClick = { showDoctorShareDialog = true },
+                            enabled = !uiState.isDoctorShareBusy && uiState.signedInEmail != null
+                        ) {
+                            Text("Generate Doctor QR")
+                        }
+                        OutlinedButton(onClick = { showRedeemDialog = true }) {
+                            Text("Redeem Doctor QR")
+                        }
+                    }
+                    uiState.doctorShareMessage?.let { Text(it, color = AppleSystemBlue, fontSize = 12.sp) }
+                    uiState.doctorShareError?.let { Text(it, color = AppleSystemRed, fontSize = 12.sp) }
                 }
             }
 

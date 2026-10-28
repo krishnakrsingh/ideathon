@@ -12,6 +12,9 @@ interface MedicationReminderDao {
     @Query("SELECT * FROM medication_reminders WHERE profileId = :profileId ORDER BY hour, minute")
     fun observeForProfile(profileId: String): Flow<List<MedicationReminderEntity>>
 
+    @Query("SELECT * FROM medication_reminders WHERE profileId = :profileId ORDER BY hour, minute")
+    suspend fun getRemindersForProfileSync(profileId: String): List<MedicationReminderEntity>
+
     @Query("SELECT * FROM medication_reminders WHERE enabled = 1")
     suspend fun getEnabledReminders(): List<MedicationReminderEntity>
 

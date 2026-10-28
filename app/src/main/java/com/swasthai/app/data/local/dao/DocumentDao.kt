@@ -45,6 +45,9 @@ interface DocumentDao {
     @Query("SELECT * FROM documents WHERE id = :id AND profileId = :profileId LIMIT 1")
     suspend fun getDocumentById(id: Long, profileId: String = DEFAULT_PERSON_PROFILE_ID): DocumentEntity?
 
+    @Query("SELECT * FROM documents WHERE stableId = :stableId LIMIT 1")
+    suspend fun getDocumentByStableId(stableId: String): DocumentEntity?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertDocument(doc: DocumentEntity): Long
 

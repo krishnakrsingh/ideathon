@@ -16,6 +16,9 @@ interface MeasurementDao {
     @Query("SELECT * FROM structured_measurements ORDER BY testDate DESC")
     suspend fun getAllMeasurementsList(): List<StructuredMeasurementEntity>
 
+    @Query("SELECT sm.* FROM structured_measurements sm JOIN documents d ON d.id = sm.documentId WHERE d.profileId = :profileId ORDER BY sm.testDate DESC")
+    suspend fun getMeasurementsForProfileSync(profileId: String): List<StructuredMeasurementEntity>
+
     @Query("SELECT * FROM structured_measurements WHERE documentId = :documentId ORDER BY biomarkerName ASC")
     suspend fun getMeasurementsForDocument(documentId: Long): List<StructuredMeasurementEntity>
 

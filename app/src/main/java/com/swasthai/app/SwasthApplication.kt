@@ -71,6 +71,9 @@ class SwasthApplication : Application() {
     lateinit var deviceKeyManager: DeviceKeyManager
         private set
 
+    lateinit var doctorShareRepository: com.swasthai.app.data.repository.DoctorShareRepository
+        private set
+
     override fun onCreate() {
         super.onCreate()
         PDFBoxResourceLoader.init(this)
@@ -92,6 +95,13 @@ class SwasthApplication : Application() {
         )
         accountFamilyRepository = AccountFamilyRepository(this)
         deviceKeyManager = DeviceKeyManager(this)
+        doctorShareRepository = com.swasthai.app.data.repository.DoctorShareRepository(
+            accountFamilyRepository = accountFamilyRepository,
+            personProfileRepository = personProfileRepository,
+            measurementDao = database.measurementDao(),
+            medicationReminderDao = database.medicationReminderDao(),
+            documentDao = database.documentDao()
+        )
 
         // 3. RAG Pipeline
         ragPipeline = RAGPipeline(
@@ -144,6 +154,7 @@ class SwasthApplication : Application() {
                     isOwner = true
                 )
             )
+            personProfileRepository.reconcileActiveProfile()
             database.conversationDao().interruptUnfinishedTurns(System.currentTimeMillis(), processStartedAt)
             try {
                 documentRepository.encryptExistingPlaintextReports()

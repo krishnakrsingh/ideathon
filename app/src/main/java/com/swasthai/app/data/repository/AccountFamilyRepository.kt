@@ -4,6 +4,8 @@ import android.content.Context
 import com.swasthai.app.security.SecureAuthSessionStore
 import com.swasthai.app.security.StoredAuthSession
 import com.swasthai.app.security.DevicePublicKeyMaterial
+import com.swasthai.app.security.DeviceKeyManager
+import com.swasthai.app.security.ProfileKeyManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
@@ -34,6 +36,21 @@ data class FamilyAccount(
     val blockedMembers: List<FamilyBlockedAccount> = emptyList()
 )
 data class FamilyCredentials(val familyId: String, val joinPassword: String)
+data class PendingFamilyInvite(
+    val inviteId: String,
+    val profileId: String,
+    val inviterUserId: String,
+    val role: String,
+    val expiresAt: Long,
+    val createdAt: Long
+)
+data class AcceptedKeyGrant(
+    val inviteId: String,
+    val profileId: String,
+    val role: String,
+    val encryptedKeyGrantBase64: String,
+    val acceptedAt: Long
+)
 
 /** Better Auth account sessions plus the authenticated family-group API. */
 class AccountFamilyRepository(context: Context) {
@@ -190,6 +207,206 @@ class AccountFamilyRepository(context: Context) {
     suspend fun leaveFamily(familyId: String): Unit = withContext(Dispatchers.IO) {
         apiRequest("DELETE", "/api/v1/families/${pathSegment(familyId)}/membership")
         Unit
+    }
+
+    suspend fun createFamilyInvite(
+        profileId: String,
+        inviteeUserId: String,
+        encryptedKeyGrantBase64: String,
+        role: String = "caregiver",
+        expiresInHours: Int = 72
+    ): String = withContext(Dispatchers.IO) {
+        val body = JSONObject()
+            .put("invitee_user_id", inviteeUserId)
+            .put("role", role)
+            .put("encrypted_key_grant", encryptedKeyGrantBase64)
+            .put("expires_in_hours", expiresInHours)
+        val response = apiRequest("POST", "/api/v1/profiles/${pathSegment(profileId)}/family-invites", body)
+        response.json.getString("invite_id")
+    }
+
+    suspend fun listPendingInvites(): List<PendingFamilyInvite> = withContext(Dispatchers.IO) {
+        val rows = apiRequest("GET", "/api/v1/family-invites").jsonArray()
+        rows.map { row ->
+            PendingFamilyInvite(
+                inviteId = row.getString("invite_id"),
+                profileId = row.getString("profile_id"),
+                inviterUserId = row.getString("inviter_user_id"),
+                role = row.getString("role"),
+                expiresAt = row.getLong("expires_at"),
+                createdAt = row.getLong("created_at")
+            )
+        }
+    }
+
+    suspend fun acceptFamilyInvite(inviteId: String): AcceptedKeyGrant = withContext(Dispatchers.IO) {
+        val row = apiRequest("POST", "/api/v1/family-invites/${pathSegment(inviteId)}/accept").json
+        AcceptedKeyGrant(
+            inviteId = row.getString("invite_id"),
+            profileId = row.getString("profile_id"),
+            role = row.getString("role"),
+            encryptedKeyGrantBase64 = row.getString("encrypted_key_grant"),
+            acceptedAt = row.getLong("accepted_at")
+        )
+    }
+
+    suspend fun rejectFamilyInvite(inviteId: String): Unit = withContext(Dispatchers.IO) {
+        apiRequest("POST", "/api/v1/family-invites/${pathSegment(inviteId)}/reject")
+        Unit
+    }
+
+    suspend fun grantProfileAccessToFamilyHead(
+        familyId: String,
+        profileId: String,
+        profileKeyBytes: ByteArray,
+        deviceKeyManager: DeviceKeyManager
+    ): Boolean = withContext(Dispatchers.IO) {
+        val family = getFamily(familyId)
+        val headUserId = family.headUserId
+        val currentUserId = currentSession?.userId ?: return@withContext false
+        if (headUserId == currentUserId) return@withContext false
+
+        val keys = listFamilyDevicePublicKeys(familyId)
+        val headKey = keys.firstOrNull { it.userId == headUserId } ?: return@withContext false
+
+        val wrappedGrant = deviceKeyManager.wrapProfileKey(headKey.publicKeyBase64, profileKeyBytes)
+        createFamilyInvite(profileId, headUserId, wrappedGrant, role = "caregiver")
+        true
+    }
+
+    suspend fun syncPendingKeyGrants(
+        deviceKeyManager: DeviceKeyManager,
+        profileKeyManager: ProfileKeyManager
+    ): Int = withContext(Dispatchers.IO) {
+        val session = currentSession ?: return@withContext 0
+        val pending = listPendingInvites()
+        var importedCount = 0
+        for (invite in pending) {
+            try {
+                val accepted = acceptFamilyInvite(invite.inviteId)
+                val rawKey = deviceKeyManager.unwrapProfileKey(session.userId, accepted.encryptedKeyGrantBase64)
+                profileKeyManager.importProfileKey(accepted.profileId, rawKey)
+                importedCount++
+            } catch (err: Exception) {
+                android.util.Log.e("AccountFamilyRepo", "Failed to sync key grant for invite ${invite.inviteId}", err)
+            }
+        }
+        importedCount
+    }
+
+    suspend fun createDoctorShare(profileId: String, encryptedSummaryBase64: String, expiresInMinutes: Int = 15): JSONObject = withContext(Dispatchers.IO) {
+        val body = JSONObject()
+            .put("encrypted_summary", encryptedSummaryBase64)
+            .put("expires_in_minutes", expiresInMinutes)
+        apiRequest("POST", "/api/v1/profiles/${pathSegment(profileId)}/doctor-shares", body).json
+    }
+
+    suspend fun revokeDoctorShare(shareId: String): Unit = withContext(Dispatchers.IO) {
+        apiRequest("DELETE", "/api/v1/doctor-shares/${pathSegment(shareId)}")
+        Unit
+    }
+
+    suspend fun redeemDoctorShare(token: String): ByteArray = withContext(Dispatchers.IO) {
+        val connection = URL(normalizedApiUrl() + "/public/v1/doctor-shares/redeem").openConnection() as HttpURLConnection
+        connection.requestMethod = "POST"
+        connection.connectTimeout = 15_000
+        connection.readTimeout = 20_000
+        connection.doOutput = true
+        connection.setRequestProperty("Content-Type", "application/json")
+        connection.setRequestProperty("Accept", "application/octet-stream")
+        val body = JSONObject().put("token", token).toString()
+        connection.outputStream.use { it.write(body.toByteArray(Charsets.UTF_8)) }
+        try {
+            val code = connection.responseCode
+            if (code !in 200..299) {
+                val err = connection.errorStream?.bufferedReader(Charsets.UTF_8)?.readText().orEmpty()
+                throw IllegalStateException("Redemption failed ($code): $err")
+            }
+            connection.inputStream.use { it.readBytes() }
+        } finally {
+            connection.disconnect()
+        }
+    }
+
+    suspend fun createCloudRecord(
+        profileId: String,
+        encryptedMetadataBase64: String,
+        ciphertextSha256: String,
+        ciphertextSize: Long,
+        cryptoVersion: Int = 1
+    ): String = withContext(Dispatchers.IO) {
+        val body = JSONObject()
+            .put("encrypted_metadata", encryptedMetadataBase64)
+            .put("ciphertext_sha256", ciphertextSha256)
+            .put("ciphertext_size", ciphertextSize)
+            .put("crypto_version", cryptoVersion)
+        apiRequest("POST", "/api/v1/profiles/${pathSegment(profileId)}/records", body).json.getString("record_id")
+    }
+
+    suspend fun uploadRecordCiphertext(
+        recordId: String,
+        file: java.io.File,
+        sha256Hex: String
+    ): Boolean = withContext(Dispatchers.IO) {
+        val session = sessionStore.read() ?: throw IllegalStateException("Sign in to sync records")
+        val tokenResponse = request(normalizedAuthUrl(), "/api/auth/token", "GET", cookieHeader = session.cookieHeader)
+        val token = tokenResponse.json.optString("token")
+        val connection = URL(normalizedApiUrl() + "/api/v1/records/${pathSegment(recordId)}/ciphertext").openConnection() as HttpURLConnection
+        connection.requestMethod = "PUT"
+        connection.connectTimeout = 30_000
+        connection.readTimeout = 60_000
+        connection.doOutput = true
+        connection.setRequestProperty("Authorization", "Bearer $token")
+        connection.setRequestProperty("Content-Type", "application/octet-stream")
+        connection.setRequestProperty("X-Ciphertext-SHA256", sha256Hex)
+        connection.setFixedLengthStreamingMode(file.length())
+        file.inputStream().use { input ->
+            connection.outputStream.use { output ->
+                input.copyTo(output)
+            }
+        }
+        try {
+            val code = connection.responseCode
+            if (code !in 200..299) {
+                val err = connection.errorStream?.bufferedReader(Charsets.UTF_8)?.readText().orEmpty()
+                throw IllegalStateException("Upload failed ($code): $err")
+            }
+            true
+        } finally {
+            connection.disconnect()
+        }
+    }
+
+    suspend fun listCloudRecords(profileId: String): List<JSONObject> = withContext(Dispatchers.IO) {
+        apiRequest("GET", "/api/v1/profiles/${pathSegment(profileId)}/records").jsonArray()
+    }
+
+    suspend fun downloadRecordCiphertext(recordId: String, destinationFile: java.io.File): Boolean = withContext(Dispatchers.IO) {
+        val session = sessionStore.read() ?: throw IllegalStateException("Sign in to sync records")
+        val tokenResponse = request(normalizedAuthUrl(), "/api/auth/token", "GET", cookieHeader = session.cookieHeader)
+        val token = tokenResponse.json.optString("token")
+        val connection = URL(normalizedApiUrl() + "/api/v1/records/${pathSegment(recordId)}/ciphertext").openConnection() as HttpURLConnection
+        connection.requestMethod = "GET"
+        connection.connectTimeout = 30_000
+        connection.readTimeout = 60_000
+        connection.setRequestProperty("Authorization", "Bearer $token")
+        connection.setRequestProperty("Accept", "application/octet-stream")
+        try {
+            val code = connection.responseCode
+            if (code !in 200..299) {
+                val err = connection.errorStream?.bufferedReader(Charsets.UTF_8)?.readText().orEmpty()
+                throw IllegalStateException("Download failed ($code): $err")
+            }
+            destinationFile.parentFile?.mkdirs()
+            connection.inputStream.use { input ->
+                destinationFile.outputStream().use { output ->
+                    input.copyTo(output)
+                }
+            }
+            true
+        } finally {
+            connection.disconnect()
+        }
     }
 
     private suspend fun apiRequest(method: String, path: String, body: JSONObject? = null): HttpResponse {

@@ -22,7 +22,11 @@ data class StructuredMeasurement(
     val referenceRangeSource: String? = null,
     val extractionMethod: String = "legacy-v1",
     val schemaVersion: Int = 1
-)
+) {
+    val isOutOfRange: Boolean
+        get() = (referenceLow != null && numericValue < referenceLow) ||
+                (referenceHigh != null && numericValue > referenceHigh)
+}
 
 sealed class HealthTimelineItem {
     abstract val timestamp: Long

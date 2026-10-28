@@ -17,14 +17,15 @@ class MedicationReminderRepository(
     fun observeActiveProfileReminders(): Flow<List<MedicationReminderEntity>> =
         personProfileRepository.activeProfileId.flatMapLatest(reminderDao::observeForProfile)
 
-    suspend fun createReminder(name: String, instructions: String, hour: Int, minute: Int) {
+    suspend fun createReminder(name: String, instructions: String, hour: Int, minute: Int, targetProfileId: String? = null) {
         val cleanedName = name.trim()
         require(cleanedName.isNotEmpty()) { "Enter a medicine name" }
         require(cleanedName.length <= 100) { "Medicine name is too long" }
         require(instructions.length <= 160) { "Reminder instructions must be under 160 characters" }
         require(hour in 0..23 && minute in 0..59) { "Choose a valid reminder time" }
+        val profileId = targetProfileId ?: personProfileRepository.activeProfileId.value
         val reminder = MedicationReminderEntity(
-            profileId = personProfileRepository.activeProfileId.value,
+            profileId = profileId,
             medicationName = cleanedName,
             instructions = instructions.trim(),
             hour = hour,

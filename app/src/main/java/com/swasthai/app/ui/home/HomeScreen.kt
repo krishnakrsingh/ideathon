@@ -7,7 +7,9 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,12 +22,15 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.DeleteOutline
@@ -117,46 +122,23 @@ fun HomeScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding),
-            contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 20.dp, vertical = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(18.dp)
+            contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 18.dp, vertical = 14.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
             item {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text("YOUR HEALTH RECORDS", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
-                        Text("Home", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
+                    Column(Modifier.weight(1f)) {
+                        Text(homeGreeting(), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(activeProfile?.displayName?.let { "Hi, $it" } ?: "Your health", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
                     }
-                    IconButton(onClick = onNavigateToSettings) {
-                        Icon(Icons.Default.Settings, contentDescription = "Settings")
-                    }
-                }
-            }
-
-            item {
-                Card(shape = RoundedCornerShape(18.dp)) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(14.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
-                        DiceBearAvatar(activeProfile?.avatarSeed ?: "avatar-01", 48.dp)
-                        Column(Modifier.weight(1f)) {
-                            Text("HEALTH PROFILE", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
-                            Text(activeProfile?.displayName ?: "Me", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-                            if (activeProfile?.relationship != null) {
-                                Text(activeProfile.relationship, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            }
-                            activeProfile?.let(::profileAgeLabel)?.let { age ->
-                                Text(age, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            }
-                        }
-                        androidx.compose.material3.TextButton(onClick = { profileMenuExpanded = true }) {
-                            Text("Switch")
-                        }
-                        DropdownMenu(
-                            expanded = profileMenuExpanded,
-                            onDismissRequest = { profileMenuExpanded = false }
-                        ) {
+                    Box {
+                        androidx.compose.material3.Surface(
+                            onClick = { profileMenuExpanded = true },
+                            shape = CircleShape,
+                            color = MaterialTheme.colorScheme.surface,
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+                        ) { DiceBearAvatar(activeProfile?.avatarSeed ?: "avatar-01", 44.dp, Modifier.padding(2.dp)) }
+                        DropdownMenu(expanded = profileMenuExpanded, onDismissRequest = { profileMenuExpanded = false }) {
                             uiState.profiles.forEach { profile ->
                                 DropdownMenuItem(
                                     text = {
@@ -165,52 +147,76 @@ fun HomeScreen(
                                             Text("${profile.displayName} · ${profile.relationship}")
                                         }
                                     },
-                                    onClick = {
-                                        profileMenuExpanded = false
-                                        viewModel.selectProfile(profile.id)
-                                    }
+                                    onClick = { profileMenuExpanded = false; viewModel.selectProfile(profile.id) }
                                 )
                             }
-                        }
-                        Button(onClick = { addProfileDialog = true }) {
-                            Text("Add local profile")
+                            DropdownMenuItem(text = { Text("Add family profile") }, onClick = { profileMenuExpanded = false; addProfileDialog = true })
                         }
                     }
+                    IconButton(onClick = onNavigateToSettings) { Icon(Icons.Default.Settings, contentDescription = "Settings") }
                 }
                 if (uiState.profileError != null) {
-                    Text(
-                        uiState.profileError.orEmpty(),
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.padding(start = 8.dp, top = 4.dp)
-                    )
+                    Text(uiState.profileError.orEmpty(), color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
                 }
             }
 
             item {
-                Card(
-                    shape = RoundedCornerShape(24.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
-                ) {
-                    Column(Modifier.fillMaxWidth().padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
-                            Text("Ask about your records", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(28.dp))
+                            .background(Brush.linearGradient(listOf(Color(0xFF103F3A), Color(0xFF176D61), Color(0xFF208C78))))
+                            .clickable { viewModel.createNewChat { onNavigateToChat(it) } }
+                            .padding(20.dp)
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+                            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                                    Box(Modifier.size(7.dp).clip(CircleShape).background(Color(0xFF9AF0C7)))
+                                    Text(modelStatusLabel(uiState.aiModelStatus), style = MaterialTheme.typography.labelMedium, color = Color(0xFFD4F5E7))
+                                }
+                                Text("Your health,\nin one place", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold, color = Color.White, lineHeight = 30.sp)
+                                Text("Reports, measurements and care reminders", style = MaterialTheme.typography.bodySmall, color = Color(0xFFD4EDE6))
+                                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                    androidx.compose.material3.Surface(shape = RoundedCornerShape(50), color = Color.White, onClick = { viewModel.createNewChat { onNavigateToChat(it) } }) {
+                                        Text("Ask Gemma  →", Modifier.padding(horizontal = 14.dp, vertical = 9.dp), color = Color(0xFF124D43), fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.labelLarge)
+                                    }
+                                    androidx.compose.material3.Surface(shape = RoundedCornerShape(50), color = Color(0x33FFFFFF), onClick = onNavigateToVault) {
+                                        Text("Add report", Modifier.padding(horizontal = 14.dp, vertical = 9.dp), color = Color.White, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.labelLarge)
+                                    }
+                                }
+                            }
+                            androidx.compose.material3.Surface(shape = CircleShape, color = Color(0x33FFFFFF), modifier = Modifier.size(66.dp)) {
+                                Icon(Icons.Default.Favorite, contentDescription = null, tint = Color(0xFFFF93A9), modifier = Modifier.padding(19.dp))
+                            }
                         }
-                        Text(
-                            "Choose what to discuss in AI chat. Answers can cite the reports you have added.",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
-                        Button(
-                            onClick = { viewModel.createNewChat { onNavigateToChat(it) } },
-                            modifier = Modifier.fillMaxWidth()
+                    }
+                    SectionHeading(title = "Latest from your reports", action = "Timeline", onAction = onNavigateToHistory)
+                    if (uiState.latestMeasurements.isEmpty()) {
+                        androidx.compose.material3.Surface(
+                            shape = RoundedCornerShape(20.dp),
+                            color = MaterialTheme.colorScheme.surface,
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+                            modifier = Modifier.fillMaxWidth().clickable(onClick = onNavigateToVault)
                         ) {
-                            Text("Start a consultation")
+                            Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                                Icon(Icons.Default.Favorite, contentDescription = null, tint = Color(0xFFD95772), modifier = Modifier.size(23.dp))
+                                Column(Modifier.weight(1f)) {
+                                    Text("Your health metrics will appear here", fontWeight = FontWeight.SemiBold)
+                                    Text("Add a report to see values from your records.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                }
+                                androidx.compose.material3.TextButton(onClick = onNavigateToVault) { Text("Add") }
+                            }
                         }
-                        OutlinedButton(onClick = onNavigateToVault, modifier = Modifier.fillMaxWidth()) {
-                            Icon(Icons.Default.Add, contentDescription = null)
-                            Text(" Add a medical record")
+                    } else {
+                        uiState.latestMeasurements.take(4).chunked(2).forEach { row ->
+                            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                                row.forEach { measurement ->
+                                    MetricTile(measurement = measurement, dateFormat = dateFormat, modifier = Modifier.weight(1f))
+                                }
+                                if (row.size == 1) Spacer(Modifier.weight(1f))
+                            }
                         }
                     }
                 }
@@ -627,6 +633,47 @@ private fun profileAgeLabel(profile: PersonProfileEntity): String? {
     val birthDate = Instant.ofEpochMilli(dob).atZone(ZoneOffset.UTC).toLocalDate()
     val age = Period.between(birthDate, LocalDate.now(ZoneOffset.UTC)).years
     return if (age >= 0) "$age years" else null
+}
+
+@Composable
+private fun MetricTile(
+    measurement: StructuredMeasurement,
+    dateFormat: SimpleDateFormat,
+    modifier: Modifier = Modifier
+) {
+    androidx.compose.material3.Surface(
+        modifier = modifier,
+        shape = RoundedCornerShape(20.dp),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+    ) {
+        Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(7.dp)) {
+                Icon(Icons.Default.Favorite, contentDescription = null, tint = Color(0xFFD95772), modifier = Modifier.size(16.dp))
+                Text(measurement.biomarkerName, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            }
+            val prefix = when (measurement.valueComparator) {
+                "<" -> "< "
+                "<=" -> "≤ "
+                ">" -> "> "
+                ">=" -> "≥ "
+                else -> ""
+            }
+            Text("$prefix${measurement.numericValue}", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold, maxLines = 1)
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(measurement.unit.ifBlank { "Value" }, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text("·", color = MaterialTheme.colorScheme.outline)
+                Text(dateFormat.format(Date(measurement.testDate)), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1)
+            }
+            Text("From report · verify source", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
+        }
+    }
+}
+
+private fun homeGreeting(): String = when (LocalTime.now().hour) {
+    in 5..11 -> "GOOD MORNING"
+    in 12..16 -> "GOOD AFTERNOON"
+    else -> "GOOD EVENING"
 }
 
 private fun indexingLabel(status: IndexingStatus): String = when (status) {
